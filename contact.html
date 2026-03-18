@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | Canal de Transmission</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14;
+            --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --text-muted: #566056;
+            --border: 1px solid #222;
+        }
+
+        /* Reset & Base */
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-main);
+            overflow: hidden; 
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
+        .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
+
+        /* --- CONTENT WRAPPER --- */
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; text-decoration: none; }
+
+        /* --- CONTENU CONTACT --- */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 60px 40px; }
+        .contact-container { max-width: 700px; margin: 0 auto; }
+
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: #fff; margin-bottom: 10px; }
+        h1 span { color: var(--neon-green); }
+        
+        .status-line { font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--neon-green); margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .blink { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* --- FORMULAIRE --- */
+        .transmission-form { background: var(--card-gray); border: var(--border); padding: 40px; border-radius: 12px; position: relative; }
+        .field-group { margin-bottom: 25px; }
+        .field-group label { display: block; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--text-gray); margin-bottom: 10px; letter-spacing: 1px; }
+        
+        input, textarea, select {
+            width: 100%; background: #000; border: 1px solid #333; padding: 15px; color: #fff;
+            font-family: 'JetBrains Mono'; font-size: 0.9rem; border-radius: 4px; outline: none; transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.1); }
+
+        .btn-send {
+            width: 100%; padding: 18px; background: var(--neon-gradient); color: #000;
+            font-family: 'Orbitron'; font-weight: 700; border: none; border-radius: 4px;
+            cursor: pointer; transition: 0.3s; letter-spacing: 2px;
+        }
+        .btn-send:hover { transform: scale(1.02); box-shadow: 0 0 20px var(--neon-green); }
+
+        .contact-intel { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .intel-box { padding: 20px; border: var(--border); border-radius: 8px; font-size: 0.85rem; }
+        .intel-box h4 { font-family: 'Orbitron'; color: var(--neon-green); margin: 0 0 10px 0; font-size: 0.7rem; }
+        .intel-box p { color: var(--text-gray); margin: 0; line-height: 1.5; }
+
+        footer { padding: 20px 40px; border-top: var(--border); background: var(--bg-sidebar); display: flex; justify-content: space-between; font-size: 0.7rem; color: #444; flex-shrink: 0; }
+        .footer-links { display: flex; gap: 15px; }
+        .footer-links a { color: #444; text-decoration: none; transition: 0.3s; }
+        .footer-links a:hover { color: var(--neon-green); }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label { display: none; }
+            .nav-item { padding: 15px 20px; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent; }
+            .nav-item.active { border-bottom: 2px solid var(--neon-green); }
+            .scroll-area { padding: 30px 20px; }
+            .contact-intel { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">PORTAIL TRIBU</div>
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
+            <a href="comment-ca-marche.html" class="nav-item">COMMENT ÇA MARCHE</a>
+            <a href="cgv.html" class="nav-item">CGV</a>
+            <a href="mentions.html" class="nav-item">MENTIONS LÉGALES</a>
+            
+            <div class="nav-footer">
+                <a href="admin.html" class="nav-item">ADMIN</a>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <header>
+                <a href="index.html" class="logo-header">TRIBAO</a>
+            </header>
+
+            <div class="scroll-area">
+                <div class="contact-container">
+                    <h1>Ouvrir une <span>Transmission</span></h1>
+                    <div class="status-line">
+                        <div class="blink"></div> CANAL SÉCURISÉ ÉTABLI // PRÊT POUR RÉCEPTION
+                    </div>
+
+                    <form class="transmission-form">
+                        <div class="field-group">
+                            <label>IDENTIFIANT / NOM</label>
+                            <input type="text" placeholder="Comment doit-on t'appeler ?">
+                        </div>
+
+                        <div class="field-group">
+                            <label>CANAL DE RÉPONSE (EMAIL)</label>
+                            <input type="email" placeholder="nom@provider.com">
+                        </div>
+
+                        <div class="field-group">
+                            <label>TYPE DE MESSAGE</label>
+                            <select>
+                                <option>Suggérer une Mission (Produit cible)</option>
+                                <option>Problème technique dans l'Arène</option>
+                                <option>Requête Fournisseur</option>
+                                <option>Autre Signalement</option>
+                            </select>
+                        </div>
+
+                        <div class="field-group">
+                            <label>CORPS DE LA TRANSMISSION</label>
+                            <textarea rows="5" placeholder="Sois précis, Guerrier."></textarea>
+                        </div>
+
+                        <button type="button" class="btn-send">ENVOYER LE SIGNAL</button>
+                    </form>
+
+                    <div class="contact-intel">
+                        <div class="intel-box">
+                            <h4>FRÉQUENCE DIRECTE</h4>
+                            <p>contact@tribao.fr<br>Réponse sous 24h à 48h (Heure de Paris).</p>
+                        </div>
+                        <div class="intel-box">
+                            <h4>REJOINDRE LE QG</h4>
+                            <p>Suis la Tribu sur les réseaux pour les alertes de missions en temps réel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+                <span>© 2026 TRIBAO - BRUTALIST ECO</span>
+                
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>

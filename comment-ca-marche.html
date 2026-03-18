@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | Le Protocole</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14;
+            --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --border: 1px solid #222;
+        }
+
+        /* Reset & Base */
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-main);
+            overflow: hidden; 
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
+        .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
+
+        /* --- CONTENT WRAPPER --- */
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; text-decoration: none; }
+
+        /* --- ZONE SCROLLABLE --- */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 60px 40px; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+        .protocol-container { max-width: 900px; margin: 0 auto; }
+
+        /* --- HERO --- */
+        .hero-header { text-align: center; margin-bottom: 60px; }
+        .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--neon-green); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 15px; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.1; margin-bottom: 20px; }
+        h1 span { color: var(--neon-green); }
+
+        /* --- LES ÉTAPES (STEPS) --- */
+        .steps-wrapper { display: flex; flex-direction: column; gap: 20px; margin-bottom: 80px; }
+        .step-card {
+            display: grid; grid-template-columns: 100px 1fr;
+            background: var(--card-gray); border: var(--border); border-radius: 12px;
+            overflow: hidden; transition: 0.3s;
+        }
+        .step-card:hover { border-color: var(--neon-green); transform: translateX(5px); }
+        .step-num {
+            background: #111; display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron'; font-size: 2rem; font-weight: 700; color: var(--neon-green);
+            border-right: var(--border);
+        }
+        .step-content { padding: 30px; }
+        .step-content h3 { font-family: 'Orbitron'; font-size: 1.2rem; color: #fff; margin: 0 0 10px; }
+        .step-content h3 span { color: var(--neon-green); }
+        .step-content p { color: var(--text-gray); line-height: 1.6; margin: 0; }
+
+        /* --- FAQ --- */
+        .faq-title { font-family: 'Orbitron'; font-size: 1.5rem; text-align: center; margin-bottom: 30px; }
+        .faq-list { display: flex; flex-direction: column; gap: 10px; }
+        .faq-item { background: var(--card-gray); border: var(--border); border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .faq-q { padding: 20px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        .faq-a { max-height: 0; overflow: hidden; padding: 0 20px; color: var(--text-gray); font-size: 0.95rem; transition: 0.3s ease-out; }
+        .faq-item.active { border-color: var(--neon-green); }
+        .faq-item.active .faq-q { color: var(--neon-green); }
+        .faq-item.active .faq-a { max-height: 200px; padding-bottom: 20px; }
+
+        footer { padding: 20px 40px; border-top: var(--border); background: var(--bg-sidebar); display: flex; justify-content: space-between; font-size: 0.7rem; color: #444; flex-shrink: 0; }
+        .footer-links { display: flex; gap: 15px; }
+        .footer-links a { color: #444; text-decoration: none; transition: 0.3s; }
+        .footer-links a:hover { color: var(--neon-green); }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label { display: none; }
+            .nav-item { padding: 15px 20px; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent; }
+            .nav-item.active { border-bottom: 2px solid var(--neon-green); }
+            .step-card { grid-template-columns: 1fr; }
+            .step-num { padding: 20px; border-right: none; border-bottom: var(--border); }
+            .scroll-area { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">PORTAIL TRIBU</div>
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
+            
+            <a href="cgv.html" class="nav-item">CGV</a>
+            <a href="mentions.html" class="nav-item">MENTIONS LÉGALES</a>
+            <a href="contact.html" class="nav-item">NOUS CONTACTER</a>
+            <div class="nav-footer">
+                <a href="admin.html" class="nav-item">ADMIN</a>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <header>
+                <a href="index.html" class="logo-header">TRIBAO</a>
+            </header>
+
+            <div class="scroll-area">
+                <div class="protocol-container">
+                    
+                    <header class="hero-header">
+                        <div class="eyebrow">// LE GUIDE DU GUERRIER</div>
+                        <h1>La mécanique <span>TRIBAO</span> expliquée simplement.</h1>
+                        <p style="color:var(--text-gray);">Découvrez comment l'union fait la force pour écraser les prix du marché.</p>
+                    </header>
+
+                    <div class="steps-wrapper">
+                        <article class="step-card">
+                            <div class="step-num">01</div>
+                            <div class="step-content">
+                                <h3>Rejoins une <span>Tribu</span></h3>
+                                <p>Choisis un produit qui t'intéresse dans l'Arène. L'adhésion est gratuite et sans aucun engagement de ta part.</p>
+                            </div>
+                        </article>
+
+                        <article class="step-card">
+                            <div class="step-num">02</div>
+                            <div class="step-content">
+                                <h3>La <span>Mission</span> s'active</h3>
+                                <p>Dès que le seuil de membres (Guerriers) est atteint, TRIBAO lance officiellement la recherche et la mise en concurrence des fournisseurs.</p>
+                            </div>
+                        </article>
+
+                        <article class="step-card">
+                            <div class="step-num">03</div>
+                            <div class="step-content">
+                                <h3>L'<span>Arène</span></h3>
+                                <p>Les fournisseurs s'affrontent en enchères inversées pour remporter le contrat de la Tribu. Le prix descend en direct sous tes yeux.</p>
+                            </div>
+                        </article>
+                    </div>
+
+                    <h2 class="faq-title">FOIRE AUX QUESTIONS</h2>
+                    <div class="faq-list">
+                        <div class="faq-item" onclick="this.classList.toggle('active')">
+                            <div class="faq-q">Est-ce vraiment gratuit ? <span>▼</span></div>
+                            <div class="faq-a">Oui, TRIBAO est totalement gratuit pour les acheteurs. Nous prélevons une commission de mise en relation sur les vendeurs uniquement.</div>
+                        </div>
+                        <div class="faq-item" onclick="this.classList.toggle('active')">
+                            <div class="faq-q">Suis-je obligé d'acheter ? <span>▼</span></div>
+                            <div class="faq-a">Non, tu restes libre de ne pas donner suite à l'offre finale si le prix ou les conditions ne te conviennent pas.</div>
+                        </div>
+                        <div class="faq-item" onclick="this.classList.toggle('active')">
+                            <div class="faq-q">Comment sont choisis les fournisseurs ? <span>▼</span></div>
+                            <div class="faq-a">Chaque fournisseur est audité par nos soins pour garantir la qualité, le SAV et la solidité logistique avant d'entrer dans l'Arène.</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <footer>
+                <span>© 2026 TRIBAO - BRUTALIST ECO</span>
+                
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>

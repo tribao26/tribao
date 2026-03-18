@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | Authentification Multi-Accès</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14; /* Couleur Tribu */
+            --neon-blue: #00d4ff;  /* Couleur Fournisseur */
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --border: 1px solid #222;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-black); color: var(--text-main); overflow: hidden; }
+
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR --- */
+        aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item:hover { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); }
+
+        /* --- CONTENT --- */
+        .content-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 20px; }
+        
+        .auth-card {
+            width: 100%; max-width: 500px;
+            background: var(--card-gray); border: var(--border);
+            border-radius: 12px; padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transition: border-color 0.5s;
+        }
+
+        /* --- SÉLECTEUR DE CAMP --- */
+        .role-selector { display: flex; gap: 10px; margin-bottom: 30px; }
+        .role-btn {
+            flex: 1; padding: 15px; border: 1px solid #333; border-radius: 8px;
+            font-family: 'Orbitron'; font-size: 0.7rem; color: var(--text-gray);
+            cursor: pointer; text-align: center; transition: 0.3s;
+        }
+        .role-btn.active.tribu { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); }
+        .role-btn.active.pro { border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 212, 255, 0.2); }
+
+        .auth-tabs { display: flex; gap: 20px; justify-content: center; margin-bottom: 30px; }
+        .tab { font-family: 'Orbitron'; font-size: 0.75rem; color: var(--text-gray); cursor: pointer; padding-bottom: 5px; }
+        .tab.active { color: #fff; border-bottom: 2px solid #fff; }
+
+        .field-group { text-align: left; margin-bottom: 20px; }
+        .field-group label { display: block; font-family: 'Orbitron'; font-size: 0.6rem; color: var(--text-gray); margin-bottom: 8px; }
+        
+        input {
+            width: 100%; background: #000; border: 1px solid #333; padding: 15px; color: #fff;
+            font-family: 'JetBrains Mono'; font-size: 0.9rem; border-radius: 4px; outline: none; transition: 0.3s;
+        }
+
+        .btn-submit {
+            width: 100%; padding: 18px; border: none; border-radius: 4px;
+            font-family: 'Orbitron'; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        
+        /* Styles Dynamiques JS */
+        .theme-tribu .btn-submit { background: var(--neon-green); color: #000; }
+        .theme-tribu input:focus { border-color: var(--neon-green); }
+        .theme-pro .btn-submit { background: var(--neon-blue); color: #000; }
+        .theme-pro input:focus { border-color: var(--neon-blue); }
+
+        .info-text { margin-top: 20px; font-size: 0.75rem; color: var(--text-gray); text-align: center; line-height: 1.4; }
+
+        @media (max-width: 768px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; flex-direction: row; overflow-x: auto; height: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label { display: none; }
+        }
+    </style>
+</head>
+<body class="theme-tribu">
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">NAVIGATION</div>
+            
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="contact.html" class="nav-item">SUPPORT</a>
+        </aside>
+
+        <div class="content-wrapper">
+            <div class="auth-card" id="authCard">
+                <div class="role-selector">
+                    <div class="role-btn active tribu" onclick="setRole('tribu')">ACCÈS TRIBU</div>
+                    <div class="role-btn pro" onclick="setRole('pro')">ACCÈS FOURNISSEUR</div>
+                </div>
+
+                <div class="auth-tabs">
+                    <div class="tab active" id="loginTab" onclick="setMode('login')">CONNEXION</div>
+                    <div class="tab" id="signupTab" onclick="setMode('signup')">INSCRIPTION</div>
+                </div>
+
+                <form id="mainForm">
+                    <div class="field-group" id="nameGroup" style="display:none;">
+                        <label id="nameLabel">NOM DE GUERRIER</label>
+                        <input type="text" placeholder="..." id="nameInput">
+                    </div>
+                    <div class="field-group">
+                        <label>IDENTIFIANT EMAIL</label>
+                        <input type="email" placeholder="email@tribao.fr">
+                    </div>
+                    <div class="field-group">
+                        <label>CODE D'ACCÈS</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+
+                    <button type="button" class="btn-submit" id="submitBtn" onclick="handleAuth()">DÉVERROUILLER L'ACCÈS</button>
+                </form>
+
+                <p class="info-text" id="footerText">Accès réservé aux membres de la Tribu TRIBAO.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRole = 'tribu';
+        let currentMode = 'login';
+
+        function setRole(role) {
+            currentRole = role;
+            document.body.className = 'theme-' + role;
+            
+            // Mise à jour visuelle des boutons
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.role-btn.' + role).classList.add('active');
+
+            // Mise à jour des textes
+            const nameLabel = document.getElementById('nameLabel');
+            const footerText = document.getElementById('footerText');
+            const authCard = document.getElementById('authCard');
+
+            if(role === 'pro') {
+                nameLabel.innerText = "NOM DE L'ENTREPRISE / SIRET";
+                footerText.innerText = "Espace dédié aux partenaires logistiques et industriels.";
+                authCard.style.borderColor = "var(--neon-blue)";
+            } else {
+                nameLabel.innerText = "NOM DE GUERRIER / PSEUDO";
+                footerText.innerText = "Accès réservé aux membres de la Tribu TRIBAO.";
+                authCard.style.borderColor = "var(--border)";
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('loginTab').classList.toggle('active', mode === 'login');
+            document.getElementById('signupTab').classList.toggle('active', mode === 'signup');
+            document.getElementById('nameGroup').style.display = (mode === 'signup') ? 'block' : 'none';
+        }
+
+        function handleAuth() {
+            // Simulation de redirection selon le rôle choisi
+            if (currentRole === 'tribu') {
+                window.location.href = 'arene.html'; // Dashboard client
+            } else {
+                window.location.href = 'dashboard-fournisseur.html'; // Dashboard pro
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | QG du Guerrier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14;
+            --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --border: 1px solid #222;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-black); color: var(--text-main); overflow: hidden; }
+
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR GUERRIER --- */
+        aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
+        .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
+
+        /* --- CONTENT --- */
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; }
+        .user-rank { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 5px 10px; border-radius: 4px; }
+
+        /* --- SCROLL AREA --- */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
+        .dashboard-grid { max-width: 1100px; margin: 0 auto; }
+
+        /* --- STATS CARDS --- */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: var(--card-gray); border: var(--border); padding: 25px; border-radius: 12px; position: relative; overflow: hidden; }
+        .stat-card::after { content: ""; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--neon-green); }
+        .stat-card span { display: block; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--text-gray); margin-bottom: 10px; }
+        .stat-card h3 { margin: 0; font-family: 'JetBrains Mono'; font-size: 1.8rem; color: #fff; }
+
+        /* --- MISSIONS REJOINTS --- */
+        .section-header { font-family: 'Orbitron'; font-size: 0.9rem; margin-bottom: 25px; letter-spacing: 2px; color: var(--text-gray); display: flex; align-items: center; gap: 15px; }
+        .section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
+
+        .active-mission {
+            background: rgba(20, 20, 20, 0.5); border: var(--border); border-radius: 12px; padding: 25px;
+            display: grid; grid-template-columns: 80px 1fr 200px; align-items: center; gap: 25px; margin-bottom: 15px;
+        }
+        .mission-icon { width: 60px; height: 60px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; }
+        .mission-name h4 { margin: 0 0 5px; font-family: 'Orbitron'; font-size: 1rem; }
+        .mission-name p { margin: 0; font-size: 0.8rem; color: var(--text-gray); }
+        
+        .mission-progress { text-align: right; }
+        .mini-gauge { width: 100%; height: 6px; background: #000; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .mini-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+        @media (max-width: 850px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .active-mission { grid-template-columns: 1fr; text-align: center; }
+            .mission-icon { margin: 0 auto; }
+            .mission-progress { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">UNITÉ : GUERRIER_01</div>
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="#" class="nav-item active">MON QG</a>
+            <a href="#" class="nav-item">MES COMMANDES</a>
+            <a href="#" class="nav-item">PORTEFEUILLE</a>
+            
+            <div class="nav-footer">
+                <a href="index.html" class="nav-item">DÉCONNEXION</a>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <header>
+                <div class="logo-header">TRIBAO</div>
+                <div class="user-rank">RANG : ÉCLAIREUR [NIVEAU 2]</div>
+            </header>
+
+            <div class="scroll-area">
+                <div class="dashboard-grid">
+                    
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <span>ÉCONOMIE TOTALE</span>
+                            <h3>412.00 €</h3>
+                        </div>
+                        <div class="stat-card">
+                            <span>MISSIONS REJOINTES</span>
+                            <h3>03</h3>
+                        </div>
+                        <div class="stat-card">
+                            <span>POINTS D'INFLUENCE</span>
+                            <h3>1 250</h3>
+                        </div>
+                    </div>
+
+                    <h2 class="section-header">MISSIONS ACTIVES</h2>
+
+                    <div class="active-mission">
+                        <div class="mission-icon">
+                            <img src="https://via.placeholder.com/40/111/39FF14?text=3D" alt="">
+                        </div>
+                        <div class="mission-name">
+                            <h4>Imprimante 3D Ender 3 S1</h4>
+                            <p>Cible : 380€ // Status : Négociation finale</p>
+                        </div>
+                        <div class="mission-progress">
+                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem;">83% ATTEINT</span>
+                            <div class="mini-gauge"><div class="mini-fill" style="width: 83%;"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="active-mission">
+                        <div class="mission-icon">
+                            <img src="https://via.placeholder.com/40/111/39FF14?text=BIKE" alt="">
+                        </div>
+                        <div class="mission-name">
+                            <h4>Vélo Électrique Rider Pro X</h4>
+                            <p>Cible : 1 800€ // Status : Ralliement Tribu</p>
+                        </div>
+                        <div class="mission-progress">
+                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem;">67% ATTEINT</span>
+                            <div class="mini-gauge"><div class="mini-fill" style="width: 67%;"></div></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <footer style="padding: 20px 40px; border-top: var(--border); font-size: 0.7rem; color: #444;">
+                © 2026 TRIBAO - SYSTÈME DE GESTION TACTIQUE
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>

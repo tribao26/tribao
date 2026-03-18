@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | Mentions Légales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14;
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --text-muted: #566056;
+            --border: 1px solid #222;
+        }
+
+        /* Reset & Base */
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-main);
+            overflow: hidden; 
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
+        .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
+
+        /* --- CONTENT WRAPPER --- */
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; text-decoration: none; }
+
+        /* --- CONTENU --- */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 60px 40px; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+        .legal-container { max-width: 850px; margin: 0 auto; }
+
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: #fff; margin-bottom: 10px; }
+        h1 span { color: var(--neon-green); }
+        .update-tag { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); margin-bottom: 40px; display: block; }
+
+        section { margin-bottom: 50px; }
+        section h2 { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 1.2rem; 
+            color: var(--neon-green); 
+            margin-bottom: 20px; 
+            border-left: 3px solid var(--neon-green);
+            padding-left: 15px;
+        }
+        
+        .info-card {
+            background: var(--card-gray);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-row:last-child { border-bottom: none; }
+        .info-key { color: var(--text-muted); width: 220px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; font-family: 'Orbitron'; letter-spacing: 1px; }
+        .info-val { color: var(--text-main); font-size: 0.95rem; font-family: 'JetBrains Mono', monospace; }
+
+        p { color: var(--text-gray); font-size: 1rem; line-height: 1.8; margin-bottom: 15px; }
+
+        footer { padding: 20px 40px; border-top: var(--border); background: var(--bg-sidebar); display: flex; justify-content: space-between; font-size: 0.7rem; color: #444; flex-shrink: 0; }
+        .footer-links { display: flex; gap: 15px; }
+        .footer-links a { color: #444; text-decoration: none; transition: 0.3s; }
+        .footer-links a:hover { color: var(--neon-green); }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label { display: none; }
+            .nav-item { padding: 15px 20px; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent; }
+            .nav-item.active { border-bottom: 2px solid var(--neon-green); }
+            .scroll-area { padding: 30px 20px; }
+            .info-row { flex-direction: column; gap: 8px; }
+            .info-key { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">PORTAIL TRIBU</div>
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
+            <a href="comment-ca-marche.html" class="nav-item">COMMENT ÇA MARCHE</a>
+            <a href="cgv.html" class="nav-item">CGV</a>
+            
+            <a href="contact.html" class="nav-item">NOUS CONTACTER</a>
+            <div class="nav-footer">
+                <a href="#" class="nav-item">ADMIN</a>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <header>
+                <a href="index.html" class="logo-header">TRIBAO</a>
+            </header>
+
+            <div class="scroll-area">
+                <div class="legal-container">
+                    <h1>Mentions <span>Légales</span></h1>
+                    <span class="update-tag">// DERNIÈRE MISE À JOUR : MARS 2026</span>
+
+                    <section>
+                        <h2>Éditeur du Site</h2>
+                        <div class="info-card">
+                            <div class="info-row">
+                                <span class="info-key">Dénomination</span>
+                                <span class="info-val">TRIBAO</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-key">Forme Juridique</span>
+                                <span class="info-val">[À COMPLÉTER : ex. SAS au capital de 1000€]</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-key">Siège Social</span>
+                                <span class="info-val">[ADRESSE COMPLÈTE]</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-key">Contact</span>
+                                <span class="info-val">contact@tribao.fr</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Hébergement & Infrastructure</h2>
+                        <div class="info-card">
+                            <div class="info-row">
+                                <span class="info-key">Déploiement</span>
+                                <span class="info-val">Vercel Inc.</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-key">Moteur de données</span>
+                                <span class="info-val">Supabase (Région Europe)</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2>Propriété Intellectuelle</h2>
+                        <p>
+                            L'ensemble des éléments édités sur ce site, incluant notamment les textes, photographies, infographies, logos et l'identité visuelle <strong>"Brutalist Eco"</strong>, constitue des œuvres protégées par le code de la Propriété Intellectuelle. 
+                        </p>
+                        <p>
+                            Toute reproduction, représentation ou diffusion, en tout ou partie, du contenu de ce site sur quelque support ou par tout procédé que ce soit est interdite sans l'accord écrit préalable de TRIBAO.
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>Protection des Données (RGPD)</h2>
+                        <p>
+                            TRIBAO s'engage à ce que la collecte et le traitement de vos données soient conformes au règlement général sur la protection des données (RGPD). Chaque membre de la Tribu dispose d'un droit d'accès, de rectification et d'opposition aux données personnelles le concernant en s'adressant au support technique.
+                        </p>
+                    </section>
+                </div>
+            </div>
+
+            <footer>
+                <span>© 2026 TRIBAO - BRUTALIST ECO</span>
+                
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>

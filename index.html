@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRIBAO | La Vitrine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-anthracite: #121212; 
+            --neon-green: #39FF14;
+            --neon-gradient: linear-gradient(135.21deg, rgba(57, 255, 20, 0.9) 0%, rgba(57, 255, 20, 0.4) 100%);
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-anthracite);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- TEXTURE BÉTON --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('texture-beton.webp'); 
+            background-size: cover;
+            background-position: center;
+            opacity: 0.25; 
+            z-index: -1;
+        }
+
+        /* --- SECTION PRINCIPALE --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(3rem, 10vw, 5rem);
+            letter-spacing: 12px;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 700;
+            max-width: 900px;
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+
+        .cta-button {
+            padding: 20px 50px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: #000;
+            background: var(--neon-gradient);
+            backdrop-filter: blur(5px);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(57, 255, 20, 0.2);
+            border: 1px solid rgba(57, 255, 20, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(57, 255, 20, 0.5);
+            border-color: var(--neon-green);
+        }
+
+        /* --- FOOTER & CARDS --- */
+        footer {
+            background-color: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #222;
+            padding: 60px 20px 30px;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .how-card {
+            background: rgba(20, 20, 20, 0.5);
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .how-card:hover {
+            border-color: var(--neon-green);
+        }
+
+        .how-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-green);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .how-card p {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #222;
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .legal-links {
+            display: flex;
+            gap: 25px;
+        }
+
+        .legal-links a {
+            color: #444;
+            text-decoration: none;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .legal-links a:hover {
+            color: var(--neon-green);
+        }
+
+        .copyright {
+            font-size: 0.75rem;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .footer-bottom { justify-content: center; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <div class="logo">TRIBAO</div>
+        <h1>L'UNION FAIT LA FORCE. <br>LE NOMBRE FAIT LE PRIX.</h1>
+        <a href="arene.html" class="cta-button">ENTRER DANS L'ARÈNE</a>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="how-grid">
+                <div class="how-card">
+                    <h3>// 01. CHOISIR</h3>
+                    <p>Sélectionnez une mission active dans l'Arène. Chaque produit a un objectif de tribu à atteindre.</p>
+                </div>
+                <div class="how-card">
+                    <h3>// 02. RALLIER</h3>
+                    <p>Partagez la mission. Plus la jauge se remplit, plus vous approchez du prix de gros direct usine.</p>
+                </div>
+                <div class="how-card">
+                    <h3>// 03. VALIDER</h3>
+                    <p>Objectif atteint ? Le contrat est scellé. Vous recevez votre part du butin au meilleur prix possible.</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="legal-links">
+                    <a href="cgv.html">CGV</a>
+                    <a href="mentions.html">Légal</a>
+		    <a href="comment-ca-marche.html">Comment ça Marche ?</a>
+                    <a href="fournisseurs.html">Pro</a>
+                </div>
+                <div class="copyright">© 2026 TRIBAO - BRUTALIST ECO</div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

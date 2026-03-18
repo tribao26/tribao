@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | Conditions Générales</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14;
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --text-muted: #566056;
+            --border: 1px solid #222;
+        }
+
+        /* Reset & Base */
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-main);
+            overflow: hidden; 
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
+        .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
+
+        /* --- CONTENT --- */
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; }
+
+        .scroll-area { flex: 1; overflow-y: auto; padding: 60px 40px; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+        .legal-container { max-width: 850px; margin: 0 auto; }
+
+        /* --- TYPOGRAPHIE LÉGALE --- */
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: #fff; margin-bottom: 10px; }
+        h1 span { color: var(--neon-green); }
+        .last-update { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-muted); margin-bottom: 40px; display: block; }
+
+        .essentiel-box { 
+            background: rgba(57, 255, 20, 0.03); 
+            border-left: 3px solid var(--neon-green); 
+            padding: 25px; 
+            border-radius: 0 12px 12px 0; 
+            margin-bottom: 50px; 
+        }
+        .essentiel-box p { margin: 0; font-size: 1rem; color: var(--text-main); line-height: 1.6; }
+        .essentiel-box strong { color: var(--neon-green); font-family: 'Orbitron'; font-size: 0.8rem; }
+
+        section { margin-bottom: 50px; }
+        section h2 { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 1.2rem; 
+            color: #fff; 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
+        section h2::before { content: ""; width: 25px; height: 2px; background: var(--neon-green); }
+        
+        section p { color: var(--text-gray); font-size: 1rem; line-height: 1.8; margin-bottom: 15px; }
+        section strong { color: var(--neon-green); font-family: 'JetBrains Mono'; }
+
+        footer { padding: 20px 40px; border-top: var(--border); background: var(--bg-sidebar); display: flex; justify-content: space-between; font-size: 0.7rem; color: #444; flex-shrink: 0; }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label { display: none; }
+            .nav-item { padding: 15px 20px; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent; }
+            .nav-item.active { border-bottom: 2px solid var(--neon-green); }
+            .scroll-area { padding: 30px 20px; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">PORTAIL TRIBU</div>
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
+            <a href="comment-ca-marche.html" class="nav-item">COMMENT ÇA MARCHE</a>
+            
+            <a href="mentions.html" class="nav-item">MENTIONS LÉGALES</a>
+            <a href="contact.html" class="nav-item">NOUS CONTACTER</a>
+            <div class="nav-footer">
+                <a href="admin.html" class="nav-item">ADMIN</a>
+            </div>
+        </aside>
+
+        <div class="content-wrapper">
+            <header>
+                <div class="logo-header">TRIBAO</div>
+            </header>
+
+            <div class="scroll-area">
+                <div class="legal-container">
+                    <h1>Conditions <span>Générales</span></h1>
+                    <span class="last-update">// DERNIÈRE MISE À JOUR : 17 MARS 2026</span>
+
+                    <div class="essentiel-box">
+                        <p><strong>ESSENTIEL :</strong> TRIBAO est une plateforme gratuite pour les acheteurs. Nous nous rémunérons via une commission payée par les fournisseurs sur les ventes réalisées. Vos données sont protégées et ne sont jamais revendues.</p>
+                    </div>
+
+                    <section>
+                        <h2>01. Présentation de TRIBAO</h2>
+                        <p>TRIBAO est une plateforme de mise en relation permettant la création de groupes d'achat appelés "Tribus". Notre mission est de réduire les coûts de consommation par la force du collectif et la suppression des intermédiaires inutiles.</p>
+                    </section>
+
+                    <section>
+                        <h2>02. Définitions du Protocole</h2>
+                        <p><strong>GUERRIER :</strong> Tout utilisateur inscrit sur la plateforme souhaitant rejoindre une mission active pour bénéficier du prix de groupe.</p>
+                        <p><strong>TRIBU :</strong> Groupe de Guerriers unis autour d'un objectif d'achat commun pour un produit spécifique.</p>
+                        <p><strong>ARÈNE :</strong> Espace de négociation et de sélection où les fournisseurs certifiés proposent leurs meilleures offres à la Tribu.</p>
+                    </section>
+
+                    <section>
+                        <h2>03. Fonctionnement des Missions</h2>
+                        <p>Une mission est lancée lorsqu'un produit stratégique est sélectionné. Une fois le seuil de Guerriers atteint, l'Arène s'ouvre. TRIBAO négocie alors les tarifs de gros pour les redistribuer directement aux membres de la Tribu. Si l'objectif de ralliement n'est pas atteint, la mission est annulée sans frais.</p>
+                    </section>
+
+                    <section>
+                        <h2>04. Données Personnelles</h2>
+                        <p>TRIBAO s'engage à respecter la vie privée de sa Tribu. Les informations collectées lors de l'inscription à la waitlist ou à une mission sont uniquement utilisées pour le bon fonctionnement du service et la logistique des commandes. Conformément au RGPD, vous disposez d'un droit d'accès et de suppression de vos données.</p>
+                    </section>
+
+		    <section>
+			<h2>05. Responsabilités</h2>
+                        <p>TRIBAO agit en tant que tiers de confiance entre la Tribu et les fournisseurs sélectionnés. Les garanties produits sont assurées directement par les fabricants.</p>
+               	    </section>
+
+		 </div>
+            </div>
+
+            <footer>
+                <span>© 2026 TRIBAO - BRUTALIST ECO</span>
+                
+            </footer>
+        </div>
+    </div>
+
+</body>
+</html>
