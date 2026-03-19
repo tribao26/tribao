@@ -294,7 +294,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c'; // Ta clé publique
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -311,17 +311,21 @@
 
             const listContainer = document.getElementById('missions-list');
             
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 listContainer.innerHTML = "<p>Aucune mission active pour le moment. Lancez une demande !</p>";
                 return;
             }
 
             listContainer.innerHTML = data.map(m => {
-                const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membre) * 100));
+                // Correction ici : objectif_membres avec un S
+                const obj = m.objectif_membres || 1;
+                const act = m.membres_actuels || 0;
+                const progress = Math.min(100, Math.round((act / obj) * 100));
+                
                 return `
                     <div class="mission-card">
                         <div class="mission-img-box">
-                            <img src="${m.image_url || 'https://via.placeholder.com/140/111/39FF14?text=TRIBAO'}" alt="${m.titre}">
+                            <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="${m.titre}">
                         </div>
                         <div class="mission-info">
                             <h3>${m.titre}</h3>
@@ -329,7 +333,7 @@
                             <div class="gauge-wrapper">
                                 <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
                                 <div class="gauge-data">
-                                    <span>${m.membres_actuels} sur ${m.objectif_membre} Guerriers</span>
+                                    <span>${act} sur ${obj} Guerriers</span>
                                     <span>${progress}%</span>
                                 </div>
                             </div>
