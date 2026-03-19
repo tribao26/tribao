@@ -38,7 +38,7 @@
 
         /* --- GAUCHE : VISUEL --- */
         .product-visual { background: #000; display: flex; align-items: center; justify-content: center; padding: 40px; border-right: var(--border); }
-        .product-visual img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 0 40px rgba(57, 255, 20, 0.1); }
+        .product-visual img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 40px rgba(57, 255, 20, 0.1); }
 
         /* --- DROITE : DATA --- */
         .product-data { padding: 60px 40px; background: var(--bg-black); }
@@ -55,7 +55,7 @@
         .tactic-box { margin-top: 50px; padding: 30px; background: var(--card-gray); border-radius: 12px; border: var(--border); }
         .gauge-header { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.8rem; margin-bottom: 15px; }
         .gauge-bar-lg { width: 100%; height: 12px; background: #000; border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; }
-        .gauge-fill-lg { height: 100%; background: var(--neon-gradient); box-shadow: 0 0 20px var(--neon-green); }
+        .gauge-fill-lg { height: 100%; width: 0%; background: var(--neon-gradient); box-shadow: 0 0 20px var(--neon-green); transition: width 1s ease-in-out; }
 
         .btn-enlist { width: 100%; padding: 20px; background: var(--neon-gradient); color: #000; font-family: 'Orbitron'; font-weight: 700; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 1rem; letter-spacing: 2px; }
         .btn-enlist:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(57, 255, 20, 0.4); }
@@ -74,7 +74,7 @@
 
     <div class="main-layout">
         <aside>
-            <div style="padding: 30px 25px;"><img src="logo.png" alt="TRIBAO" style="width: 120px;"></div>
+            <div style="padding: 30px 25px;"><a href="index.html" style="text-decoration:none;"><span style="font-family:'Orbitron'; color:var(--neon-green); font-weight:700;">TRIBAO</span></a></div>
             <a href="arene.html" class="nav-item">RETOUR ARÈNE</a>
             <a href="comment-ca-marche.html" class="nav-item">VÉRIFIER LE PROTOCOLE</a>
             <a href="contact.html" class="nav-item">SIGNALER UN PROBLÈME</a>
@@ -85,32 +85,32 @@
                 <a href="arene.html" class="back-link">← MISSIONS ACTIVES / MATÉRIEL DE PRÉCISION</a>
             </header>
 
-            <div class="mission-grid">
+            <div class="mission-grid" id="mission-content" style="display: none;">
                 <div class="product-visual">
-                    <img src="https://via.placeholder.com/600x400/111/39FF14?text=PRINTER_3D_ENDER_3_S1" alt="Produit">
+                    <img id="mission-img" src="" alt="Produit">
                 </div>
 
                 <div class="product-data">
                     <div class="badge-status">MISSION : ACTIVÉE // J-14</div>
-                    <h1>Pack Imprimante 3D Ender 3 S1</h1>
-                    <p style="color: var(--text-gray); margin-bottom: 30px;">Directement sortie d'usine. Qualité industrielle. Nous avons négocié un prix de gros exclusif pour une Tribu de 300 personnes.</p>
+                    <h1 id="mission-title">Chargement...</h1>
+                    <p id="mission-desc" style="color: var(--text-gray); margin-bottom: 30px;">Analyse tactique du matériel en cours...</p>
 
                     <div class="price-info">
-                        <span class="target-price">380.00 €</span>
-                        <span class="retail-price">520.00 €</span>
+                        <span class="target-price" id="mission-price-target">-- €</span>
+                        <span class="retail-price" id="mission-price-retail">-- €</span>
                         <br>
-                        <div class="gain-box">ÉCONOMIE TRIBU : 140.00 € (DIRECT USINE)</div>
+                        <div class="gain-box" id="mission-gain">ÉCONOMIE TRIBU : CALCUL...</div>
                     </div>
 
                     <div class="tactic-box">
                         <div class="gauge-header">
                             <span>RALLIEMENT TRIBU</span>
-                            <span>250 / 300</span>
+                            <span id="gauge-text">0 / 0</span>
                         </div>
                         <div class="gauge-bar-lg">
-                            <div class="gauge-fill-lg" style="width: 83%;"></div>
+                            <div id="gauge-fill" class="gauge-fill-lg"></div>
                         </div>
-                        <button class="btn-enlist" onclick="window.location.href='auth.html'">REJOINDRE LA MISSION</button>
+                        <button class="btn-enlist" onclick="enlistInMission()">REJOINDRE LA MISSION</button>
                     </div>
 
                     <div class="intel-row">
@@ -125,8 +125,87 @@
                     </div>
                 </div>
             </div>
+            <div id="loading-state" style="padding: 100px; text-align: center; font-family: 'Orbitron'; color: var(--neon-green);">
+                // DÉCRYPTAGE DES DONNÉES...
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const missionId = urlParams.get('id');
+
+        async function loadMission() {
+            if (!missionId) {
+                window.location.href = 'arene.html';
+                return;
+            }
+
+            const { data: m, error } = await _supabase
+                .from('missions')
+                .select('*')
+                .eq('id', missionId)
+                .single();
+
+            if (error || !m) {
+                console.error("Mission introuvable");
+                return;
+            }
+
+            // Injection des données
+            document.getElementById('mission-title').innerText = m.titre;
+            document.getElementById('mission-img').src = m.image_url || 'https://via.placeholder.com/600x400/111/39FF14?text=TRIBAO';
+            document.getElementById('mission-price-target').innerText = m.prix_cible + " €";
+            
+            // On gère le prix public (retail) s'il existe, sinon on met +30% par défaut
+            const retail = m.prix_public || Math.round(m.prix_cible * 1.35);
+            document.getElementById('mission-price-retail').innerText = retail + " €";
+            document.getElementById('mission-gain').innerText = `ÉCONOMIE TRIBU : ${retail - m.prix_cible} € (DIRECT USINE)`;
+
+            // Gestion de la jauge
+            const obj = m.objectif_membres || 1;
+            const act = m.membres_actuels || 0;
+            const progress = Math.min(100, Math.round((act / obj) * 100));
+            
+            document.getElementById('gauge-text').innerText = `${act} / ${obj}`;
+            document.getElementById('gauge-fill').style.width = progress + "%";
+
+            // Affichage du contenu
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('mission-content').style.display = 'grid';
+        }
+
+        async function enlistInMission() {
+            const btn = document.querySelector('.btn-enlist');
+            btn.innerText = "// TRANSMISSION...";
+            btn.disabled = true;
+
+            // 1. Récupérer score actuel
+            const { data } = await _supabase.from('missions').select('membres_actuels').eq('id', missionId).single();
+            
+            // 2. Update +1
+            const { error } = await _supabase
+                .from('missions')
+                .update({ membres_actuels: data.membres_actuels + 1 })
+                .eq('id', missionId);
+
+            if (!error) {
+                alert("ENGAGEMENT VALIDÉ. BIENVENUE DANS LA TRIBU !");
+                loadMission(); // Rafraîchir les chiffres
+                btn.innerText = "MISSION REJOINTE";
+            } else {
+                alert("Erreur lors de la transmission.");
+                btn.disabled = false;
+                btn.innerText = "REJOINDRE LA MISSION";
+            }
+        }
+
+        loadMission();
+    </script>
 </body>
 </html>
