@@ -120,20 +120,20 @@
             // 👮 VÉRIFICATION DE LA SESSION
             const { data: { session } } = await _supabase.auth.getSession();
 
+            // REDIRECTION INSTANTANÉE SI PAS DE SESSION
             if (!session) {
-                alert("SÉCURITÉ : Identifiez-vous pour rejoindre la mission.");
                 window.location.href = 'auth.html';
-                return; // STOPPE TOUT ICI
+                return; 
             }
 
             // 👮 VÉRIFICATION DU RÔLE
             const userRole = session.user.user_metadata.role;
             if (userRole === 'pro') {
                 alert("ACCÈS REFUSÉ : Les Fournisseurs ne peuvent pas rallier de missions.");
-                return; // STOPPE TOUT ICI
+                return; 
             }
 
-            // ⚔️ SI OK, ON VALIDE L'ENGAGEMENT
+            // ⚔️ SI OK (TRIBU CONNECTÉE), ON VALIDE L'ENGAGEMENT
             const btn = document.querySelector('.btn-enlist');
             btn.innerText = "// TRANSMISSION...";
             btn.disabled = true;
@@ -144,9 +144,12 @@
             if (!error) {
                 alert("ENGAGEMENT VALIDÉ !");
                 loadMission();
+                btn.innerText = "REJOINDRE LA MISSION";
+                btn.disabled = false;
             } else {
                 alert("Erreur serveur.");
                 btn.disabled = false;
+                btn.innerText = "REJOINDRE LA MISSION";
             }
         }
 
