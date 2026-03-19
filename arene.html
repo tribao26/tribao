@@ -35,7 +35,6 @@
             width: 100vw;
         }
 
-        /* --- SIDEBAR (GAUCHE) --- */
         aside {
             width: 260px;
             background-color: var(--bg-sidebar);
@@ -72,7 +71,6 @@
 
         .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
 
-        /* --- CONTENEUR DE DROITE --- */
         .content-wrapper {
             flex: 1;
             display: flex;
@@ -80,7 +78,6 @@
             min-width: 0;
         }
 
-        /* --- HEADER --- */
         header {
             height: 70px;
             display: flex;
@@ -113,7 +110,6 @@
             box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
         }
 
-        /* --- ZONE DE SCROLL --- */
         .scroll-area {
             flex: 1;
             overflow-y: auto;
@@ -130,7 +126,6 @@
             margin: 0 auto;
         }
 
-        /* --- ACCROCHE --- */
         .hero-callout {
             background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent);
             border-left: 4px solid var(--neon-green);
@@ -223,7 +218,6 @@
             font-size: 0.75rem;
         }
 
-        /* --- FOOTER --- */
         footer {
             padding: 20px 40px;
             border-top: var(--border);
@@ -235,11 +229,6 @@
             flex-shrink: 0;
         }
 
-        .footer-links { display: flex; gap: 20px; }
-        .footer-links a { color: #444; text-decoration: none; transition: 0.3s; }
-        .footer-links a:hover { color: var(--neon-green); }
-
-        /* --- RESPONSIVE --- */
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
             aside { width: 100%; height: auto; border-right: none; border-bottom: var(--border); flex-direction: row; overflow-x: auto; }
@@ -276,7 +265,7 @@
             </header>
 
             <div class="scroll-area">
-                <div class="arena-grid">
+                <div class="arena-grid" id="arena-container">
                     
                     <section class="hero-callout">
                         <h2>LA RÉVOLUTION EST EN MARCHE.</h2>
@@ -289,58 +278,8 @@
 
                     <h2 style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS EN COURS</h2>
 
-                    <div class="mission-card">
-                        <div class="mission-img-box">
-                            <img src="https://via.placeholder.com/140/111/39FF14?text=PRINTER" alt="">
-                        </div>
-                        <div class="mission-info">
-                            <h3>Pack Imprimante 3D Ender 3 S1</h3>
-                            <div class="price-tag">Prix ciblé : 380€ (-25%)</div>
-                            <div class="gauge-wrapper">
-                                <div class="bar-bg"><div class="bar-fill" style="width: 56%;"></div></div>
-                                <div class="gauge-data">
-                                    <span>250 sur 300 Objectif atteint</span>
-                                    <span>56%</span>
-                                </div>
-                            </div>
-                            <a href="mission-detail.html" class="btn-join">REJOINDRE L'ARÈNE</a>
-                        </div>
-                    </div>
-
-                    <div class="mission-card">
-                        <div class="mission-img-box">
-                            <img src="https://via.placeholder.com/140/111/39FF14?text=HERMAN" alt="">
-                        </div>
-                        <div class="mission-info">
-                            <h3>Groupé Chaise Ergo Herman Miller</h3>
-                            <div class="price-tag">Prix ciblé : 750€ (-30%)</div>
-                            <div class="gauge-wrapper">
-                                <div class="bar-bg"><div class="bar-fill" style="width: 41%;"></div></div>
-                                <div class="gauge-data">
-                                    <span>82 sur 200 Participants engagés</span>
-                                    <span>41%</span>
-                                </div>
-                            </div>
-                            <a href="mission-detail.html" class="btn-join">REJOINDRE L'ARÈNE</a>
-                        </div>
-                    </div>
-
-                    <div class="mission-card">
-                        <div class="mission-img-box">
-                            <img src="https://via.placeholder.com/140/111/39FF14?text=E-BIKE" alt="">
-                        </div>
-                        <div class="mission-info">
-                            <h3>Achat Collectif Vélo Électrique Rider Pro X</h3>
-                            <div class="price-tag">Prix ciblé : 1 800€ (-20%)</div>
-                            <div class="gauge-wrapper">
-                                <div class="bar-bg"><div class="bar-fill" style="width: 67%;"></div></div>
-                                <div class="gauge-data">
-                                    <span>134 sur 200 Participants engagés</span>
-                                    <span>67%</span>
-                                </div>
-                            </div>
-                            <a href="mission-detail.html" class="btn-join">REJOINDRE L'ARÈNE</a>
-                        </div>
+                    <div id="missions-list">
+                         <p style="color: var(--neon-green); font-family: 'Orbitron';">CHARGEMENT DE L'ARÈNE...</p>
                     </div>
                     
                 </div>
@@ -348,10 +287,60 @@
 
             <footer>
                 <span>© 2026 TRIBAO - BRUTALIST ECO</span>
-               
             </footer>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'sb_publishable_W1KsUezaGRZX3y0X07944g_Fu746'; // Ta clé publique
+
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function loadMissions() {
+            const { data, error } = await _supabase
+                .from('missions')
+                .select('*');
+
+            if (error) {
+                console.error("Erreur de chargement:", error);
+                document.getElementById('missions-list').innerHTML = "<p>Erreur de connexion à l'arène.</p>";
+                return;
+            }
+
+            const listContainer = document.getElementById('missions-list');
+            
+            if (data.length === 0) {
+                listContainer.innerHTML = "<p>Aucune mission active pour le moment. Lancez une demande !</p>";
+                return;
+            }
+
+            listContainer.innerHTML = data.map(m => {
+                const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membre) * 100));
+                return `
+                    <div class="mission-card">
+                        <div class="mission-img-box">
+                            <img src="${m.image_url || 'https://via.placeholder.com/140/111/39FF14?text=TRIBAO'}" alt="${m.titre}">
+                        </div>
+                        <div class="mission-info">
+                            <h3>${m.titre}</h3>
+                            <div class="price-tag">Prix ciblé : ${m.prix_cible}€</div>
+                            <div class="gauge-wrapper">
+                                <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
+                                <div class="gauge-data">
+                                    <span>${m.membres_actuels} sur ${m.objectif_membre} Guerriers</span>
+                                    <span>${progress}%</span>
+                                </div>
+                            </div>
+                            <a href="mission-detail.html?id=${m.id}" class="btn-join">REJOINDRE L'ARÈNE</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        loadMissions();
+    </script>
 </body>
 </html>
