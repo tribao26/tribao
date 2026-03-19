@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRIBAO | La Vitrine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-anthracite: #121212; 
             --neon-green: #39FF14;
-            --neon-gradient: linear-gradient(135.21deg, rgba(57, 255, 20, 0.9) 0%, rgba(57, 255, 20, 0.4) 100%);
+            --neon-gradient: linear-gradient(135.21deg, rgba(57, 255, 20, 0.95) 0%, rgba(57, 255, 20, 0.55) 100%);
             --text-main: #f0f0f0;
-            --text-gray: #888;
+            --text-gray: #a0a0a0;
         }
 
         body, html {
@@ -33,7 +33,7 @@
             background-image: url('texture-beton.webp'); 
             background-size: cover;
             background-position: center;
-            opacity: 0.25; 
+            opacity: 0.20; 
             z-index: -1;
         }
 
@@ -45,7 +45,14 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 40px 20px;
+            padding: 70px 20px 60px;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .logo {
@@ -53,36 +60,58 @@
             font-size: clamp(3rem, 10vw, 5rem);
             letter-spacing: 12px;
             color: var(--neon-green);
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
         }
 
-        h1 {
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
+        .hero-title {
+            font-size: clamp(2rem, 5.2vw, 3.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            max-width: 850px;
+            margin: 0 0 18px;
+            text-wrap: balance;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.1vw, 1.28rem);
+            font-weight: 400;
+            line-height: 1.7;
+            color: var(--text-gray);
+            max-width: 760px;
+            margin: 0 0 18px;
+        }
+
+        .hero-punch {
+            font-size: 0.95rem;
             font-weight: 700;
-            max-width: 900px;
-            margin-bottom: 40px;
-            letter-spacing: -1px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--neon-green);
+            margin: 0 0 36px;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.18);
         }
 
         .cta-button {
-            padding: 20px 50px;
+            padding: 18px 46px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #000;
             background: var(--neon-gradient);
             backdrop-filter: blur(5px);
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-weight: 700;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px rgba(57, 255, 20, 0.2);
-            border: 1px solid rgba(57, 255, 20, 0.3);
+            transition: all 0.35s ease;
+            box-shadow: 0 10px 30px rgba(57, 255, 20, 0.18);
+            border: 1px solid rgba(57, 255, 20, 0.35);
+            display: inline-block;
         }
 
         .cta-button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(57, 255, 20, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(57, 255, 20, 0.35);
             border-color: var(--neon-green);
         }
 
@@ -112,25 +141,27 @@
             border-radius: 12px;
             padding: 40px 30px;
             text-align: center;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, transform 0.3s ease;
         }
 
         .how-card:hover {
             border-color: var(--neon-green);
+            transform: translateY(-3px);
         }
 
         .how-card h3 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--neon-green);
             margin-bottom: 15px;
             letter-spacing: 1px;
+            line-height: 1.5;
         }
 
         .how-card p {
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             color: var(--text-gray);
-            line-height: 1.6;
+            line-height: 1.7;
             margin: 0;
         }
 
@@ -147,6 +178,7 @@
         .legal-links {
             display: flex;
             gap: 25px;
+            flex-wrap: wrap;
         }
 
         .legal-links a {
@@ -168,17 +200,69 @@
         }
 
         @media (max-width: 768px) {
-            .footer-bottom { justify-content: center; text-align: center; }
+            main {
+                padding: 55px 20px 45px;
+            }
+
+            .logo {
+                letter-spacing: 7px;
+                margin-bottom: 18px;
+            }
+
+            .hero-title {
+                letter-spacing: -1.2px;
+                margin-bottom: 14px;
+            }
+
+            .hero-subtitle {
+                line-height: 1.6;
+                margin-bottom: 16px;
+            }
+
+            .hero-punch {
+                font-size: 0.85rem;
+                letter-spacing: 1.5px;
+                margin-bottom: 28px;
+            }
+
+            .cta-button {
+                width: 100%;
+                max-width: 360px;
+                text-align: center;
+                padding: 18px 24px;
+            }
+
+            .footer-bottom {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .legal-links {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
 
     <main>
-        <div class="logo">TRIBAO</div>
-        <h1> Pour tous ceux qui refusent de subir les prix <br>Particuliers, groupes d’acheteurs, communautés, entreprises ou réseaux locaux : TRIBAO s’adresse à tous ceux qui veulent obtenir de meilleures conditions grâce à la force du collectif.
-Passez à l’action</h1>
-        <a href="arene.html" class="cta-button">REJOINDRE LES MISSIONS</a>
+        <div class="hero-content">
+            <div class="logo">TRIBAO</div>
+
+            <h1 class="hero-title">
+                Refusez de subir les prix.<br>
+                Achetez ensemble, négociez plus fort.
+            </h1>
+
+            <p class="hero-subtitle">
+                Particuliers, groupes d’acheteurs, communautés, entreprises ou réseaux locaux :
+                TRIBAO vous permet d’obtenir de meilleures conditions grâce à la force du collectif.
+            </p>
+
+            <p class="hero-punch">Le collectif crée le levier</p>
+
+            <a href="arene.html" class="cta-button">REJOINDRE LES MISSIONS</a>
+        </div>
     </main>
 
     <footer>
@@ -186,27 +270,32 @@ Passez à l’action</h1>
             <div class="how-grid">
                 <div class="how-card">
                     <h3>// 01. LANCER UNE MISSION</h3>
-                    <p>Créer ou Rejoindre une mission active dans l'Arène. Chaque produit a un objectif de tribu à atteindre.</p>
+                    <p>Créer ou rejoindre une mission active dans l'Arène. Chaque produit a un objectif de tribu à atteindre.</p>
                 </div>
+
                 <div class="how-card">
-                    <h3>// 02. Rassemblez une tribu</h3>
-                    <p>Partagez la mission. D’autres acheteurs rejoignent votre demande et Plus la jauge se remplit, plus vous approchez du prix de gros direct usine.</p>
+                    <h3>// 02. RASSEMBLEZ UNE TRIBU</h3>
+                    <p>Partagez la mission. D’autres acheteurs rejoignent votre demande. Plus la jauge se remplit, plus vous approchez du prix de gros direct usine.</p>
                 </div>
-		<div class="how-card">
-                    <h3>// 03. RECEVEZ LES OFFRES DE FOURNISSEURS / VENDEURS</h3>
-                    <p>Les fournisseurs proposent leurs meilleurs prix sous forme d'enchère inversée donc le prix à la baisse.</p>
-                </div>
+
                 <div class="how-card">
-                    <h3>// 04. VALIDER et CHOISIR l'offre gagnante</h3>
-                    <p>Objectif atteint ? Vous validez l’offre la plus avantageuse. Vous recevez votre part du butin au meilleur prix possible.</p>
+                    <h3>// 03. RECEVEZ LES OFFRES</h3>
+                    <p>Les fournisseurs proposent leurs meilleurs prix sous forme d’enchère inversée, avec une logique de prix à la baisse.</p>
                 </div>
-<div class="how-card">
-                    <h3>// 05. ALLER SUR LE SITE DU FOURNISSEUR</h3>
-                    <p>Recevez le lien de la mission et Payer sur le site du Fournisseur ou vendeur le PRIX Negocié en toute sécurité</p>
+
+                <div class="how-card">
+                    <h3>// 04. VALIDEZ L’OFFRE GAGNANTE</h3>
+                    <p>Objectif atteint ? Vous choisissez l’offre la plus avantageuse et obtenez le meilleur prix possible.</p>
                 </div>
-<div class="how-card">
-                    <h3>// 06. GARANTIE FOURNISSEUR </h3>
-                    <p> Vous bénéficiez des conditions de ventes et livraison du Fournisseur, Mais aussi des GARANTIS produits.</p>
+
+                <div class="how-card">
+                    <h3>// 05. ACHETEZ CHEZ LE FOURNISSEUR</h3>
+                    <p>Recevez le lien de la mission et payez directement sur le site du fournisseur ou du vendeur, au prix négocié.</p>
+                </div>
+
+                <div class="how-card">
+                    <h3>// 06. BÉNÉFICIEZ DES GARANTIES</h3>
+                    <p>Vous profitez des conditions de vente, de livraison et des garanties produit directement proposées par le fournisseur.</p>
                 </div>
             </div>
 
@@ -214,7 +303,7 @@ Passez à l’action</h1>
                 <div class="legal-links">
                     <a href="cgv.html">CGV</a>
                     <a href="mentions.html">Légal</a>
-		    <a href="comment-ca-marche.html">Comment ça Marche ?</a>
+                    <a href="comment-ca-marche.html">Comment ça marche ?</a>
                     <a href="fournisseurs.html">Pro</a>
                 </div>
                 <div class="copyright">© 2026 TRIBAO - BRUTALIST ECO</div>
