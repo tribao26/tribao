@@ -22,13 +22,11 @@
 
         .main-layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR --- */
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
         .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
         .nav-item:hover { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); }
 
-        /* --- CONTENT --- */
         .content-wrapper { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; padding: 20px; }
         
         .auth-card {
@@ -39,7 +37,6 @@
             transition: border-color 0.5s;
         }
 
-        /* --- SÉLECTEUR DE CAMP --- */
         .role-selector { display: flex; gap: 10px; margin-bottom: 30px; }
         .role-btn {
             flex: 1; padding: 15px; border: 1px solid #333; border-radius: 8px;
@@ -74,7 +71,6 @@
 
         .info-text { margin-top: 20px; font-size: 0.75rem; color: var(--text-gray); text-align: center; line-height: 1.4; }
         
-        /* Message d'état pour l'utilisateur */
         #auth-status { margin-top: 15px; font-size: 0.8rem; text-align: center; font-family: 'JetBrains Mono'; min-height: 1.2rem; }
 
         @media (max-width: 768px) {
@@ -130,7 +126,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Configuration Supabase
         const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
@@ -141,7 +136,6 @@
         function setRole(role) {
             currentRole = role;
             document.body.className = 'theme-' + role;
-            
             document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector('.role-btn.' + role).classList.add('active');
 
@@ -182,20 +176,15 @@
                 const { data, error } = await _supabase.auth.signUp({
                     email,
                     password,
-                    options: {
-                        data: { 
-                            full_name: name,
-                            role: currentRole 
-                        }
-                    }
+                    options: { data: { full_name: name, role: currentRole } }
                 });
 
                 if (error) {
                     status.style.color = "#ff4444";
                     status.innerText = "ERREUR : " + error.message;
                 } else {
-                    status.style.color = currentRole === 'tribu' ? "var(--neon-green)" : "var(--neon-blue)";
-                    status.innerText = "ACCÈS INITIÉ. Vérifiez vos emails.";
+                    status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
+                    status.innerText = "INSCRIPTION OK. Vérifiez vos emails.";
                 }
             } else {
                 const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
@@ -205,8 +194,8 @@
                     status.innerText = "IDENTIFIANTS INVALIDES";
                 } else {
                     const userRole = data.user.user_metadata.role || 'tribu';
-                    status.style.color = userRole === 'tribu' ? "var(--neon-green)" : "var(--neon-blue)";
-                    status.innerText = "AUTORISATION ACCORDÉE...";
+                    status.style.color = (userRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
+                    status.innerText = "DÉVERROUILLAGE RÉUSSI...";
                     
                     setTimeout(() => {
                         window.location.href = (userRole === 'pro') ? 'dashboard-fournisseur.html' : 'arene.html';
