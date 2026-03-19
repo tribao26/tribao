@@ -22,59 +22,35 @@
 
         .main-layout { display: flex; min-height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR --- */
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; transition: 0.3s; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; transition: 0.3s; }
         .nav-item:hover { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); }
 
-        /* --- CONTENT WRAPPER --- */
         .content-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { height: 70px; display: flex; align-items: center; padding: 0 30px; border-bottom: var(--border); background: rgba(10,10,10,0.9); sticky top: 0; z-index: 10; }
-        .back-link { color: var(--text-gray); text-decoration: none; font-size: 0.8rem; font-family: 'Orbitron'; transition: 0.3s; }
-        .back-link:hover { color: var(--neon-green); }
+        header { height: 70px; display: flex; align-items: center; padding: 0 30px; border-bottom: var(--border); background: rgba(10,10,10,0.9); }
+        .back-link { color: var(--text-gray); text-decoration: none; font-size: 0.8rem; font-family: 'Orbitron'; }
 
-        /* --- PRODUCT GRID --- */
         .mission-grid { display: grid; grid-template-columns: 1fr 450px; min-height: calc(100vh - 70px); }
 
-        /* --- GAUCHE : VISUEL --- */
         .product-visual { background: #000; display: flex; align-items: center; justify-content: center; padding: 40px; border-right: var(--border); }
         .product-visual img { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 40px rgba(57, 255, 20, 0.1); }
 
-        /* --- DROITE : DATA --- */
         .product-data { padding: 60px 40px; background: var(--bg-black); }
         .badge-status { display: inline-block; padding: 5px 12px; border: 1px solid var(--neon-green); color: var(--neon-green); font-family: 'JetBrains Mono'; font-size: 0.7rem; border-radius: 4px; margin-bottom: 20px; }
         
-        h1 { font-family: 'Orbitron'; font-size: 2rem; margin: 0 0 15px; letter-spacing: 1px; line-height: 1.2; }
-        .price-info { margin-bottom: 40px; }
+        h1 { font-family: 'Orbitron'; font-size: 2rem; margin: 0 0 15px; letter-spacing: 1px; }
         .target-price { font-family: 'Orbitron'; font-size: 1.8rem; color: var(--neon-green); font-weight: 700; }
         .retail-price { color: var(--text-gray); text-decoration: line-through; margin-left: 15px; font-size: 1rem; }
 
-        .gain-box { background: #111; border: 1px dashed var(--neon-green); padding: 15px; border-radius: 4px; display: inline-block; margin-top: 10px; font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--neon-green); }
-
-        /* --- JAUGE TACTIQUE --- */
         .tactic-box { margin-top: 50px; padding: 30px; background: var(--card-gray); border-radius: 12px; border: var(--border); }
-        .gauge-header { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.8rem; margin-bottom: 15px; }
         .gauge-bar-lg { width: 100%; height: 12px; background: #000; border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; }
         .gauge-fill-lg { height: 100%; width: 0%; background: var(--neon-gradient); box-shadow: 0 0 20px var(--neon-green); transition: width 1s ease-in-out; }
 
-        .btn-enlist { width: 100%; padding: 20px; background: var(--neon-gradient); color: #000; font-family: 'Orbitron'; font-weight: 700; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 1rem; letter-spacing: 2px; }
-        .btn-enlist:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(57, 255, 20, 0.4); }
+        .btn-enlist { width: 100%; padding: 20px; background: var(--neon-gradient); color: #000; font-family: 'Orbitron'; font-weight: 700; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 1rem; }
 
-        .intel-row { display: flex; gap: 20px; margin-top: 30px; }
-        .intel-item { flex: 1; font-size: 0.75rem; color: var(--text-gray); line-height: 1.4; }
-        .intel-item strong { color: #fff; display: block; margin-bottom: 5px; font-family: 'Orbitron'; font-size: 0.65rem; }
-
-        /* --- AJUSTEMENTS MOBILE --- */
         @media (max-width: 1000px) {
-            body, html { overflow: auto; } /* On permet le scroll */
-            aside { display: none; } /* On cache la sidebar sur mobile */
-            .mission-grid { grid-template-columns: 1fr; } /* On empile les colonnes */
-            .product-visual { border-right: none; border-bottom: var(--border); padding: 20px; }
-            .product-data { padding: 40px 20px; }
-            h1 { font-size: 1.6rem; }
-            .target-price { font-size: 1.5rem; }
-            .tactic-box { margin-top: 30px; padding: 20px; }
-            .intel-row { flex-direction: column; gap: 20px; }
+            aside { display: none; }
+            .mission-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -82,61 +58,35 @@
 
     <div class="main-layout">
         <aside>
-            <div style="padding: 30px 25px;"><a href="index.html" style="text-decoration:none;"><span style="font-family:'Orbitron'; color:var(--neon-green); font-weight:700; font-size:1.2rem;">TRIBAO</span></a></div>
-            <a href="arene.html" class="nav-item">RETOUR ARÈNE</a>
-            <a href="comment-ca-marche.html" class="nav-item">VÉRIFIER LE PROTOCOLE</a>
-            <a href="contact.html" class="nav-item">SIGNALER UN PROBLÈME</a>
+            <div style="padding: 30px 25px;"><span style="font-family:'Orbitron'; color:var(--neon-green); font-weight:700;">TRIBAO</span></div>
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="contact.html" class="nav-item">SUPPORT</a>
         </aside>
 
         <div class="content-wrapper">
-            <header>
-                <a href="arene.html" class="back-link">← MISSIONS / MATÉRIEL</a>
-            </header>
+            <header><a href="arene.html" class="back-link">← RETOUR MISSIONS</a></header>
 
             <div class="mission-grid" id="mission-content" style="display: none;">
-                <div class="product-visual">
-                    <img id="mission-img" src="" alt="Produit">
-                </div>
-
+                <div class="product-visual"><img id="mission-img" src="" alt="Produit"></div>
                 <div class="product-data">
-                    <div class="badge-status">MISSION : ACTIVÉE // J-14</div>
+                    <div class="badge-status">MISSION ACTIVÉE</div>
                     <h1 id="mission-title">Chargement...</h1>
-                    <p id="mission-desc" style="color: var(--text-gray); margin-bottom: 30px;">Directement sortie d'usine. Qualité industrielle. Nous avons négocié un prix de gros exclusif pour une Tribu de 300 personnes.</p>
-
                     <div class="price-info">
                         <span class="target-price" id="mission-price-target">-- €</span>
                         <span class="retail-price" id="mission-price-retail">-- €</span>
-                        <br>
-                        <div class="gain-box" id="mission-gain">ÉCONOMIE TRIBU : CALCUL...</div>
                     </div>
 
                     <div class="tactic-box">
-                        <div class="gauge-header">
-                            <span>RALLIEMENT TRIBU</span>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-family:'Orbitron'; font-size:0.8rem;">
+                            <span>RALLIEMENT</span>
                             <span id="gauge-text">0 / 0</span>
                         </div>
-                        <div class="gauge-bar-lg">
-                            <div id="gauge-fill" class="gauge-fill-lg"></div>
-                        </div>
+                        <div class="gauge-bar-lg"><div id="gauge-fill" class="gauge-fill-lg"></div></div>
                         <button class="btn-enlist" onclick="enlistInMission()">REJOINDRE LA MISSION</button>
-                    </div>
-
-                    <div class="intel-row">
-                        <div class="intel-item">
-                            <strong>LIVRAISON</strong>
-                            Expédition groupée via HUB Central. 5 jours après validation.
-                        </div>
-                        <div class="intel-item">
-                            <strong>CONTRAT</strong>
-                            Achat validé à 100%. Aucun frais avant ralliement complet.
-                        </div>
                     </div>
                 </div>
             </div>
-
-            <div id="loading-state" style="padding: 100px; text-align: center; font-family: 'Orbitron'; color: var(--neon-green);">
-                // DÉCRYPTAGE DES DONNÉES...
-            </div>
+            <div id="loading-state" style="padding: 100px; text-align: center; font-family: 'Orbitron'; color: var(--neon-green);">// ANALYSE EN COURS...</div>
         </div>
     </div>
 
@@ -150,31 +100,16 @@
         const missionId = urlParams.get('id');
 
         async function loadMission() {
-            if (!missionId) {
-                window.location.href = 'arene.html';
-                return;
-            }
-
-            const { data: m, error } = await _supabase.from('missions').select('*').eq('id', missionId).single();
-
-            if (error || !m) {
-                console.error("Mission introuvable");
-                return;
-            }
+            const { data: m } = await _supabase.from('missions').select('*').eq('id', missionId).single();
+            if (!m) return;
 
             document.getElementById('mission-title').innerText = m.titre;
-            document.getElementById('mission-img').src = m.image_url || 'https://via.placeholder.com/600x400/111/39FF14?text=TRIBAO';
+            document.getElementById('mission-img').src = m.image_url;
             document.getElementById('mission-price-target').innerText = m.prix_cible + " €";
-            
-            const retail = m.prix_public || Math.round(m.prix_cible * 1.35);
-            document.getElementById('mission-price-retail').innerText = retail + " €";
-            document.getElementById('mission-gain').innerText = `ÉCONOMIE TRIBU : ${retail - m.prix_cible} € (DIRECT USINE)`;
+            document.getElementById('mission-price-retail').innerText = Math.round(m.prix_cible * 1.35) + " €";
 
-            const obj = m.objectif_membres || 1;
-            const act = m.membres_actuels || 0;
-            const progress = Math.min(100, Math.round((act / obj) * 100));
-            
-            document.getElementById('gauge-text').innerText = `${act} / ${obj}`;
+            const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
+            document.getElementById('gauge-text').innerText = `${m.membres_actuels} / ${m.objectif_membres}`;
             document.getElementById('gauge-fill').style.width = progress + "%";
 
             document.getElementById('loading-state').style.display = 'none';
@@ -182,22 +117,36 @@
         }
 
         async function enlistInMission() {
+            // 👮 VÉRIFICATION DE LA SESSION
+            const { data: { session } } = await _supabase.auth.getSession();
+
+            if (!session) {
+                alert("SÉCURITÉ : Identifiez-vous pour rejoindre la mission.");
+                window.location.href = 'auth.html';
+                return; // STOPPE TOUT ICI
+            }
+
+            // 👮 VÉRIFICATION DU RÔLE
+            const userRole = session.user.user_metadata.role;
+            if (userRole === 'pro') {
+                alert("ACCÈS REFUSÉ : Les Fournisseurs ne peuvent pas rallier de missions.");
+                return; // STOPPE TOUT ICI
+            }
+
+            // ⚔️ SI OK, ON VALIDE L'ENGAGEMENT
             const btn = document.querySelector('.btn-enlist');
-            const oldText = btn.innerText;
             btn.innerText = "// TRANSMISSION...";
             btn.disabled = true;
 
-            const { data } = await _supabase.from('missions').select('membres_actuels').eq('id', missionId).single();
-            const { error } = await _supabase.from('missions').update({ membres_actuels: data.membres_actuels + 1 }).eq('id', missionId);
+            const { data: m } = await _supabase.from('missions').select('membres_actuels').eq('id', missionId).single();
+            const { error } = await _supabase.from('missions').update({ membres_actuels: m.membres_actuels + 1 }).eq('id', missionId);
 
             if (!error) {
                 alert("ENGAGEMENT VALIDÉ !");
-                await loadMission();
-                btn.innerText = "MISSION REJOINTE";
+                loadMission();
             } else {
-                alert("Erreur de transmission.");
+                alert("Erreur serveur.");
                 btn.disabled = false;
-                btn.innerText = oldText;
             }
         }
 
