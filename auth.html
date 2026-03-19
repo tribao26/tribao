@@ -168,7 +168,6 @@
             document.getElementById('submitBtn').innerText = (mode === 'login') ? "DÉVERROUILLER L'ACCÈS" : "CRÉER MON ACCÈS";
         }
 
-        // GESTION RÉELLE DE L'AUTH
         document.getElementById('mainForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('emailInput').value;
@@ -180,7 +179,6 @@
             status.innerText = "// TRANSMISSION EN COURS...";
 
             if (currentMode === 'signup') {
-                // INSCRIPTION
                 const { data, error } = await _supabase.auth.signUp({
                     email,
                     password,
@@ -200,7 +198,6 @@
                     status.innerText = "ACCÈS INITIÉ. Vérifiez vos emails.";
                 }
             } else {
-                // CONNEXION
                 const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
                 if (error) {
