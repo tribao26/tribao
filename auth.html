@@ -182,7 +182,15 @@
                 if (error) {
                     status.style.color = "#ff4444";
                     status.innerText = "ERREUR : " + error.message;
+                } else if (data.session) {
+                    // SI PAS DE CONFIRMATION MAIL, SUPABASE CREE UNE SESSION DE SUITE
+                    status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
+                    status.innerText = "DÉVERROUILLAGE RÉUSSI...";
+                    setTimeout(() => {
+                        window.location.href = (currentRole === 'pro') ? 'dashboard-fournisseur.html' : 'arene.html';
+                    }, 1000);
                 } else {
+                    // SI CONFIRMATION MAIL ACTIVE
                     status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
                     status.innerText = "INSCRIPTION OK. Vérifiez vos emails.";
                 }
