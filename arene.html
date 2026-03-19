@@ -17,7 +17,6 @@
             --border: 1px solid #222;
         }
 
-        /* Reset & Base */
         * { box-sizing: border-box; }
         body, html {
             margin: 0; padding: 0;
@@ -25,7 +24,6 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-black);
             color: var(--text-main);
-            overflow: hidden; 
         }
 
         /* --- LAYOUT PRINCIPAL --- */
@@ -35,6 +33,7 @@
             width: 100vw;
         }
 
+        /* SIDEBAR (PC) */
         aside {
             width: 260px;
             background-color: var(--bg-sidebar);
@@ -44,13 +43,7 @@
             flex-shrink: 0;
         }
 
-        .nav-label {
-            padding: 30px 25px 10px;
-            font-size: 0.65rem;
-            color: #444;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
-        }
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron'; letter-spacing: 2px; }
 
         .nav-item {
             padding: 15px 25px;
@@ -60,7 +53,8 @@
             font-size: 0.75rem;
             display: flex;
             align-items: center;
-            transition: all 0.3s;
+            transition: 0.3s;
+            border-left: 3px solid transparent;
         }
 
         .nav-item:hover, .nav-item.active {
@@ -69,13 +63,13 @@
             border-left: 3px solid var(--neon-green);
         }
 
-        .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
-
+        /* CONTENT */
         .content-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             min-width: 0;
+            overflow: hidden;
         }
 
         header {
@@ -90,7 +84,7 @@
         }
 
         .logo-header {
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Orbitron';
             color: var(--neon-green);
             font-weight: 700;
             font-size: 1.3rem;
@@ -98,33 +92,13 @@
             text-decoration: none;
         }
 
-        .btn-create {
-            background: var(--neon-gradient);
-            color: #000;
-            padding: 10px 18px;
-            border-radius: 4px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 0.75rem;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
-        }
-
         .scroll-area {
             flex: 1;
             overflow-y: auto;
             padding: 40px;
-            scrollbar-width: thin;
-            scrollbar-color: #333 transparent;
         }
 
-        .scroll-area::-webkit-scrollbar { width: 6px; }
-        .scroll-area::-webkit-scrollbar-thumb { background-color: #333; border-radius: 10px; }
-
-        .arena-grid {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+        .arena-grid { max-width: 1100px; margin: 0 auto; }
 
         .hero-callout {
             background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent);
@@ -134,43 +108,9 @@
             border-radius: 0 12px 12px 0;
         }
 
-        .hero-callout h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1.2rem, 3vw, 2.2rem);
-            color: #fff;
-            margin: 0 0 15px 0;
-            letter-spacing: 2px;
-            line-height: 1.2;
-        }
+        .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; }
 
-        .hero-callout p {
-            font-size: 1rem;
-            color: var(--text-gray);
-            margin-bottom: 25px;
-            max-width: 700px;
-            line-height: 1.5;
-        }
-
-        .hero-callout p span { color: var(--neon-green); font-weight: 700; }
-
-        .auth-quick-links { display: flex; gap: 15px; flex-wrap: wrap; }
-
-        .btn-auth {
-            padding: 12px 25px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: 0.3s;
-            text-align: center;
-        }
-
-        .btn-auth:not(.outline) { background: var(--neon-green); color: #000; }
-        .btn-auth.outline { border: 1px solid var(--neon-green); color: var(--neon-green); }
-        .btn-auth:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(57, 255, 20, 0.3); }
-
-        /* --- MISSION CARDS --- */
+        /* MISSION CARDS */
         .mission-card {
             background: var(--card-gray);
             border: var(--border);
@@ -179,7 +119,7 @@
             padding: 25px;
             margin-bottom: 25px;
             gap: 30px;
-            transition: border-color 0.3s;
+            transition: 0.3s;
         }
 
         .mission-card:hover { border-color: var(--neon-green); }
@@ -188,57 +128,71 @@
             width: 160px; height: 160px;
             background: #000; border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
+            flex-shrink: 0; overflow: hidden;
         }
 
-        .mission-img-box img { max-width: 100%; border-radius: 4px; }
+        .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
         .mission-info { flex: 1; display: flex; flex-direction: column; }
-
-        .mission-info h3 { margin: 0 0 10px; font-size: 1.1rem; font-family: 'Orbitron', sans-serif; color: #fff; }
+        .mission-info h3 { margin: 0 0 10px; font-family: 'Orbitron'; color: #fff; }
         
-        .price-tag { color: var(--neon-green); font-weight: 700; margin-bottom: 20px; font-size: 0.9rem; }
+        .price-tag { color: var(--neon-green); font-weight: 700; margin-bottom: 20px; }
 
         .gauge-wrapper { margin-top: auto; }
-        .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; }
-        .bar-fill { height: 100%; background: var(--neon-green); border-radius: 10px; box-shadow: 0 0 10px var(--neon-green); }
-
+        .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s; }
         .gauge-data { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-gray); }
 
         .btn-join {
             margin-top: 15px;
-            align-self: flex-end;
             background: var(--neon-gradient);
             color: #000;
-            padding: 10px 25px;
+            padding: 12px 25px;
             border-radius: 4px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Orbitron';
             font-weight: 700;
             text-decoration: none;
             font-size: 0.75rem;
+            text-align: center;
         }
 
-        footer {
-            padding: 20px 40px;
-            border-top: var(--border);
-            background: var(--bg-sidebar);
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            color: #444;
-            flex-shrink: 0;
-        }
-
+        /* --- RESPONSIVE MOBILE --- */
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
-            aside { width: 100%; height: auto; border-right: none; border-bottom: var(--border); flex-direction: row; overflow-x: auto; }
+            
+            aside {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: var(--border);
+                scrollbar-width: none;
+            }
+            aside::-webkit-scrollbar { display: none; }
+
             .nav-label { display: none; }
-            .nav-item { padding: 15px 20px; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent; }
-            .nav-item.active { border-bottom: 2px solid var(--neon-green); }
-            .mission-card { flex-direction: column; }
+
+            .nav-item {
+                padding: 15px 20px;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                white-space: nowrap;
+            }
+
+            .nav-item:hover, .nav-item.active { border-bottom: 3px solid var(--neon-green); }
+
+            .scroll-area { padding: 20px; overflow-x: hidden; }
+
+            .hero-callout { padding: 25px; border-radius: 12px; border-left: none; border-top: 4px solid var(--neon-green); }
+            .hero-callout h2 { font-size: 1.4rem; }
+
+            .mission-card { flex-direction: column; gap: 20px; padding: 20px; }
             .mission-img-box { width: 100%; height: 200px; }
-            .scroll-area { padding: 20px; }
-            .hero-callout { padding: 25px; }
+            
+            .btn-join { width: 100%; align-self: center; padding: 15px; }
+            
+            header { padding: 0 20px; }
         }
     </style>
 </head>
@@ -249,45 +203,33 @@
             <div class="nav-label">PORTAIL TRIBU</div>
             <a href="arene.html" class="nav-item active">L'ARÈNE</a>
             <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
-            <a href="comment-ca-marche.html" class="nav-item">COMMENT ÇA MARCHE</a>
+            <a href="comment-ca-marche.html" class="nav-item">PROTOCOLE</a>
             <a href="cgv.html" class="nav-item">CGV</a>
-            <a href="mentions.html" class="nav-item">MENTIONS LÉGALES</a>
-            <a href="contact.html" class="nav-item">NOUS CONTACTER</a>
-            <div class="nav-footer">
-                <a href="admin.html" class="nav-item" style="color: #ff3e00; font-size: 0.65rem;">ADMIN</a>
-            </div>
+            <a href="contact.html" class="nav-item">CONTACT</a>
         </aside>
 
         <div class="content-wrapper">
             <header>
                 <a href="index.html" class="logo-header">TRIBAO</a>
-                <a href="soumission-mission.html" class="btn-create">+ LANCER UNE DEMANDE</a>
+                <a href="soumission-mission.html" style="font-size: 0.6rem; padding: 8px 12px;" class="btn-join">+ DEMANDE</a>
             </header>
 
             <div class="scroll-area">
-                <div class="arena-grid" id="arena-container">
+                <div class="arena-grid">
                     
                     <section class="hero-callout">
                         <h2>LA RÉVOLUTION EST EN MARCHE.</h2>
-                        <p>INSCRIVEZ-VOUS OU CONNECTEZ-VOUS POUR REJOINDRE LA TRIBU <span>TRIBAO</span> ET PROFITER DU PRIX DE GROS.</p>
-                        <div class="auth-quick-links">
-                            <a href="auth.html" class="btn-auth">S'INSCRIRE</a>
-                            <a href="auth.html" class="btn-auth outline">SE CONNECTER</a>
-                        </div>
+                        <p>REJOIGNEZ LA TRIBU <span>TRIBAO</span> ET ACCÉDEZ AU PRIX DE GROS.</p>
                     </section>
 
-                    <h2 style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS EN COURS</h2>
+                    <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS EN COURS</h2>
 
                     <div id="missions-list">
-                         <p style="color: var(--neon-green); font-family: 'Orbitron';">CHARGEMENT DE L'ARÈNE...</p>
+                         <p style="color: var(--neon-green); font-family: 'Orbitron'; font-size: 0.8rem;">// DÉCRYPTAGE DES MISSIONS...</p>
                     </div>
                     
                 </div>
             </div>
-
-            <footer>
-                <span>© 2026 TRIBAO - BRUTALIST ECO</span>
-            </footer>
         </div>
     </div>
 
@@ -295,29 +237,24 @@
     <script>
         const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
-
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         async function loadMissions() {
-            const { data, error } = await _supabase
-                .from('missions')
-                .select('*');
+            const { data, error } = await _supabase.from('missions').select('*');
 
             if (error) {
-                console.error("Erreur de chargement:", error);
-                document.getElementById('missions-list').innerHTML = "<p>Erreur de connexion à l'arène.</p>";
+                document.getElementById('missions-list').innerHTML = "<p>// ERREUR DE LIAISON</p>";
                 return;
             }
 
             const listContainer = document.getElementById('missions-list');
             
             if (!data || data.length === 0) {
-                listContainer.innerHTML = "<p>Aucune mission active pour le moment. Lancez une demande !</p>";
+                listContainer.innerHTML = "<p>// AUCUNE MISSION ACTIVE</p>";
                 return;
             }
 
             listContainer.innerHTML = data.map(m => {
-                // Correction ici : objectif_membres avec un S
                 const obj = m.objectif_membres || 1;
                 const act = m.membres_actuels || 0;
                 const progress = Math.min(100, Math.round((act / obj) * 100));
@@ -325,19 +262,19 @@
                 return `
                     <div class="mission-card">
                         <div class="mission-img-box">
-                            <img src="${m.image_url}" alt="TEST IMAGE">
+                            <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="Produit">
                         </div>
                         <div class="mission-info">
                             <h3>${m.titre}</h3>
-                            <div class="price-tag">Prix ciblé : ${m.prix_cible}€</div>
+                            <div class="price-tag">CIBLE : ${m.prix_cible}€</div>
                             <div class="gauge-wrapper">
                                 <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
                                 <div class="gauge-data">
-                                    <span>${act} sur ${obj} Guerriers</span>
+                                    <span>${act} / ${obj} Guerriers</span>
                                     <span>${progress}%</span>
                                 </div>
                             </div>
-                            <a href="mission-detail.html?id=${m.id}" class="btn-join">REJOINDRE L'ARÈNE</a>
+                            <a href="mission-detail.html?id=${m.id}" class="btn-join">DÉTAILS MISSION</a>
                         </div>
                     </div>
                 `;
