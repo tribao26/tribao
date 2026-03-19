@@ -22,25 +22,20 @@
 
         .main-layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR --- */
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; transition: 0.3s; }
         .nav-item:hover { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); }
 
-        /* --- CONTENT WRAPPER --- */
         .content-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         header { height: 70px; display: flex; align-items: center; padding: 0 30px; border-bottom: var(--border); background: rgba(10,10,10,0.9); }
         .back-link { color: var(--text-gray); text-decoration: none; font-size: 0.8rem; font-family: 'Orbitron'; transition: 0.3s; }
         .back-link:hover { color: var(--neon-green); }
 
-        /* --- PRODUCT GRID --- */
         .mission-grid { display: grid; grid-template-columns: 1fr 450px; min-height: calc(100vh - 70px); }
 
-        /* --- GAUCHE : VISUEL --- */
         .product-visual { background: #000; display: flex; align-items: center; justify-content: center; padding: 40px; border-right: var(--border); }
         .product-visual img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; box-shadow: 0 0 40px rgba(57, 255, 20, 0.1); }
 
-        /* --- DROITE : DATA --- */
         .product-data { padding: 60px 40px; background: var(--bg-black); }
         .badge-status { display: inline-block; padding: 5px 12px; border: 1px solid var(--neon-green); color: var(--neon-green); font-family: 'JetBrains Mono'; font-size: 0.7rem; border-radius: 4px; margin-bottom: 20px; }
         
@@ -51,7 +46,6 @@
 
         .gain-box { background: #111; border: 1px dashed var(--neon-green); padding: 15px; border-radius: 4px; display: inline-block; margin-top: 10px; font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--neon-green); }
 
-        /* --- JAUGE TACTIQUE --- */
         .tactic-box { margin-top: 50px; padding: 30px; background: var(--card-gray); border-radius: 12px; border: var(--border); }
         .gauge-header { display: flex; justify-content: space-between; font-family: 'Orbitron'; font-size: 0.8rem; margin-bottom: 15px; }
         .gauge-bar-lg { width: 100%; height: 12px; background: #000; border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; }
@@ -157,13 +151,13 @@
                 return;
             }
 
-            // Injection des données
+            // Injection des données réelles
             document.getElementById('mission-title').innerText = m.titre;
             document.getElementById('mission-img').src = m.image_url || 'https://via.placeholder.com/600x400/111/39FF14?text=TRIBAO';
             document.getElementById('mission-price-target').innerText = m.prix_cible + " €";
             
-            // On gère le prix public (retail) s'il existe, sinon on met +30% par défaut
-            const retail = m.prix_public || Math.round(m.prix_cible * 1.35);
+            // Calcul auto du prix public (retail) puisque la colonne n'existe pas
+            const retail = Math.round(m.prix_cible * 1.35);
             document.getElementById('mission-price-retail').innerText = retail + " €";
             document.getElementById('mission-gain').innerText = `ÉCONOMIE TRIBU : ${retail - m.prix_cible} € (DIRECT USINE)`;
 
@@ -182,26 +176,34 @@
 
         async function enlistInMission() {
             const btn = document.querySelector('.btn-enlist');
+            const originalText = btn.innerText;
             btn.innerText = "// TRANSMISSION...";
             btn.disabled = true;
 
-            // 1. Récupérer score actuel
-            const { data } = await _supabase.from('missions').select('membres_actuels').eq('id', missionId).single();
+            // 1. Récupérer le score le plus récent
+            const { data, error: fetchError } = await _supabase.from('missions').select('membres_actuels').eq('id', missionId).single();
             
+            if (fetchError) {
+                alert("Erreur de connexion au serveur.");
+                btn.disabled = false;
+                btn.innerText = originalText;
+                return;
+            }
+
             // 2. Update +1
-            const { error } = await _supabase
+            const { error: updateError } = await _supabase
                 .from('missions')
                 .update({ membres_actuels: data.membres_actuels + 1 })
                 .eq('id', missionId);
 
-            if (!error) {
+            if (!updateError) {
                 alert("ENGAGEMENT VALIDÉ. BIENVENUE DANS LA TRIBU !");
-                loadMission(); // Rafraîchir les chiffres
+                await loadMission(); // Rafraîchir les chiffres sur la page
                 btn.innerText = "MISSION REJOINTE";
             } else {
                 alert("Erreur lors de la transmission.");
                 btn.disabled = false;
-                btn.innerText = "REJOINDRE LA MISSION";
+                btn.innerText = originalText;
             }
         }
 
