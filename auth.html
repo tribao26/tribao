@@ -73,6 +73,9 @@
         .theme-pro input:focus { border-color: var(--neon-blue); }
 
         .info-text { margin-top: 20px; font-size: 0.75rem; color: var(--text-gray); text-align: center; line-height: 1.4; }
+        
+        /* Message d'état pour l'utilisateur */
+        #auth-status { margin-top: 15px; font-size: 0.8rem; text-align: center; font-family: 'JetBrains Mono'; min-height: 1.2rem; }
 
         @media (max-width: 768px) {
             .main-layout { flex-direction: column; }
@@ -86,7 +89,6 @@
     <div class="main-layout">
         <aside>
             <div class="nav-label">NAVIGATION</div>
-            
             <a href="arene.html" class="nav-item">L'ARÈNE</a>
             <a href="contact.html" class="nav-item">SUPPORT</a>
         </aside>
@@ -110,22 +112,29 @@
                     </div>
                     <div class="field-group">
                         <label>IDENTIFIANT EMAIL</label>
-                        <input type="email" placeholder="email@tribao.fr">
+                        <input type="email" placeholder="email@tribao.fr" id="emailInput" required>
                     </div>
                     <div class="field-group">
                         <label>CODE D'ACCÈS</label>
-                        <input type="password" placeholder="••••••••">
+                        <input type="password" placeholder="••••••••" id="passInput" required>
                     </div>
 
-                    <button type="button" class="btn-submit" id="submitBtn" onclick="handleAuth()">DÉVERROUILLER L'ACCÈS</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">DÉVERROUILLER L'ACCÈS</button>
                 </form>
 
+                <div id="auth-status"></div>
                 <p class="info-text" id="footerText">Accès réservé aux membres de la Tribu TRIBAO.</p>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Configuration Supabase
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         let currentRole = 'tribu';
         let currentMode = 'login';
 
@@ -133,11 +142,9 @@
             currentRole = role;
             document.body.className = 'theme-' + role;
             
-            // Mise à jour visuelle des boutons
             document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector('.role-btn.' + role).classList.add('active');
 
-            // Mise à jour des textes
             const nameLabel = document.getElementById('nameLabel');
             const footerText = document.getElementById('footerText');
             const authCard = document.getElementById('authCard');
@@ -158,16 +165,58 @@
             document.getElementById('loginTab').classList.toggle('active', mode === 'login');
             document.getElementById('signupTab').classList.toggle('active', mode === 'signup');
             document.getElementById('nameGroup').style.display = (mode === 'signup') ? 'block' : 'none';
+            document.getElementById('submitBtn').innerText = (mode === 'login') ? "DÉVERROUILLER L'ACCÈS" : "CRÉER MON ACCÈS";
         }
 
-        function handleAuth() {
-            // Simulation de redirection selon le rôle choisi
-            if (currentRole === 'tribu') {
-                window.location.href = 'arene.html'; // Dashboard client
+        // GESTION RÉELLE DE L'AUTH
+        document.getElementById('mainForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passInput').value;
+            const name = document.getElementById('nameInput').value;
+            const status = document.getElementById('auth-status');
+
+            status.style.color = "var(--text-gray)";
+            status.innerText = "// TRANSMISSION EN COURS...";
+
+            if (currentMode === 'signup') {
+                // INSCRIPTION
+                const { data, error } = await _supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { 
+                            full_name: name,
+                            role: currentRole 
+                        }
+                    }
+                });
+
+                if (error) {
+                    status.style.color = "#ff4444";
+                    status.innerText = "ERREUR : " + error.message;
+                } else {
+                    status.style.color = currentRole === 'tribu' ? "var(--neon-green)" : "var(--neon-blue)";
+                    status.innerText = "ACCÈS INITIÉ. Vérifiez vos emails.";
+                }
             } else {
-                window.location.href = 'dashboard-fournisseur.html'; // Dashboard pro
+                // CONNEXION
+                const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+                if (error) {
+                    status.style.color = "#ff4444";
+                    status.innerText = "IDENTIFIANTS INVALIDES";
+                } else {
+                    const userRole = data.user.user_metadata.role || 'tribu';
+                    status.style.color = userRole === 'tribu' ? "var(--neon-green)" : "var(--neon-blue)";
+                    status.innerText = "AUTORISATION ACCORDÉE...";
+                    
+                    setTimeout(() => {
+                        window.location.href = (userRole === 'pro') ? 'dashboard-fournisseur.html' : 'arene.html';
+                    }, 1000);
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>
