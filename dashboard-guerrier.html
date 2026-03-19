@@ -46,7 +46,7 @@
         .stat-card span { display: block; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--text-gray); margin-bottom: 10px; }
         .stat-card h3 { margin: 0; font-family: 'JetBrains Mono'; font-size: 1.8rem; color: #fff; }
 
-        /* --- MISSIONS REJOINTS --- */
+        /* --- MISSIONS REJOINTES --- */
         .section-header { font-family: 'Orbitron'; font-size: 0.9rem; margin-bottom: 25px; letter-spacing: 2px; color: var(--text-gray); display: flex; align-items: center; gap: 15px; }
         .section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
 
@@ -54,13 +54,14 @@
             background: rgba(20, 20, 20, 0.5); border: var(--border); border-radius: 12px; padding: 25px;
             display: grid; grid-template-columns: 80px 1fr 200px; align-items: center; gap: 25px; margin-bottom: 15px;
         }
-        .mission-icon { width: 60px; height: 60px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; }
+        .mission-icon { width: 60px; height: 60px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; overflow: hidden; }
+        .mission-icon img { width: 100%; height: 100%; object-fit: cover; }
         .mission-name h4 { margin: 0 0 5px; font-family: 'Orbitron'; font-size: 1rem; }
         .mission-name p { margin: 0; font-size: 0.8rem; color: var(--text-gray); }
         
         .mission-progress { text-align: right; }
         .mini-gauge { width: 100%; height: 6px; background: #000; border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        .mini-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+        .mini-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 1s; }
 
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
@@ -75,21 +76,21 @@
 
     <div class="main-layout">
         <aside>
-            <div class="nav-label">UNITÉ : GUERRIER_01</div>
+            <div class="nav-label" id="unit-id">UNITÉ : CHARGEMENT...</div>
             <a href="arene.html" class="nav-item">L'ARÈNE</a>
             <a href="#" class="nav-item active">MON QG</a>
             <a href="#" class="nav-item">MES COMMANDES</a>
             <a href="#" class="nav-item">PORTEFEUILLE</a>
             
             <div class="nav-footer">
-                <a href="index.html" class="nav-item">DÉCONNEXION</a>
+                <a href="#" onclick="handleLogout(event)" class="nav-item" style="color:#ff4444;">DÉCONNEXION</a>
             </div>
         </aside>
 
         <div class="content-wrapper">
             <header>
                 <div class="logo-header">TRIBAO</div>
-                <div class="user-rank">RANG : ÉCLAIREUR [NIVEAU 2]</div>
+                <div class="user-rank" id="display-rank">RANG : ÉCLAIREUR</div>
             </header>
 
             <div class="scroll-area">
@@ -97,47 +98,23 @@
                     
                     <div class="stats-row">
                         <div class="stat-card">
-                            <span>ÉCONOMIE TOTALE</span>
-                            <h3>412.00 €</h3>
+                            <span>ÉCONOMIE ESTIMÉE</span>
+                            <h3 id="stat-eco">0.00 €</h3>
                         </div>
                         <div class="stat-card">
                             <span>MISSIONS REJOINTES</span>
-                            <h3>03</h3>
+                            <h3 id="stat-count">00</h3>
                         </div>
                         <div class="stat-card">
                             <span>POINTS D'INFLUENCE</span>
-                            <h3>1 250</h3>
+                            <h3 id="stat-pts">0</h3>
                         </div>
                     </div>
 
-                    <h2 class="section-header">MISSIONS ACTIVES</h2>
+                    <h2 class="section-header">MES ENGAGEMENTS ACTIFS</h2>
 
-                    <div class="active-mission">
-                        <div class="mission-icon">
-                            <img src="https://via.placeholder.com/40/111/39FF14?text=3D" alt="">
-                        </div>
-                        <div class="mission-name">
-                            <h4>Imprimante 3D Ender 3 S1</h4>
-                            <p>Cible : 380€ // Status : Négociation finale</p>
-                        </div>
-                        <div class="mission-progress">
-                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem;">83% ATTEINT</span>
-                            <div class="mini-gauge"><div class="mini-fill" style="width: 83%;"></div></div>
-                        </div>
-                    </div>
-
-                    <div class="active-mission">
-                        <div class="mission-icon">
-                            <img src="https://via.placeholder.com/40/111/39FF14?text=BIKE" alt="">
-                        </div>
-                        <div class="mission-name">
-                            <h4>Vélo Électrique Rider Pro X</h4>
-                            <p>Cible : 1 800€ // Status : Ralliement Tribu</p>
-                        </div>
-                        <div class="mission-progress">
-                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem;">67% ATTEINT</span>
-                            <div class="mini-gauge"><div class="mini-fill" style="width: 67%;"></div></div>
-                        </div>
+                    <div id="my-missions-container">
+                        <p style="color:var(--neon-green); font-family:'JetBrains Mono'; font-size:0.8rem;">// RÉCUPÉRATION DES DONNÉES TACTIQUES...</p>
                     </div>
 
                 </div>
@@ -149,5 +126,75 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function initDashboard() {
+            // 1. Vérification session
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            const user = session.user;
+            document.getElementById('unit-id').innerText = `UNITÉ : ${user.email.split('@')[0].toUpperCase()}`;
+
+            // 2. Récupération des ralliements (Missions rejointes)
+            // On suppose que tu as créé la table 'ralliements' comme discuté
+            const { data: ralliements, error } = await _supabase
+                .from('ralliements')
+                .select(`
+                    mission_id,
+                    missions (*)
+                `)
+                .eq('user_id', user.id);
+
+            const container = document.getElementById('my-missions-container');
+            
+            if (error || !ralliements || ralliements.length === 0) {
+                container.innerHTML = "<p style='color:var(--text-gray); font-family:Orbitron; font-size:0.8rem;'>// AUCUNE MISSION REJOINTE. L'ARÈNE VOUS ATTEND.</p>";
+                document.getElementById('stat-count').innerText = "00";
+                return;
+            }
+
+            // 3. Mise à jour des Stats
+            document.getElementById('stat-count').innerText = ralliements.length.toString().padStart(2, '0');
+            document.getElementById('stat-pts').innerText = (ralliements.length * 150); // Simulation de points
+
+            // 4. Affichage des missions
+            container.innerHTML = ralliements.map(item => {
+                const m = item.missions;
+                const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
+                
+                return `
+                    <div class="active-mission">
+                        <div class="mission-icon">
+                            <img src="${m.image_url}" alt="">
+                        </div>
+                        <div class="mission-name">
+                            <h4>${m.titre}</h4>
+                            <p>Cible : ${m.prix_cible}€ // Status : En cours de ralliement</p>
+                        </div>
+                        <div class="mission-progress">
+                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem;">${progress}% ATTEINT</span>
+                            <div class="mini-gauge"><div class="mini-fill" style="width: ${progress}%;"></div></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function handleLogout(e) {
+            e.preventDefault();
+            await _supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        initDashboard();
+    </script>
 </body>
 </html>

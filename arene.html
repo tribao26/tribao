@@ -228,7 +228,7 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // --- GESTION DE LA SESSION ---
+        // --- GESTION DE LA SESSION + RALLIEMENT AUTOMATIQUE ---
         async function checkSession() {
             const { data: { session } } = await _supabase.auth.getSession();
             
@@ -243,8 +243,23 @@
 
                 // Maj du Hero
                 document.getElementById('hero-title').innerText = "Ravi de vous revoir, Guerrier.";
-                document.getElementById('hero-desc').innerHTML = `Votre session est <span>ACTIF</span>. Parcourez les missions ci-dessous et engagez-vous pour faire baisser les prix.`;
+                document.getElementById('hero-desc').innerHTML = `Votre session est <span style="color:var(--neon-green)">ACTIF</span>. Parcourez les missions ci-dessous.`;
                 document.getElementById('hero-auth-btns').style.display = 'none';
+
+                // --- 🛡️ LOGIQUE DE RALLIEMENT AUTOMATIQUE ---
+                const pendingId = localStorage.getItem('pending_mission_id');
+                if (pendingId && role === 'tribu') {
+                    localStorage.removeItem('pending_mission_id'); // On vide la mémoire tout de suite
+                    
+                    // On récupère le score actuel
+                    const { data: m } = await _supabase.from('missions').select('membres_actuels').eq('id', pendingId).single();
+                    if (m) {
+                        // On valide le +1
+                        await _supabase.from('missions').update({ membres_actuels: m.membres_actuels + 1 }).eq('id', pendingId);
+                        alert("ENGAGEMENT VALIDÉ ! Vous avez rejoint la mission automatiquement.");
+                        loadMissions(); // On rafraîchit la liste pour voir le changement
+                    }
+                }
             }
         }
 
@@ -254,17 +269,13 @@
             window.location.reload();
         }
 
-        // --- CHARGEMENT DES MISSIONS ---
         async function loadMissions() {
             const { data, error } = await _supabase.from('missions').select('*');
-
             if (error) {
                 document.getElementById('missions-list').innerHTML = "<p>// ERREUR DE LIAISON</p>";
                 return;
             }
-
             const listContainer = document.getElementById('missions-list');
-            
             if (!data || data.length === 0) {
                 listContainer.innerHTML = "<p>// AUCUNE MISSION ACTIVE</p>";
                 return;
@@ -274,7 +285,6 @@
                 const obj = m.objectif_membres || 1;
                 const act = m.membres_actuels || 0;
                 const progress = Math.min(100, Math.round((act / obj) * 100));
-                
                 return `
                     <div class="mission-card">
                         <div class="mission-img-box">
@@ -297,7 +307,6 @@
             }).join('');
         }
 
-        // Initialisation
         checkSession();
         loadMissions();
     </script>

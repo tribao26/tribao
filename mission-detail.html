@@ -120,8 +120,10 @@
             // 👮 VÉRIFICATION DE LA SESSION
             const { data: { session } } = await _supabase.auth.getSession();
 
-            // REDIRECTION INSTANTANÉE SI PAS DE SESSION
+            // REDIRECTION SI PAS DE SESSION + MÉMORISATION
             if (!session) {
+                // On stocke l'ID de la mission pour la valider automatiquement après le login
+                localStorage.setItem('pending_mission_id', missionId);
                 window.location.href = 'auth.html';
                 return; 
             }
@@ -133,7 +135,7 @@
                 return; 
             }
 
-            // ⚔️ SI OK (TRIBU CONNECTÉE), ON VALIDE L'ENGAGEMENT
+            // ⚔️ SI OK, ON VALIDE L'ENGAGEMENT
             const btn = document.querySelector('.btn-enlist');
             btn.innerText = "// TRANSMISSION...";
             btn.disabled = true;
