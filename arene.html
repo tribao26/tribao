@@ -177,11 +177,19 @@
     <div class="main-layout">
         <aside>
             <div class="nav-label">PORTAIL TRIBU</div>
+            
+            <div id="user-identity" style="padding: 10px 25px; margin-bottom: 10px; display: none;">
+                <div style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon-green); letter-spacing: 1px;">GUERRIER CONNECTÉ</div>
+                <div id="user-email" style="font-size: 0.7rem; color: #fff; margin-top: 5px; opacity: 0.8; overflow: hidden; text-overflow: ellipsis;">---</div>
+            </div>
+
             <a href="arene.html" class="nav-item active">L'ARÈNE</a>
             <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
             <a href="comment-ca-marche.html" class="nav-item">COMMENT CA MARCHE</a>
             <a href="cgv.html" class="nav-item">CGV</a>
             <a href="contact.html" class="nav-item">CONTACT</a>
+            
+            <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
         </aside>
 
         <div class="content-wrapper">
@@ -194,10 +202,10 @@
                 <div class="arena-grid">
                     
                     <section class="hero-callout">
-                        <h2>TRIBAO — La plateforme où les clients reprennent le pouvoir.</h2>
-                        <p>REJOIGNEZ LA TRIBU <span>TRIBAO</span> Créez une mission, rassemblez une tribu, mettez les fournisseurs en concurrence et obtenez des offres plus avantageuses..</p>
+                        <h2 id="hero-title">TRIBAO — La plateforme où les clients reprennent le pouvoir.</h2>
+                        <p id="hero-desc">REJOIGNEZ LA TRIBU <span>TRIBAO</span> Créez une mission, rassemblez une tribu, mettez les fournisseurs en concurrence et obtenez des offres plus avantageuses.</p>
                         
-                        <div class="auth-actions">
+                        <div class="auth-actions" id="hero-auth-btns">
                             <a href="auth.html" class="btn-hero btn-hero-solid">S'INSCRIRE</a>
                             <a href="auth.html" class="btn-hero btn-hero-outline">SE CONNECTER</a>
                         </div>
@@ -220,6 +228,33 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        // --- GESTION DE LA SESSION ---
+        async function checkSession() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            
+            if (session) {
+                const user = session.user;
+                const role = user.user_metadata.role || 'tribu';
+
+                // Maj de la Sidebar
+                document.getElementById('user-identity').style.display = 'block';
+                document.getElementById('user-email').innerText = user.email;
+                document.getElementById('logout-link').style.display = 'flex';
+
+                // Maj du Hero
+                document.getElementById('hero-title').innerText = "Ravi de vous revoir, Guerrier.";
+                document.getElementById('hero-desc').innerHTML = `Votre session est <span>ACTIF</span>. Parcourez les missions ci-dessous et engagez-vous pour faire baisser les prix.`;
+                document.getElementById('hero-auth-btns').style.display = 'none';
+            }
+        }
+
+        async function handleLogout(e) {
+            e.preventDefault();
+            await _supabase.auth.signOut();
+            window.location.reload();
+        }
+
+        // --- CHARGEMENT DES MISSIONS ---
         async function loadMissions() {
             const { data, error } = await _supabase.from('missions').select('*');
 
@@ -262,6 +297,8 @@
             }).join('');
         }
 
+        // Initialisation
+        checkSession();
         loadMissions();
     </script>
 </body>
