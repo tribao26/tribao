@@ -25,7 +25,7 @@
         /* --- SIDEBAR GUERRIER --- */
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
-        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
         .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
         .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
 
@@ -45,6 +45,14 @@
         .stat-card::after { content: ""; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--neon-green); }
         .stat-card span { display: block; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--text-gray); margin-bottom: 10px; }
         .stat-card h3 { margin: 0; font-family: 'JetBrains Mono'; font-size: 1.8rem; color: #fff; }
+
+        /* --- RECRUITMENT BOX (Special Style) --- */
+        .recruit-box { grid-column: 1 / -1; border: 1px dashed var(--neon-green); background: rgba(57, 255, 20, 0.02); }
+        .recruit-box::after { display: none; }
+        .recruit-group { display: flex; gap: 10px; margin-top: 15px; }
+        .recruit-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: var(--neon-green); font-family: 'JetBrains Mono'; font-size: 0.75rem; border-radius: 4px; outline: none; }
+        .btn-copy { background: var(--neon-green); color: #000; border: none; padding: 0 20px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.7rem; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .btn-copy:hover { filter: brightness(1.2); }
 
         /* --- MISSIONS REJOINTES --- */
         .section-header { font-family: 'Orbitron'; font-size: 0.9rem; margin-bottom: 25px; letter-spacing: 2px; color: var(--text-gray); display: flex; align-items: center; gap: 15px; }
@@ -66,6 +74,9 @@
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
             aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label { display: none; }
+            .nav-item { border-left: none; border-bottom: 3px solid transparent; }
+            .nav-item.active { border-bottom: 3px solid var(--neon-green); }
             .active-mission { grid-template-columns: 1fr; text-align: center; }
             .mission-icon { margin: 0 auto; }
             .mission-progress { text-align: center; }
@@ -109,6 +120,14 @@
                             <span>POINTS D'INFLUENCE</span>
                             <h3 id="stat-pts">0</h3>
                         </div>
+
+                        <div class="stat-card recruit-box">
+                            <span>UNITÉ DE RECRUTEMENT TACTIQUE</span>
+                            <div class="recruit-group">
+                                <input type="text" id="ref-link" class="recruit-input" readonly value="GÉNÉRATION DU LIEN...">
+                                <button onclick="copyLink()" class="btn-copy">COPIER LE LIEN</button>
+                            </div>
+                        </div>
                     </div>
 
                     <h2 class="section-header">MES ENGAGEMENTS ACTIFS</h2>
@@ -133,7 +152,6 @@
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         async function initDashboard() {
-            // 1. Vérification session
             const { data: { session } } = await _supabase.auth.getSession();
             if (!session) {
                 window.location.href = 'auth.html';
@@ -141,31 +159,39 @@
             }
 
             const user = session.user;
-            document.getElementById('unit-id').innerText = `UNITÉ : ${user.email.split('@')[0].toUpperCase()}`;
+            document.getElementById('unit-id').innerText = `UNITÉ : ${(user.user_metadata.full_name || user.email.split('@')[0]).toUpperCase()}`;
 
-            // 2. Récupération des ralliements (Missions rejointes)
-            // On suppose que tu as créé la table 'ralliements' comme discuté
-            const { data: ralliements, error } = await _supabase
+            // --- 🤝 GÉNÉRATION DU LIEN DE PARRAINAGE ---
+            const myRefLink = window.location.origin + "/auth.html?ref=" + user.id;
+            document.getElementById('ref-link').value = myRefLink;
+
+            // --- 📊 RÉCUPÉRATION DONNÉES (MISSIONS + PARRAINAGES) ---
+            const { data: ralliements } = await _supabase
                 .from('ralliements')
-                .select(`
-                    mission_id,
-                    missions (*)
-                `)
+                .select('mission_id, missions (*)')
                 .eq('user_id', user.id);
+
+            const { data: parrainages } = await _supabase
+                .from('parrainages')
+                .select('*')
+                .eq('parrain_id', user.id);
 
             const container = document.getElementById('my-missions-container');
             
-            if (error || !ralliements || ralliements.length === 0) {
+            // Calcul des points : 150 par mission + 50 par recrue
+            const mCount = ralliements ? ralliements.length : 0;
+            const pCount = parrainages ? parrainages.length : 0;
+            const totalPoints = (mCount * 150) + (pCount * 50);
+
+            document.getElementById('stat-count').innerText = mCount.toString().padStart(2, '0');
+            document.getElementById('stat-pts').innerText = totalPoints;
+
+            if (!ralliements || ralliements.length === 0) {
                 container.innerHTML = "<p style='color:var(--text-gray); font-family:Orbitron; font-size:0.8rem;'>// AUCUNE MISSION REJOINTE. L'ARÈNE VOUS ATTEND.</p>";
-                document.getElementById('stat-count').innerText = "00";
                 return;
             }
 
-            // 3. Mise à jour des Stats
-            document.getElementById('stat-count').innerText = ralliements.length.toString().padStart(2, '0');
-            document.getElementById('stat-pts').innerText = (ralliements.length * 150); // Simulation de points
-
-            // 4. Affichage des missions
+            // Affichage des missions
             container.innerHTML = ralliements.map(item => {
                 const m = item.missions;
                 const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
@@ -173,7 +199,7 @@
                 return `
                     <div class="active-mission">
                         <div class="mission-icon">
-                            <img src="${m.image_url}" alt="">
+                            <img src="${m.image_url || 'https://via.placeholder.com/60'}" alt="">
                         </div>
                         <div class="mission-name">
                             <h4>${m.titre}</h4>
@@ -186,6 +212,13 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function copyLink() {
+            const copyText = document.getElementById("ref-link");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            alert("UNITÉ DE RECRUTEMENT : Lien de parrainage copié !");
         }
 
         async function handleLogout(e) {
