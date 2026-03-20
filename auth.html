@@ -130,6 +130,14 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        // --- 🤝 CAPTURE DU PARRAIN ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const refId = urlParams.get('ref');
+        if (refId) {
+            localStorage.setItem('referrer_id', refId);
+            console.log("Cible de parrainage verrouillée : " + refId);
+        }
+
         let currentRole = 'tribu';
         let currentMode = 'login';
 
@@ -183,14 +191,12 @@
                     status.style.color = "#ff4444";
                     status.innerText = "ERREUR : " + error.message;
                 } else if (data.session) {
-                    // SI PAS DE CONFIRMATION MAIL, SUPABASE CREE UNE SESSION DE SUITE
                     status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
                     status.innerText = "DÉVERROUILLAGE RÉUSSI...";
                     setTimeout(() => {
                         window.location.href = (currentRole === 'pro') ? 'dashboard-fournisseur.html' : 'arene.html';
                     }, 1000);
                 } else {
-                    // SI CONFIRMATION MAIL ACTIVE
                     status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
                     status.innerText = "INSCRIPTION OK. Vérifiez vos emails.";
                 }

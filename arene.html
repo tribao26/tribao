@@ -220,24 +220,37 @@
                 document.getElementById('user-identity').style.display = 'block';
                 document.getElementById('user-email').innerText = user.email;
                 document.getElementById('logout-link').style.display = 'flex';
-                document.getElementById('qg-link').style.display = 'flex'; // On montre le QG
+                document.getElementById('qg-link').style.display = 'flex'; 
 
                 document.getElementById('hero-title').innerText = "Ravi de vous revoir, Guerrier.";
                 document.getElementById('hero-desc').innerHTML = `Votre session est <span style="color:var(--neon-green)">ACTIVE</span>. Parcourez les missions ci-dessous.`;
                 document.getElementById('hero-auth-btns').style.display = 'none';
+
+                // --- 🤝 LOGIQUE DE PARRAINAGE ---
+                const referrerId = localStorage.getItem('referrer_id');
+                if (referrerId && referrerId !== user.id) {
+                    const { data: existing } = await _supabase.from('parrainages').select('*').eq('filleul_id', user.id).single();
+                    if (!existing) {
+                        await _supabase.from('parrainages').insert([{
+                            parrain_id: referrerId,
+                            filleul_id: user.id,
+                            points_gagnes: 50
+                        }]);
+                        localStorage.removeItem('referrer_id');
+                        alert("SYSTÈME : Recrutement validé. +50 points d'influence pour votre parrain.");
+                    }
+                }
 
                 // --- 🛡️ RALLIEMENT AUTOMATIQUE ---
                 const pendingId = localStorage.getItem('pending_mission_id');
                 if (pendingId && role === 'tribu') {
                     localStorage.removeItem('pending_mission_id'); 
                     
-                    // 1. Création du lien dans 'ralliements'
                     const { error: linkErr } = await _supabase.from('ralliements').insert([
                         { user_id: user.id, mission_id: pendingId }
                     ]);
 
                     if (!linkErr) {
-                        // 2. Mise à jour compteur missions
                         const { data: m } = await _supabase.from('missions').select('membres_actuels').eq('id', pendingId).single();
                         if (m) {
                             await _supabase.from('missions').update({ membres_actuels: m.membres_actuels + 1 }).eq('id', pendingId);
