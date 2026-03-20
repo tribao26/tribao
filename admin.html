@@ -20,6 +20,29 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg-admin); color: var(--text-main); font-family: 'JetBrains Mono', monospace; display: flex; height: 100vh; overflow: hidden; }
 
+        /* --- OVERLAY DE SÉCURITÉ --- */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-admin); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .lock-box {
+            text-align: center; padding: 40px; border: 1px solid var(--accent-orange);
+            background: var(--panel-bg); border-radius: 8px; box-shadow: 0 0 30px rgba(255, 62, 0, 0.2);
+        }
+        .lock-box h2 { font-family: 'Orbitron'; color: var(--accent-orange); margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 2px; }
+        .lock-box input {
+            background: #000; border: 1px solid #333; color: var(--neon-green);
+            padding: 12px; text-align: center; font-family: 'JetBrains Mono';
+            outline: none; border-radius: 4px; margin-bottom: 15px; width: 200px;
+        }
+        .lock-box button {
+            background: var(--accent-orange); color: #fff; border: none;
+            padding: 10px 20px; font-family: 'Orbitron'; font-size: 0.7rem;
+            cursor: pointer; border-radius: 4px; transition: 0.3s;
+        }
+        .lock-box button:hover { background: #fff; color: #000; }
+
         /* --- SIDEBAR --- */
         aside { width: 280px; background: var(--panel-bg); border-right: var(--border); display: flex; flex-direction: column; }
         .cmd-label { padding: 30px 20px 10px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--accent-orange); letter-spacing: 2px; }
@@ -33,24 +56,12 @@
 
         .dashboard-view { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-        /* --- ANALYTICS CARDS --- */
+        /* --- STATS CARDS --- */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
-        .stat-box { background: var(--panel-bg); border: var(--border); padding: 20px; border-radius: 4px; position: relative; }
+        .stat-box { background: var(--panel-bg); border: var(--border); padding: 20px; border-radius: 4px; }
         .stat-box small { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 10px; }
         .stat-val { font-size: 1.4rem; font-family: 'Orbitron'; }
-        
         .conv-circle { width: 45px; height: 45px; border-radius: 50%; border: 3px solid #111; border-top-color: var(--neon-green); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-right: 10px; }
-
-        /* --- INTEL GRID (Influence & Conversion) --- */
-        .intel-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
-        .intel-card { background: var(--panel-bg); border: var(--border); padding: 25px; border-radius: 8px; }
-        .intel-card h3 { font-family: 'Orbitron'; font-size: 0.7rem; color: var(--accent-orange); margin-bottom: 20px; letter-spacing: 1px; }
-
-        /* Graphique simple */
-        .influence-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; padding-bottom: 15px; border-bottom: 1px solid #222; }
-        .bar { flex: 1; background: var(--accent-orange); opacity: 0.2; position: relative; transition: 0.3s; }
-        .bar:hover { opacity: 1; background: var(--neon-green); }
-        .bar::after { content: attr(data-label); position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); font-size: 0.5rem; color: var(--text-dim); }
 
         /* --- TABLES --- */
         .control-panel { background: var(--panel-bg); border: var(--border); border-radius: 8px; margin-bottom: 30px; }
@@ -64,22 +75,57 @@
         .btn { padding: 6px 12px; border: none; border-radius: 3px; font-family: 'JetBrains Mono'; font-size: 0.7rem; cursor: pointer; }
         .btn-add { background: var(--neon-green); color: #000; font-weight: 700; }
         .btn-delete { background: rgba(255, 62, 0, 0.1); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
-        .btn-delete:hover { background: var(--accent-orange); color: #fff; }
 
-        .trend-up { color: var(--neon-green); font-size: 0.6rem; margin-left: 5px; }
+        /* --- MODAL --- */
+        #launch-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 10000;
+        }
+        .modal-content { 
+            background: #111; padding: 30px; border: 1px solid var(--neon-green); 
+            width: 400px; border-radius: 8px;
+        }
+        .modal-content input {
+            width: 100%; background: #000; border: 1px solid #333; padding: 10px;
+            color: #fff; margin: 10px 0; font-family: 'JetBrains Mono';
+        }
 
-        @media (max-width: 1100px) { .stats-grid, .intel-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 1100px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
 <body>
+
+    <div id="lock-screen">
+        <div class="lock-box">
+            <div style="font-family:'Orbitron'; font-size: 2rem; color: #fff; margin-bottom: 10px;">TRIBAO</div>
+            <h2>IDENTIFICATION REQUISE</h2>
+            <input type="password" id="admin-pass" placeholder="CODE D'ACCÈS">
+            <br>
+            <button onclick="unlockSystem()">ENTRER DANS LE NOYAU</button>
+        </div>
+    </div>
+
+    <div id="launch-modal">
+        <div class="modal-content">
+            <h3 style="font-family: 'Orbitron'; color: var(--neon-green); margin-bottom: 15px; font-size: 0.8rem;">FINALISER LA MISSION</h3>
+            <p id="modal-product-name" style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 10px;"></p>
+            
+            <label style="font-size: 0.6rem; color: var(--accent-orange);">PRIX CIBLE (€)</label>
+            <input type="number" id="final-price" placeholder="Prix négocié...">
+            
+            <label style="font-size: 0.6rem; color: var(--accent-orange);">URL IMAGE PRODUIT</label>
+            <input type="text" id="final-image" placeholder="Lien http://...">
+            
+            <button class="btn btn-add" onclick="processValidation()" style="width: 100%; padding: 15px; margin-top: 10px;">DÉPLOYER DANS L'ARÈNE</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-dim); width:100%; margin-top:10px; cursor:pointer; font-size: 0.6rem;">ANNULER</button>
+        </div>
+    </div>
 
     <aside>
         <div class="cmd-label">TRIBAO CORE ADMIN</div>
         <a href="#" class="nav-item active">TABLEAU DE BORD</a>
         <a href="#" class="nav-item">GÉRER LES MISSIONS</a>
         <a href="#" class="nav-item">BASE GUERRIERS</a>
-        <a href="#" class="nav-item">RÉSEAU FOURNISSEURS</a>
-        <a href="#" class="nav-item">FINANCES</a>
         <div style="margin-top: auto; border-top: var(--border);">
             <a href="index.html" class="nav-item" style="color: var(--accent-orange);">QUITTER LE SYSTÈME</a>
         </div>
@@ -88,139 +134,129 @@
     <div class="main-content">
         <header>
             <div style="font-family: 'Orbitron'; font-weight: 700; letter-spacing: 3px;">CENTRAL COMMAND</div>
-            <div class="sys-status">● LIAISON ÉTABLIE // MARS 2026 // BIENVENUE ADMIN</div>
+            <div class="sys-status" id="sys-status">● LIAISON ÉTABLIE // MARS 2026</div>
         </header>
 
         <div class="dashboard-view">
-            
             <div class="stats-grid">
-                <div class="stat-box">
-                    <small>Conversion Visiteur > Guerrier</small>
-                    <div style="display: flex; align-items: center;">
-                        <div class="conv-circle">18.4%</div>
-                        <span class="trend-up">▲ 2.1%</span>
-                    </div>
-                </div>
-                <div class="stat-box">
-                    <small>Vitesse de Ralliement (Moy)</small>
-                    <div class="stat-val">12 <span style="font-size: 0.7rem; color: var(--text-dim);">G/Heure</span></div>
-                </div>
-                <div class="stat-box">
-                    <small>Taux d'Engagement Social</small>
-                    <div class="stat-val" style="color: var(--neon-blue);">24%</div>
-                </div>
-                <div class="stat-box">
-                    <small>C.A. PRÉVISIONNEL (24H)</small>
-                    <div class="stat-val" style="color: var(--neon-green);">14 250 €</div>
-                </div>
-            </div>
-
-            <div class="intel-grid">
-                <div class="intel-card">
-                    <h3>PIC D'INFLUENCE (Activité de la Tribu / 24H)</h3>
-                    <div class="influence-chart">
-                        <div class="bar" style="height: 15%;" data-label="06h"></div>
-                        <div class="bar" style="height: 30%;" data-label="09h"></div>
-                        <div class="bar" style="height: 45%;" data-label="12h"></div>
-                        <div class="bar" style="height: 35%;" data-label="15h"></div>
-                        <div class="bar" style="height: 60%;" data-label="18h"></div>
-                        <div class="bar" style="height: 100%; background: var(--neon-green); opacity: 0.8;" data-label="21h"></div>
-                        <div class="bar" style="height: 85%;" data-label="00h"></div>
-                        <div class="bar" style="height: 20%;" data-label="03h"></div>
-                    </div>
-                    <p style="font-size: 0.65rem; color: var(--text-dim); margin-top: 35px; line-height: 1.4;">
-                        <span style="color: var(--neon-green);">● ANALYSE :</span> Le point de bascule se situe à <strong style="color: #fff;">21:00</strong>. Déclenchement conseillé des alertes "Price Drop" à 20:30 pour maximiser la conversion nocturne.
-                    </p>
-                </div>
-
-                <div class="intel-card">
-                    <h3>RETENTION FOURNISSEURS</h3>
-                    <div style="margin-top: 10px;">
-                        <div style="font-size: 1.8rem; font-family: 'Orbitron';">92%</div>
-                        <p style="font-size: 0.65rem; color: var(--text-dim); margin-top: 10px;">Les partenaires B2B maintiennent leurs offres sur 9 missions sur 10 après la première cotation.</p>
-                    </div>
-                    <div style="margin-top: 25px; border-top: 1px solid #222; padding-top: 15px;">
-                        <small style="color: var(--accent-orange); font-size: 0.55rem; text-transform: uppercase;">Alerte Négociation</small>
-                        <div style="font-size: 0.75rem; margin-top: 5px;">3 fournisseurs attendent un signal.</div>
-                    </div>
-                </div>
+                <div class="stat-box"><small>Conversion</small><div class="stat-val">18.4%</div></div>
+                <div class="stat-box"><small>Guerriers/H</small><div class="stat-val">12</div></div>
+                <div class="stat-box"><small>Engagement</small><div class="stat-val" style="color: var(--neon-blue);">24%</div></div>
+                <div class="stat-box"><small>C.A. PRÉVU</small><div class="stat-val" style="color: var(--neon-green);">14 250 €</div></div>
             </div>
 
             <div class="control-panel">
                 <div class="panel-head">
-                    <h2>// MISSIONS SOUS CONTRÔLE</h2>
-                    <button class="btn btn-add">+ NOUVELLE MISSION</button>
+                    <h2>// REQUÊTES EN ATTENTE DE VALIDATION</h2>
+                    <button class="btn btn-add" onclick="loadPendingRequests()">RAFRAÎCHIR</button>
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>GUERRIER ID</th>
                             <th>PRODUIT</th>
-                            <th>JAUGE</th>
-                            <th>CONVERSION</th>
+                            <th>MARQUE</th>
+                            <th>CIBLE</th>
                             <th>ACTIONS</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>#M-882</td>
-                            <td>Ender 3 S1 (Pack)</td>
-                            <td style="color: var(--neon-green);">83%</td>
-                            <td>22%</td>
-                            <td>
-                                <button class="btn" style="background:#222; color:#fff;">LOGS</button>
-                                <button class="btn btn-delete">STOP</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#M-885</td>
-                            <td>Herman Miller Ergo</td>
-                            <td style="color: var(--neon-blue);">41%</td>
-                            <td>12%</td>
-                            <td>
-                                <button class="btn" style="background:#222; color:#fff;">LOGS</button>
-                                <button class="btn btn-delete">STOP</button>
-                            </td>
-                        </tr>
+                    <tbody id="requetes-table-body">
+                        <tr><td colspan="5" style="text-align:center; color:var(--text-dim)">// CHARGEMENT DU FLUX...</td></tr>
                     </tbody>
                 </table>
             </div>
-
-            <div class="control-panel">
-                <div class="panel-head">
-                    <h2>// DERNIERS MOUVEMENTS TRIBU</h2>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>GUERRIER</th>
-                            <th>TYPE</th>
-                            <th>STATUS</th>
-                            <th>INFLUENCE</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>ShadowRunner_92</td>
-                            <td>GUERRIER</td>
-                            <td style="color: var(--neon-green);">ACTIF</td>
-                            <td>NIV. 4</td>
-                            <td><button class="btn btn-delete">BAN</button></td>
-                        </tr>
-                        <tr>
-                            <td>Logistix_Europe</td>
-                            <td>FOURNISSEUR</td>
-                            <td style="color: var(--neon-blue);">OFFRE EN COURS</td>
-                            <td>PRO</td>
-                            <td><button class="btn btn-delete">DISCONNECT</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const ADMIN_CODE = "Redhot12!Montelimar26";
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let selectedRequest = null;
+
+        function unlockSystem() {
+            const input = document.getElementById('admin-pass');
+            if (input.value === ADMIN_CODE) {
+                document.getElementById('lock-screen').style.display = 'none';
+                sessionStorage.setItem('admin_auth', 'granted');
+                loadPendingRequests();
+            } else {
+                alert("ACCÈS REFUSÉ");
+                input.value = "";
+            }
+        }
+
+        async function loadPendingRequests() {
+            const { data, error } = await _supabase
+                .from('requetes')
+                .select('*')
+                .eq('statut', 'en_attente');
+
+            const tbody = document.getElementById('requetes-table-body');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--text-dim)'>// AUCUNE REQUÊTE EN ATTENTE</td></tr>";
+                return;
+            }
+
+            tbody.innerHTML = data.map(req => `
+                <tr>
+                    <td>#${req.user_id.substring(0,8)}</td>
+                    <td>${req.type_produit}</td>
+                    <td>${req.marque}</td>
+                    <td style="color:var(--neon-blue)">${req.objectif_membres} G</td>
+                    <td>
+                        <button class="btn btn-add" onclick="openLaunchModal(${JSON.stringify(req).replace(/"/g, '&quot;')})">VALIDER</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openLaunchModal(req) {
+            selectedRequest = req;
+            document.getElementById('modal-product-name').innerText = req.type_produit + " (" + req.marque + ")";
+            document.getElementById('launch-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('launch-modal').style.display = 'none';
+        }
+
+        async function processValidation() {
+            const price = document.getElementById('final-price').value;
+            const image = document.getElementById('final-image').value;
+
+            if(!price || !image) { alert("DONNÉES MANQUANTES"); return; }
+
+            // 1. Créer la mission
+            const { error: err1 } = await _supabase.from('missions').insert([{
+                titre: selectedRequest.type_produit,
+                prix_cible: parseFloat(price),
+                objectif_membres: selectedRequest.objectif_membres,
+                membres_actuels: 1,
+                image_url: image,
+                description: selectedRequest.description
+            }]);
+
+            if(!err1) {
+                // 2. Update statut requête
+                await _supabase.from('requetes').update({ statut: 'validee' }).eq('id', selectedRequest.id);
+                alert("SYSTÈME : MISSION DÉPLOYÉE DANS L'ARÈNE");
+                closeModal();
+                loadPendingRequests();
+            } else {
+                alert("ERREUR : " + err1.message);
+            }
+        }
+
+        window.onload = function() {
+            if (sessionStorage.getItem('admin_auth') === 'granted') {
+                document.getElementById('lock-screen').style.display = 'none';
+                loadPendingRequests();
+            }
+        };
+    </script>
 </body>
 </html>
