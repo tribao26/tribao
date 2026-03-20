@@ -23,8 +23,8 @@
         .main-layout { display: flex; min-height: 100vh; width: 100vw; }
 
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
-        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; transition: 0.3s; }
-        .nav-item:hover { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; transition: 0.3s; border-left: 3px solid transparent; }
+        .nav-item:hover { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
 
         .content-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         header { height: 70px; display: flex; align-items: center; padding: 0 30px; border-bottom: var(--border); background: rgba(10,10,10,0.9); }
@@ -47,6 +47,7 @@
         .gauge-fill-lg { height: 100%; width: 0%; background: var(--neon-gradient); box-shadow: 0 0 20px var(--neon-green); transition: width 1s ease-in-out; }
 
         .btn-enlist { width: 100%; padding: 20px; background: var(--neon-gradient); color: #000; font-family: 'Orbitron'; font-weight: 700; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-enlist:disabled { opacity: 0.7; cursor: not-allowed; filter: grayscale(1); }
 
         @media (max-width: 1000px) {
             aside { display: none; }
@@ -60,6 +61,7 @@
         <aside>
             <div style="padding: 30px 25px;"><span style="font-family:'Orbitron'; color:var(--neon-green); font-weight:700;">TRIBAO</span></div>
             <a href="arene.html" class="nav-item">L'ARÈNE</a>
+            <a href="dashboard-tribu.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
             <a href="contact.html" class="nav-item">SUPPORT</a>
         </aside>
 
@@ -99,6 +101,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         const missionId = urlParams.get('id');
 
+        async function checkSession() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                document.getElementById('qg-link').style.display = 'flex';
+            }
+        }
+
         async function loadMission() {
             const { data: m } = await _supabase.from('missions').select('*').eq('id', missionId).single();
             if (!m) return;
@@ -117,44 +126,52 @@
         }
 
         async function enlistInMission() {
-            // 👮 VÉRIFICATION DE LA SESSION
             const { data: { session } } = await _supabase.auth.getSession();
 
-            // REDIRECTION SI PAS DE SESSION + MÉMORISATION
             if (!session) {
-                // On stocke l'ID de la mission pour la valider automatiquement après le login
                 localStorage.setItem('pending_mission_id', missionId);
                 window.location.href = 'auth.html';
                 return; 
             }
 
-            // 👮 VÉRIFICATION DU RÔLE
             const userRole = session.user.user_metadata.role;
             if (userRole === 'pro') {
                 alert("ACCÈS REFUSÉ : Les Fournisseurs ne peuvent pas rallier de missions.");
                 return; 
             }
 
-            // ⚔️ SI OK, ON VALIDE L'ENGAGEMENT
             const btn = document.querySelector('.btn-enlist');
             btn.innerText = "// TRANSMISSION...";
             btn.disabled = true;
 
+            // 1. On crée le lien dans la table 'ralliements'
+            const { error: linkError } = await _supabase
+                .from('ralliements')
+                .insert([{ user_id: session.user.id, mission_id: missionId }]);
+
+            if (linkError) {
+                alert("Erreur technique ou mission déjà ralliée.");
+                btn.disabled = false;
+                btn.innerText = "REJOINDRE LA MISSION";
+                return;
+            }
+
+            // 2. On met à jour le compteur dans 'missions'
             const { data: m } = await _supabase.from('missions').select('membres_actuels').eq('id', missionId).single();
             const { error } = await _supabase.from('missions').update({ membres_actuels: m.membres_actuels + 1 }).eq('id', missionId);
 
             if (!error) {
-                alert("ENGAGEMENT VALIDÉ !");
+                alert("ENGAGEMENT VALIDÉ ! Retrouvez cette mission dans votre QG.");
                 loadMission();
-                btn.innerText = "REJOINDRE LA MISSION";
-                btn.disabled = false;
+                btn.innerText = "MISSION REJOINTE";
             } else {
-                alert("Erreur serveur.");
+                alert("Erreur lors de la mise à jour du compteur.");
                 btn.disabled = false;
                 btn.innerText = "REJOINDRE LA MISSION";
             }
         }
 
+        checkSession();
         loadMission();
     </script>
 </body>

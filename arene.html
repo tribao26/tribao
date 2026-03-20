@@ -85,7 +85,7 @@
 
         .arena-grid { max-width: 1100px; margin: 0 auto; }
 
-        /* --- HERO CALLOUT --- */
+        /* --- HERO --- */
         .hero-callout {
             background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent);
             border-left: 4px solid var(--neon-green);
@@ -93,12 +93,10 @@
             margin-bottom: 50px;
             border-radius: 0 12px 12px 0;
         }
-
         .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
         .hero-callout p { font-size: 1rem; color: var(--text-gray); margin-bottom: 25px; line-height: 1.5; }
         .hero-callout p span { color: var(--neon-green); font-weight: 700; }
 
-        /* BOUTONS AUTH DANS HERO */
         .auth-actions { display: flex; gap: 15px; margin-top: 20px; }
         .btn-hero {
             padding: 12px 25px;
@@ -112,9 +110,8 @@
         }
         .btn-hero-solid { background: var(--neon-green); color: #000; }
         .btn-hero-outline { border: 1px solid var(--neon-green); color: var(--neon-green); }
-        .btn-hero:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(57, 255, 20, 0.3); }
 
-        /* --- MISSION CARDS --- */
+        /* --- CARDS --- */
         .mission-card {
             background: var(--card-gray);
             border: var(--border);
@@ -127,12 +124,7 @@
         }
         .mission-card:hover { border-color: var(--neon-green); }
 
-        .mission-img-box {
-            width: 160px; height: 160px;
-            background: #000; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; overflow: hidden;
-        }
+        .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
         .mission-info { flex: 1; display: flex; flex-direction: column; }
@@ -157,18 +149,11 @@
             text-align: center;
         }
 
-        /* --- RESPONSIVE --- */
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
             aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
             .nav-label { display: none; }
-            .nav-item { padding: 15px 20px; border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
-            .nav-item:hover, .nav-item.active { border-bottom: 3px solid var(--neon-green); }
-            .scroll-area { padding: 20px; }
-            .hero-callout { padding: 25px; }
-            .auth-actions { flex-direction: column; }
-            .mission-card { flex-direction: column; gap: 20px; }
-            .mission-img-box { width: 100%; height: 200px; }
+            .nav-item { padding: 15px 20px; border-left: none; white-space: nowrap; }
         }
     </style>
 </head>
@@ -184,9 +169,9 @@
             </div>
 
             <a href="arene.html" class="nav-item active">L'ARÈNE</a>
+            <a href="dashboard-tribu.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
             <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
             <a href="comment-ca-marche.html" class="nav-item">COMMENT CA MARCHE</a>
-            <a href="cgv.html" class="nav-item">CGV</a>
             <a href="contact.html" class="nav-item">CONTACT</a>
             
             <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
@@ -200,7 +185,6 @@
 
             <div class="scroll-area">
                 <div class="arena-grid">
-                    
                     <section class="hero-callout">
                         <h2 id="hero-title">TRIBAO — La plateforme où les clients reprennent le pouvoir.</h2>
                         <p id="hero-desc">REJOIGNEZ LA TRIBU <span>TRIBAO</span> Créez une mission, rassemblez une tribu, mettez les fournisseurs en concurrence et obtenez des offres plus avantageuses.</p>
@@ -212,11 +196,9 @@
                     </section>
 
                     <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS EN COURS</h2>
-
                     <div id="missions-list">
                          <p style="color: var(--neon-green); font-family: 'Orbitron'; font-size: 0.8rem;">// DÉCRYPTAGE DES MISSIONS...</p>
                     </div>
-                    
                 </div>
             </div>
         </div>
@@ -228,7 +210,6 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // --- GESTION DE LA SESSION + RALLIEMENT AUTOMATIQUE ---
         async function checkSession() {
             const { data: { session } } = await _supabase.auth.getSession();
             
@@ -236,28 +217,33 @@
                 const user = session.user;
                 const role = user.user_metadata.role || 'tribu';
 
-                // Maj de la Sidebar
                 document.getElementById('user-identity').style.display = 'block';
                 document.getElementById('user-email').innerText = user.email;
                 document.getElementById('logout-link').style.display = 'flex';
+                document.getElementById('qg-link').style.display = 'flex'; // On montre le QG
 
-                // Maj du Hero
                 document.getElementById('hero-title').innerText = "Ravi de vous revoir, Guerrier.";
-                document.getElementById('hero-desc').innerHTML = `Votre session est <span style="color:var(--neon-green)">ACTIF</span>. Parcourez les missions ci-dessous.`;
+                document.getElementById('hero-desc').innerHTML = `Votre session est <span style="color:var(--neon-green)">ACTIVE</span>. Parcourez les missions ci-dessous.`;
                 document.getElementById('hero-auth-btns').style.display = 'none';
 
-                // --- 🛡️ LOGIQUE DE RALLIEMENT AUTOMATIQUE ---
+                // --- 🛡️ RALLIEMENT AUTOMATIQUE ---
                 const pendingId = localStorage.getItem('pending_mission_id');
                 if (pendingId && role === 'tribu') {
-                    localStorage.removeItem('pending_mission_id'); // On vide la mémoire tout de suite
+                    localStorage.removeItem('pending_mission_id'); 
                     
-                    // On récupère le score actuel
-                    const { data: m } = await _supabase.from('missions').select('membres_actuels').eq('id', pendingId).single();
-                    if (m) {
-                        // On valide le +1
-                        await _supabase.from('missions').update({ membres_actuels: m.membres_actuels + 1 }).eq('id', pendingId);
-                        alert("ENGAGEMENT VALIDÉ ! Vous avez rejoint la mission automatiquement.");
-                        loadMissions(); // On rafraîchit la liste pour voir le changement
+                    // 1. Création du lien dans 'ralliements'
+                    const { error: linkErr } = await _supabase.from('ralliements').insert([
+                        { user_id: user.id, mission_id: pendingId }
+                    ]);
+
+                    if (!linkErr) {
+                        // 2. Mise à jour compteur missions
+                        const { data: m } = await _supabase.from('missions').select('membres_actuels').eq('id', pendingId).single();
+                        if (m) {
+                            await _supabase.from('missions').update({ membres_actuels: m.membres_actuels + 1 }).eq('id', pendingId);
+                            alert("MISSION REJOINTE AUTOMATIQUEMENT !");
+                            loadMissions(); 
+                        }
                     }
                 }
             }
