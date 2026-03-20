@@ -57,6 +57,7 @@
             display: flex;
             align-items: center;
             transition: 0.3s;
+            border-left: 3px solid transparent;
         }
 
         .nav-item:hover, .nav-item.active {
@@ -115,11 +116,15 @@
             background: var(--neon-blue); color: #000;
             padding: 8px 15px; border-radius: 4px; text-decoration: none;
             font-family: 'Orbitron'; font-size: 0.7rem; font-weight: 700;
+            border: none; cursor: pointer; transition: 0.3s;
         }
+        .btn-bid:hover { transform: scale(1.05); filter: brightness(1.1); }
 
         @media (max-width: 768px) {
             .main-layout { flex-direction: column; }
-            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .pro-label { display: none; }
+            .nav-item { padding: 15px 20px; border-left: none; white-space: nowrap; }
             .stats-row { grid-template-columns: 1fr 1fr; }
         }
     </style>
@@ -130,34 +135,33 @@
         <aside>
             <div class="pro-label">TERMINAL PARTENAIRE</div>
             <a href="#" class="nav-item active">TABLEAU DE BORD</a>
-            <a href="#" class="nav-item">MISSIONS ACTIVES</a>
+            <a href="arene.html" class="nav-item">L'ARÈNE</a>
             <a href="#" class="nav-item">MES CONTRATS</a>
             <a href="#" class="nav-item">LOGISTIQUE</a>
-            <a href="#" class="nav-item">PARAMÈTRES</a>
             <div style="margin-top:auto; border-top: var(--border);">
-                <a href="index.html" class="nav-item">DÉCONNEXION</a>
+                <a href="#" onclick="handleLogout(event)" class="nav-item" style="color: #ff4444;">DÉCONNEXION</a>
             </div>
         </aside>
 
         <div class="content-wrapper">
             <header>
                 <div class="logo-pro">TRIBAO PRO</div>
-                <div class="user-pro">PARTENAIRE_ID: 99284 // SAS LOGISTIX</div>
+                <div id="pro-name" class="user-pro">PARTENAIRE_ID: SCANNING...</div>
             </header>
 
             <div class="scroll-area">
                 <div class="stats-row">
                     <div class="stat-card">
                         <span>VOLUME D'AFFAIRES</span>
-                        <h4>42 850 €</h4>
+                        <h4 id="stat-ca">0 €</h4>
                     </div>
                     <div class="stat-card">
-                        <span>MISSIONS REMPORTÉES</span>
-                        <h4>12</h4>
+                        <span>OFFRES ENVOYÉES</span>
+                        <h4 id="stat-offres">0</h4>
                     </div>
                     <div class="stat-card">
-                        <span>TRIBU ENGAGÉE</span>
-                        <h4>1 240 PERS.</h4>
+                        <span>MISSIONS ACTIVES</span>
+                        <h4 id="stat-missions">0</h4>
                     </div>
                     <div class="stat-card">
                         <span>SCORE FIABILITÉ</span>
@@ -177,27 +181,9 @@
                             <th>ACTION</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="mission-body">
                         <tr>
-                            <td>Imprimante 3D Ender 3 S1</td>
-                            <td>250 / 300</td>
-                            <td>380 €</td>
-                            <td><span class="status-badge">OUVERT</span></td>
-                            <td><a href="#" class="btn-bid">SOUMETTRE PRIX</a></td>
-                        </tr>
-                        <tr>
-                            <td>Chaise Ergo Herman Miller</td>
-                            <td>82 / 200</td>
-                            <td>750 €</td>
-                            <td><span class="status-badge">ATTENTE TRIBU</span></td>
-                            <td><a href="#" class="btn-bid" style="opacity: 0.5;">LOCKED</a></td>
-                        </tr>
-                        <tr>
-                            <td>Vélo Électrique Rider Pro X</td>
-                            <td>134 / 200</td>
-                            <td>1 800 €</td>
-                            <td><span class="status-badge">EN COURS</span></td>
-                            <td><a href="#" class="btn-bid">SOUMETTRE PRIX</a></td>
+                            <td colspan="5" style="text-align:center; color: var(--neon-blue);">RECHERCHE DE FLUX TACTIQUES...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -205,5 +191,89 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function initProDashboard() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            const user = session.user;
+            document.getElementById('pro-name').innerText = `ID: ${user.id.substring(0,8)} // ${user.email}`;
+
+            loadMissions();
+            loadStats(user.id);
+        }
+
+        async function loadMissions() {
+            const { data: missions, error } = await _supabase.from('missions').select('*');
+            if (error) return;
+
+            const tbody = document.getElementById('mission-body');
+            document.getElementById('stat-missions').innerText = missions.length;
+
+            tbody.innerHTML = missions.map(m => {
+                const isReady = m.membres_actuels >= (m.objectif_membres / 2); // Eligible si au moins 50%
+                return `
+                    <tr>
+                        <td>${m.titre}</td>
+                        <td>${m.membres_actuels} / ${m.objectif_membres}</td>
+                        <td>${m.prix_cible} €</td>
+                        <td><span class="status-badge">${isReady ? 'OUVERT' : 'EN RALLIEMENT'}</span></td>
+                        <td>
+                            <button onclick="submitBid(${m.id}, '${m.titre.replace(/'/g, "\\'")}')" class="btn-bid">SOUMETTRE PRIX</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadStats(userId) {
+            const { count } = await _supabase
+                .from('offres')
+                .select('*', { count: 'exact', head: true })
+                .eq('fournisseur_id', userId);
+            
+            document.getElementById('stat-offres').innerText = count || 0;
+        }
+
+        async function submitBid(missionId, title) {
+            const { data: { session } } = await _supabase.auth.getSession();
+            
+            const prix = prompt(`Votre meilleure offre pour : ${title} (€)`);
+            if (!prix || isNaN(prix)) return;
+
+            const message = prompt(`Un message pour la tribu ? (Garanties, délais...)`);
+
+            const { error } = await _supabase.from('offres').insert([{
+                mission_id: missionId,
+                fournisseur_id: session.user.id,
+                prix_propose: parseFloat(prix),
+                message: message || "Offre partenaire TRIBAO PRO",
+                statut: 'en_attente'
+            }]);
+
+            if (!error) {
+                alert("COTATION TRANSMISE AVEC SUCCÈS.");
+                location.reload();
+            } else {
+                alert("ERREUR LORS DE LA TRANSMISSION : " + error.message);
+            }
+        }
+
+        async function handleLogout(e) {
+            e.preventDefault();
+            await _supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        initProDashboard();
+    </script>
 </body>
 </html>
