@@ -22,13 +22,11 @@
 
         .main-layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR --- */
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron'; letter-spacing: 2px; }
         .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; transition: 0.3s; }
         .nav-item:hover { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); }
 
-        /* --- CONTENT --- */
         .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         header { height: 70px; display: flex; align-items: center; padding: 0 30px; border-bottom: var(--border); background: rgba(10,10,10,0.9); }
         .back-link { color: var(--text-gray); text-decoration: none; font-size: 0.8rem; font-family: 'Orbitron'; }
@@ -40,7 +38,6 @@
         h1 span { color: var(--neon-green); }
         .sub { color: var(--text-gray); font-size: 0.9rem; margin-bottom: 40px; font-family: 'JetBrains Mono'; }
 
-        /* --- FORMULAIRE TACTIQUE --- */
         .request-form { background: var(--card-gray); border: var(--border); padding: 40px; border-radius: 12px; transition: 0.5s; }
         .grid-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         
@@ -60,7 +57,6 @@
         }
         .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(57, 255, 20, 0.4); }
 
-        /* --- MESSAGE DE VALIDATION --- */
         #confirmation { 
             display: none; 
             margin-top: 20px; 
@@ -109,40 +105,40 @@
                         <div class="grid-fields">
                             <div class="field-group">
                                 <label>TYPE DE PRODUIT</label>
-                                <input type="text" placeholder="Ex: Carte Graphique, Smartphone...">
+                                <input type="text" id="type_produit" placeholder="Ex: Carte Graphique, Smartphone..." required>
                             </div>
                             <div class="field-group">
                                 <label>MARQUE(S) CIBLE(S)</label>
-                                <input type="text" placeholder="Ex: NVIDIA, Apple, Sony...">
+                                <input type="text" id="marque" placeholder="Ex: NVIDIA, Apple, Sony...">
                             </div>
                         </div>
 
                         <div class="grid-fields">
                             <div class="field-group">
                                 <label>OBJECTIF TRIBU (Nb de Guerriers)</label>
-                                <select>
-                                    <option>50 membres</option>
-                                    <option>100 membres</option>
-                                    <option>250 membres</option>
-                                    <option>500+ membres</option>
+                                <select id="objectif">
+                                    <option value="50">50 membres</option>
+                                    <option value="100">100 membres</option>
+                                    <option value="250">250 membres</option>
+                                    <option value="500">500+ membres</option>
                                 </select>
                             </div>
                             <div class="field-group">
                                 <label>DURÉE DE NÉGO (JOURS)</label>
-                                <select>
-                                    <option>7 jours (Flash)</option>
-                                    <option>14 jours (Standard)</option>
-                                    <option>30 jours (Massif)</option>
+                                <select id="duree">
+                                    <option value="7">7 jours (Flash)</option>
+                                    <option value="14">14 jours (Standard)</option>
+                                    <option value="30">30 jours (Massif)</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="field-group">
                             <label>DESCRIPTION & SPÉCIFICATIONS</label>
-                            <textarea rows="4" placeholder="Détaillez le modèle exact ou les performances attendues..."></textarea>
+                            <textarea id="description" rows="4" placeholder="Détaillez le modèle exact ou les performances attendues..."></textarea>
                         </div>
 
-                        <button type="button" class="btn-submit" onclick="submitRequest()">SOUMETTRE À LA TRIBU</button>
+                        <button type="button" class="btn-submit" id="btnSubmit" onclick="submitRequest()">SOUMETTRE À LA TRIBU</button>
                     </form>
 
                     <div id="confirmation">
@@ -160,20 +156,53 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        function submitRequest() {
-            // Effet visuel de désactivation
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function submitRequest() {
+            const btn = document.getElementById('btnSubmit');
             const form = document.getElementById('requestForm');
             const confirmBox = document.getElementById('confirmation');
-            
-            form.style.opacity = '0.2';
-            form.style.pointerEvents = 'none';
-            confirmBox.style.display = 'block';
-            
-            // Scroll automatique vers le message de confirmation
-            confirmBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // 1. Vérification session
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) {
+                alert("🔒 Accès restreint. Connectez-vous pour lancer une mission.");
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            btn.innerText = "// TRANSMISSION...";
+            btn.disabled = true;
+
+            // 2. Préparation des données
+            const payload = {
+                user_id: session.user.id,
+                type_produit: document.getElementById('type_produit').value,
+                marque: document.getElementById('marque').value,
+                objectif_membres: parseInt(document.getElementById('objectif').value),
+                duree: parseInt(document.getElementById('duree').value),
+                description: document.getElementById('description').value,
+                statut: 'en_attente'
+            };
+
+            // 3. Envoi Supabase
+            const { error } = await _supabase.from('requetes').insert([payload]);
+
+            if (!error) {
+                form.style.opacity = '0.2';
+                form.style.pointerEvents = 'none';
+                confirmBox.style.display = 'block';
+                confirmBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                alert("ERREUR TACTIQUE : " + error.message);
+                btn.innerText = "SOUMETTRE À LA TRIBU";
+                btn.disabled = false;
+            }
         }
     </script>
-
 </body>
 </html>
