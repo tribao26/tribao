@@ -47,7 +47,7 @@
         .stat-card span { display: block; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--text-gray); margin-bottom: 10px; }
         .stat-card h3 { margin: 0; font-family: 'JetBrains Mono'; font-size: 1.8rem; color: #fff; }
 
-        /* --- RECRUITMENT BOX (Special Style) --- */
+        /* --- RECRUITMENT BOX --- */
         .recruit-box { grid-column: 1 / -1; border: 1px dashed var(--neon-green); background: rgba(57, 255, 20, 0.02); }
         .recruit-box::after { display: none; }
         .recruit-group { display: flex; gap: 10px; margin-top: 15px; }
@@ -89,7 +89,7 @@
 
     <div class="main-layout">
         <aside>
-            <div class="nav-label" id="unit-id">UNITÉ : CHARGEMENT...</div>
+            <div class="nav-label" id="unit-id">UNITÉ : ---</div>
             <a href="arene.html" class="nav-item">L'ARÈNE</a>
             <a href="#" id="menu-home" class="nav-item active" onclick="switchView('home')">MON QG</a>
             <a href="#" id="menu-arsenal" class="nav-item" onclick="switchView('arsenal')">PORTEFEUILLE</a>
@@ -191,11 +191,9 @@
             const user = session.user;
             document.getElementById('unit-id').innerText = `UNITÉ : ${(user.user_metadata.full_name || user.email.split('@')[0]).toUpperCase()}`;
 
-            // --- 🤝 LIEN DE PARRAINAGE ---
             const myRefLink = window.location.origin + "/auth.html?ref=" + user.id;
             document.getElementById('ref-link').value = myRefLink;
 
-            // --- 📊 RÉCUPÉRATION DONNÉES ---
             const { data: ralliements } = await _supabase
                 .from('ralliements')
                 .select('mission_id, missions (*)')
@@ -208,7 +206,6 @@
 
             const container = document.getElementById('my-missions-container');
             
-            // Points : 150 par mission + 50 par recrue
             const mCount = ralliements ? ralliements.length : 0;
             const pCount = parrainages ? parrainages.length : 0;
             const totalPoints = (mCount * 150) + (pCount * 50);
@@ -217,7 +214,6 @@
             document.getElementById('stat-recrues').innerText = pCount.toString().padStart(2, '0');
             document.getElementById('stat-pts').innerText = totalPoints;
 
-            // --- 🎖️ RANG ---
             let rank = "SOLDAT";
             if (totalPoints > 1500) rank = "LÉGENDE";
             else if (totalPoints > 800) rank = "CENTURION";
@@ -229,7 +225,6 @@
                 return;
             }
 
-            // Affichage des missions
             container.innerHTML = ralliements.map(item => {
                 const m = item.missions;
                 if (!m) return ""; 
