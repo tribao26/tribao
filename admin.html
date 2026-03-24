@@ -143,7 +143,7 @@
             <div class="control-panel">
                 <div class="panel-head">
                     <h2>// REQUÊTES EN ATTENTE DE VALIDATION</h2>
-                    <button class="btn btn-add" onclick="refreshCoreData()">RAFRAÎCHIR</button>
+                    <button class="btn btn-add" id="refresh-btn" onclick="refreshCoreData()">RAFRAÎCHIR</button>
                 </div>
                 <table>
                     <thead>
@@ -191,22 +191,18 @@
 
         let selectedRequest = null;
 
-        function unlockSystem() {
-            const input = document.getElementById('admin-pass');
-            if (input.value === ADMIN_CODE) {
-                document.getElementById('lock-screen').style.display = 'none';
-                sessionStorage.setItem('admin_auth', 'granted');
-                refreshCoreData();
-            } else {
-                alert("ACCÈS REFUSÉ");
-                input.value = "";
-            }
-        }
-
-        function logoutAdmin(e) {
-            e.preventDefault();
-            sessionStorage.removeItem('admin_auth');
-            window.location.href = "index.html";
+        // --- 📊 FONCTION DE MISE À JOUR GLOBALE ---
+        async function refreshCoreData() {
+            console.log("Système : Rafraîchissement des données...");
+            
+            // On lance les 3 piliers en parallèle
+            await Promise.all([
+                loadPendingRequests(),
+                loadValidatedRequests(),
+                updateDashboardStats()
+            ]);
+            
+            console.log("Système : Dashboard à jour.");
         }
 
         async function updateDashboardStats() {
@@ -235,15 +231,17 @@
         async function loadPendingRequests() {
             const { data } = await _supabase.from('requetes').select('*').eq('statut', 'en_attente');
             const tbody = document.getElementById('requetes-table-body');
+            
             if (!data || data.length === 0) {
                 tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--text-dim)'>// AUCUNE REQUÊTE EN ATTENTE</td></tr>";
                 return;
             }
+            
             tbody.innerHTML = data.map(req => `
                 <tr>
                     <td>#${req.user_id.substring(0,8)}</td>
-                    <td>${req.type_produit}</td>
-                    <td>${req.marque}</td>
+                    <td>${req.type_produit || 'N/A'}</td>
+                    <td>${req.marque || 'N/A'}</td>
                     <td style="color:var(--neon-blue)">${req.objectif_membres} G</td>
                     <td><button class="btn btn-add" onclick="openLaunchModal(${JSON.stringify(req).replace(/"/g, '&quot;')})">VALIDER</button></td>
                 </tr>
@@ -253,30 +251,45 @@
         async function loadValidatedRequests() {
             const { data } = await _supabase.from('requetes').select('*').eq('statut', 'validee');
             const tbody = document.getElementById('validees-table-body');
-            if (!data || data.length === 0) return;
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; color:var(--text-dim)'>// AUCUNE MISSION VALIDÉE</td></tr>";
+                return;
+            }
+            
             tbody.innerHTML = data.map(req => `
                 <tr>
                     <td>#${req.user_id.substring(0,8)}</td>
-                    <td>${req.type_produit}</td>
-                    <td>${req.marque}</td>
+                    <td>${req.type_produit || 'N/A'}</td>
+                    <td>${req.marque || 'N/A'}</td>
                     <td><span style="color:var(--neon-green); font-size:0.6rem;">● DÉPLOYÉE</span></td>
                 </tr>
             `).join('');
         }
 
-        // --- FONCTION DE MISE À JOUR GLOBALE ---
-function refreshCoreData() {
-    console.log("Système : Rafraîchissement des données en cours...");
-    
-    // On relance les 3 piliers du dashboard
-    loadPendingRequests();   // Recharger le tableau "En attente"
-    loadValidatedRequests(); // Recharger le tableau "Missions dans l'Arène"
-    updateDashboardStats();  // Recalculer les chiffres en haut
-}
+        // --- 🔐 LOGIQUE DE SÉCURITÉ ---
+        function unlockSystem() {
+            const input = document.getElementById('admin-pass');
+            if (input.value === ADMIN_CODE) {
+                document.getElementById('lock-screen').style.display = 'none';
+                sessionStorage.setItem('admin_auth', 'granted');
+                refreshCoreData();
+            } else {
+                alert("ACCÈS REFUSÉ");
+                input.value = "";
+            }
+        }
 
+        function logoutAdmin(e) {
+            e.preventDefault();
+            sessionStorage.removeItem('admin_auth');
+            window.location.href = "index.html";
+        }
+
+        // --- 🚀 MODAL & VALIDATION ---
         function openLaunchModal(req) {
             selectedRequest = req;
-            document.getElementById('modal-product-name').innerText = req.type_produit + " (" + req.marque + ")";
+            document.getElementById('modal-product-name').innerText = (req.type_produit || "Produit") + " (" + (req.marque || "Marque") + ")";
             document.getElementById('launch-modal').style.display = 'flex';
         }
 
@@ -289,6 +302,7 @@ function refreshCoreData() {
             const image = document.getElementById('final-image').value;
             if(!price || !image) { alert("DONNÉES MANQUANTES"); return; }
 
+            // 1. Insertion dans Missions
             const { error: err1 } = await _supabase.from('missions').insert([{
                 titre: selectedRequest.type_produit,
                 prix_cible: parseFloat(price),
@@ -298,15 +312,18 @@ function refreshCoreData() {
             }]);
 
             if(!err1) {
+                // 2. Update du statut de la requête
                 await _supabase.from('requetes').update({ statut: 'validee' }).eq('id', selectedRequest.id);
                 alert("SYSTÈME : MISSION DÉPLOYÉE DANS L'ARÈNE");
                 closeModal();
+                // 3. Force le rafraîchissement
                 refreshCoreData();
             } else {
                 alert("ERREUR : " + err1.message);
             }
         }
 
+        // --- DÉMARRAGE ---
         window.onload = function() {
             if (sessionStorage.getItem('admin_auth') === 'granted') {
                 document.getElementById('lock-screen').style.display = 'none';
