@@ -287,20 +287,20 @@
             `).join('') : "<tr><td colspan='5' style='text-align:center;'>// AUCUNE MISSION VALIDÉE</td></tr>";
         }
 
-        // --- 🗑️ ANNULATION (FIXÉ AVEC ILIKE) ---
         async function cancelMission(requestId, titre) {
-            if(confirm(`Supprimer "${titre}" de l'Arène et la remettre en attente ?`)) {
-                // Supprime dans 'missions' sans se soucier de la casse (ilike)
-                const { error: err1 } = await _supabase.from('missions').delete().ilike('titre', titre);
-                // Remet à jour la requête
-                const { error: err2 } = await _supabase.from('requetes').update({ statut: 'en_attente' }).eq('id', requestId);
+            if(confirm(`Voulez-vous supprimer la mission "${titre}" et TOUS ses ralliements ?`)) {
+                // Nettoyage radical : ilike ignore la casse, trim ignore les espaces
+                const { error: err1 } = await _supabase.from('missions').delete().ilike('titre', titre.trim());
                 
-                if(!err1 && !err2) {
-                    await refreshCoreData();
-                    alert("SYSTÈME : MISSION NETTOYÉE");
-                } else {
-                    alert("ERREUR : Vérifiez la permission DELETE sur Supabase.");
+                if (err1) {
+                    console.error("Erreur 409 probable :", err1);
+                    alert("ERREUR : Impossible de supprimer. Videz d'abord la table 'ralliements' manuellement sur Supabase.");
+                    return;
                 }
+
+                await _supabase.from('requetes').update({ statut: 'en_attente' }).eq('id', requestId);
+                await refreshCoreData();
+                alert("SYSTÈME : MISSION NETTOYÉE");
             }
         }
 
