@@ -113,19 +113,6 @@
         </div>
     </div>
 
-    <div id="launch-modal">
-        <div class="modal-content">
-            <h3 style="font-family: 'Orbitron'; color: var(--neon-green); margin-bottom: 15px; font-size: 0.8rem;">FINALISER LA MISSION</h3>
-            <p id="modal-product-name" style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 10px;"></p>
-            <label style="font-size: 0.6rem; color: var(--accent-orange);">PRIX CIBLE (€)</label>
-            <input type="number" id="final-price" placeholder="Prix négocié...">
-            <label style="font-size: 0.6rem; color: var(--accent-orange);">URL IMAGE PRODUIT</label>
-            <input type="text" id="final-image" placeholder="Lien http://...">
-            <button class="btn btn-add" onclick="processValidation()" style="width: 100%; padding: 15px; margin-top: 10px;">DÉPLOYER DANS L'ARÈNE</button>
-            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-dim); width:100%; margin-top:10px; cursor:pointer; font-size: 0.6rem;">ANNULER</button>
-        </div>
-    </div>
-
     <aside>
         <div class="cmd-label">TRIBAO CORE ADMIN</div>
         <div onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active">TABLEAU DE BORD</div>
@@ -165,7 +152,7 @@
                         </tr>
                     </thead>
                     <tbody id="requetes-table-body">
-                        <tr><td colspan="5" style="text-align:center; color:var(--text-dim)">// CHARGEMENT...</td></tr>
+                        <tr><td colspan="5" style="text-align:center;">// CHARGEMENT...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -185,7 +172,7 @@
                         </tr>
                     </thead>
                     <tbody id="validees-table-body">
-                        <tr><td colspan="5" style="text-align:center; color:var(--text-dim)">// AUCUNE MISSION VALIDÉE</td></tr>
+                        <tr><td colspan="5" style="text-align:center;">// AUCUNE MISSION VALIDÉE</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -206,15 +193,27 @@
                         <tr>
                             <th>IDENTIFIANT UNIQUE</th>
                             <th>PREMIÈRE ACTIVITÉ</th>
-                            <th>MISSIONS REJOINTES</th>
                             <th>RANK</th>
                         </tr>
                     </thead>
                     <tbody id="guerriers-table-body">
-                        <tr><td colspan="4" style="text-align:center; color:var(--text-dim)">// SCANNING DES DONNÉES...</td></tr>
+                        <tr><td colspan="3" style="text-align:center;">// SCANNING...</td></tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <div id="launch-modal">
+        <div class="modal-content">
+            <h3 style="font-family: 'Orbitron'; color: var(--neon-green); margin-bottom: 15px; font-size: 0.8rem;">FINALISER LA MISSION</h3>
+            <p id="modal-product-name" style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 10px;"></p>
+            <label style="font-size: 0.6rem; color: var(--accent-orange);">PRIX CIBLE (€)</label>
+            <input type="number" id="final-price" placeholder="Prix négocié...">
+            <label style="font-size: 0.6rem; color: var(--accent-orange);">URL IMAGE PRODUIT</label>
+            <input type="text" id="final-image" placeholder="Lien http://...">
+            <button class="btn btn-add" onclick="processValidation()" style="width: 100%; padding: 15px; margin-top: 10px;">DÉPLOYER DANS L'ARÈNE</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:var(--text-dim); width:100%; margin-top:10px; cursor:pointer; font-size: 0.6rem;">ANNULER</button>
         </div>
     </div>
 
@@ -237,11 +236,7 @@
         }
 
         async function refreshCoreData() {
-            await Promise.all([
-                loadPendingRequests(),
-                loadValidatedRequests(),
-                updateDashboardStats()
-            ]);
+            await Promise.all([loadPendingRequests(), loadValidatedRequests(), updateDashboardStats()]);
         }
 
         async function updateDashboardStats() {
@@ -292,26 +287,31 @@
             `).join('') : "<tr><td colspan='5' style='text-align:center;'>// AUCUNE MISSION VALIDÉE</td></tr>";
         }
 
+        // --- 🗑️ ANNULATION (FIXÉ AVEC ILIKE) ---
+        async function cancelMission(requestId, titre) {
+            if(confirm(`Supprimer "${titre}" de l'Arène et la remettre en attente ?`)) {
+                // Supprime dans 'missions' sans se soucier de la casse (ilike)
+                const { error: err1 } = await _supabase.from('missions').delete().ilike('titre', titre);
+                // Remet à jour la requête
+                const { error: err2 } = await _supabase.from('requetes').update({ statut: 'en_attente' }).eq('id', requestId);
+                
+                if(!err1 && !err2) {
+                    await refreshCoreData();
+                    alert("SYSTÈME : MISSION NETTOYÉE");
+                } else {
+                    alert("ERREUR : Vérifiez la permission DELETE sur Supabase.");
+                }
+            }
+        }
+
         async function loadGuerriers() {
             const { data } = await _supabase.from('requetes').select('user_id, created_at');
             const uniqueIDs = [...new Set(data.map(item => item.user_id))];
             document.getElementById('stat-total-guerriers').innerText = uniqueIDs.length;
             document.getElementById('guerriers-table-body').innerHTML = uniqueIDs.map(id => {
                 const firstContact = data.find(d => d.user_id === id).created_at;
-                return `<tr><td style="color:var(--neon-blue)">#${id}</td><td>${new Date(firstContact).toLocaleDateString()}</td><td>1</td><td>SOLDAT</td></tr>`;
+                return `<tr><td style="color:var(--neon-blue)">#${id}</td><td>${new Date(firstContact).toLocaleDateString()}</td><td>SOLDAT</td></tr>`;
             }).join('');
-        }
-
-        async function cancelMission(requestId, titre) {
-            if(confirm(`Supprimer "${titre}" et la remettre en attente ?`)) {
-                // On attend que les deux opérations soient finies
-                await _supabase.from('missions').delete().eq('titre', titre);
-                await _supabase.from('requetes').update({ statut: 'en_attente' }).eq('id', requestId);
-                
-                // CRITIQUE : On attend le refresh pour que ça disparaisse visuellement
-                await refreshCoreData();
-                alert("SYSTÈME : MISSION ANNULÉE");
-            }
         }
 
         function unlockSystem() {
