@@ -162,13 +162,13 @@
             return "CODE EN ATTENTE...";
         }
 
-        // --- AUTOMATISATION ET TRACKING COMMISION ---
+        // --- AUTOMATISATION ET TRACKING COMMISION AVEC AFFICHAGE DU CODE ---
         async function utiliserButin(code, url, missionId) {
             await navigator.clipboard.writeText(code);
-            alert("UNITÉ TRIBAO : Code copié avec succès !\nVous allez être redirigé vers le fournisseur pour finaliser l'achat au tarif négocié.");
+            // On affiche clairement le code dans l'alerte
+            alert("🏆 VICTOIRE CONFIRMÉE !\n\nTON CODE : " + code + "\n\nLe code a été copié dans votre presse-papier. Vous allez être redirigé vers le fournisseur.");
             
             const { data: { session } } = await _supabase.auth.getSession();
-            // On enregistre l'intention d'achat pour prouver la commission plus tard
             await _supabase.from('intentions_achat').insert([{
                 user_id: session.user.id,
                 mission_id: missionId,
@@ -210,7 +210,7 @@
                 if (!m) continue;
                 const isFull = m.statut === 'termine';
                 const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
-                const targetUrl = m.url_produit || "#"; // Lien vers le fournisseur
+                const targetUrl = m.url_produit || "#";
                 
                 let myCode = "";
                 if (isFull) {
@@ -218,20 +218,23 @@
                     arsenalHTML += `
                         <div class="stat-card" style="margin-bottom:15px; border-color:var(--neon-blue); background: rgba(0, 212, 255, 0.05);">
                             <span style="color: var(--neon-blue);">🏆 VICTOIRE : ${m.titre}</span>
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <div class="coupon-box" style="flex:1; text-align:center;">${myCode}</div>
-                                <button onclick="utiliserButin('${myCode}', '${targetUrl}', '${m.id}')" class="btn-action" style="background: var(--neon-blue);">DÉPLOYER LE CODE</button>
+                            <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
+                                <div class="coupon-box" style="flex:1; text-align:center; border-style: dashed;">CODE : ${myCode}</div>
+                                <button onclick="utiliserButin('${myCode}', '${targetUrl}', '${m.id}')" class="btn-action" style="background: var(--neon-blue); height: 40px;">DÉPLOYER</button>
                             </div>
                         </div>`;
                 }
 
                 missionHTML += `
-                    <div class="active-mission" style="${isFull ? 'border-color:var(--neon-blue)' : ''}">
+                    <div class="active-mission" style="${isFull ? 'border-color:var(--neon-blue); background: rgba(0, 212, 255, 0.02);' : ''}">
                         <div class="mission-icon"><img src="${m.image_url || 'https://via.placeholder.com/60'}"></div>
                         <div class="mission-name">
                             <h4 style="${isFull ? 'color:var(--neon-blue)' : ''}">${m.titre}</h4>
                             <p>${isFull ? '🏆 MISSION ACCOMPLIE' : 'Cible : ' + m.prix_cible + '€'}</p>
-                            ${isFull ? `<button onclick="utiliserButin('${myCode}', '${targetUrl}', '${m.id}')" class="btn-action" style="background:var(--neon-blue); margin-top:10px; font-size:0.6rem;">ALLER CHEZ LE FOURNISSEUR</button>` : ''}
+                            ${isFull ? `
+                                <div class="coupon-box" style="border-style: dashed; margin-bottom: 5px;">PROMO : ${myCode}</div>
+                                <button onclick="utiliserButin('${myCode}', '${targetUrl}', '${m.id}')" class="btn-action" style="background:var(--neon-blue); margin-top:5px; font-size:0.6rem; width: 100%;">ALLER CHEZ LE FOURNISSEUR</button>
+                            ` : ''}
                         </div>
                         <div class="mission-progress">
                             <span style="font-size:0.8rem; color:${isFull ? 'var(--neon-blue)' : 'inherit'}">${isFull ? 'SUCCÈS' : progress + '%'}</span>
