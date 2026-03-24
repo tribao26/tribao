@@ -60,7 +60,6 @@
         .stat-box { background: var(--panel-bg); border: var(--border); padding: 20px; border-radius: 4px; }
         .stat-box small { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; display: block; margin-bottom: 10px; }
         .stat-val { font-size: 1.4rem; font-family: 'Orbitron'; }
-        .conv-circle { width: 45px; height: 45px; border-radius: 50%; border: 3px solid #111; border-top-color: var(--neon-green); display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem; margin-right: 10px; }
 
         .control-panel { background: var(--panel-bg); border: var(--border); border-radius: 8px; margin-bottom: 30px; }
         .panel-head { padding: 15px 20px; border-bottom: var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -72,7 +71,6 @@
 
         .btn { padding: 6px 12px; border: none; border-radius: 3px; font-family: 'JetBrains Mono'; font-size: 0.7rem; cursor: pointer; }
         .btn-add { background: var(--neon-green); color: #000; font-weight: 700; }
-        .btn-delete { background: rgba(255, 62, 0, 0.1); color: var(--accent-orange); border: 1px solid var(--accent-orange); }
 
         #launch-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -162,6 +160,25 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="control-panel" style="margin-top: 40px; border-color: rgba(57, 255, 20, 0.2);">
+                <div class="panel-head">
+                    <h2 style="color: var(--neon-green);">// MISSIONS ACTUELLEMENT DANS L'ARÈNE</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>GUERRIER ID</th>
+                            <th>PRODUIT</th>
+                            <th>MARQUE</th>
+                            <th>STATUT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="validees-table-body">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-dim)">// AUCUNE MISSION VALIDÉE</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -174,7 +191,6 @@
 
         let selectedRequest = null;
 
-        // --- 🔐 LOGIQUE DE SÉCURITÉ ---
         function unlockSystem() {
             const input = document.getElementById('admin-pass');
             if (input.value === ADMIN_CODE) {
@@ -193,9 +209,7 @@
             window.location.href = "index.html";
         }
 
-        // --- 📊 CALCUL DES STATISTIQUES ---
         async function updateDashboardStats() {
-            // 1. Fetch Requêtes pour Conversion
             const { data: reqs } = await _supabase.from('requetes').select('statut');
             if(reqs) {
                 const total = reqs.length;
@@ -205,7 +219,6 @@
                 document.getElementById('stat-requests').innerText = total;
             }
 
-            // 2. Fetch Missions pour CA et Engagement
             const { data: missions } = await _supabase.from('missions').select('prix_cible, objectif_membres, membres_actuels');
             if(missions) {
                 let caTotal = 0;
@@ -219,35 +232,42 @@
             }
         }
 
-        function refreshCoreData() {
-            loadPendingRequests();
-            updateDashboardStats();
-        }
-
-        // --- 🛰️ SUPABASE OPERATIONS ---
         async function loadPendingRequests() {
-            const { data, error } = await _supabase
-                .from('requetes')
-                .select('*')
-                .eq('statut', 'en_attente');
-
+            const { data } = await _supabase.from('requetes').select('*').eq('statut', 'en_attente');
             const tbody = document.getElementById('requetes-table-body');
             if (!data || data.length === 0) {
                 tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--text-dim)'>// AUCUNE REQUÊTE EN ATTENTE</td></tr>";
                 return;
             }
-
             tbody.innerHTML = data.map(req => `
                 <tr>
                     <td>#${req.user_id.substring(0,8)}</td>
                     <td>${req.type_produit}</td>
                     <td>${req.marque}</td>
                     <td style="color:var(--neon-blue)">${req.objectif_membres} G</td>
-                    <td>
-                        <button class="btn btn-add" onclick="openLaunchModal(${JSON.stringify(req).replace(/"/g, '&quot;')})">VALIDER</button>
-                    </td>
+                    <td><button class="btn btn-add" onclick="openLaunchModal(${JSON.stringify(req).replace(/"/g, '&quot;')})">VALIDER</button></td>
                 </tr>
             `).join('');
+        }
+
+        async function loadValidatedRequests() {
+            const { data } = await _supabase.from('requetes').select('*').eq('statut', 'validee');
+            const tbody = document.getElementById('validees-table-body');
+            if (!data || data.length === 0) return;
+            tbody.innerHTML = data.map(req => `
+                <tr>
+                    <td>#${req.user_id.substring(0,8)}</td>
+                    <td>${req.type_produit}</td>
+                    <td>${req.marque}</td>
+                    <td><span style="color:var(--neon-green); font-size:0.6rem;">● DÉPLOYÉE</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function refreshCoreData() {
+            loadPendingRequests();
+            loadValidatedRequests();
+            updateDashboardStats();
         }
 
         function openLaunchModal(req) {
@@ -263,7 +283,6 @@
         async function processValidation() {
             const price = document.getElementById('final-price').value;
             const image = document.getElementById('final-image').value;
-
             if(!price || !image) { alert("DONNÉES MANQUANTES"); return; }
 
             const { error: err1 } = await _supabase.from('missions').insert([{
@@ -284,7 +303,6 @@
             }
         }
 
-        // --- EVENT LISTENERS ---
         window.onload = function() {
             if (sessionStorage.getItem('admin_auth') === 'granted') {
                 document.getElementById('lock-screen').style.display = 'none';
