@@ -172,40 +172,24 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // --- NAVIGATION ENTRE VUES ---
         function switchView(view) {
             document.getElementById('view-home').style.display = (view === 'home') ? 'block' : 'none';
             document.getElementById('view-arsenal').style.display = (view === 'arsenal') ? 'block' : 'none';
-
             document.getElementById('menu-home').classList.toggle('active', view === 'home');
             document.getElementById('menu-arsenal').classList.toggle('active', view === 'arsenal');
         }
 
         async function initDashboard() {
             const { data: { session } } = await _supabase.auth.getSession();
-            if (!session) {
-                window.location.href = 'auth.html';
-                return;
-            }
+            if (!session) { window.location.href = 'auth.html'; return; }
 
             const user = session.user;
             document.getElementById('unit-id').innerText = `UNITÉ : ${(user.user_metadata.full_name || user.email.split('@')[0]).toUpperCase()}`;
+            document.getElementById('ref-link').value = window.location.origin + "/auth.html?ref=" + user.id;
 
-            const myRefLink = window.location.origin + "/auth.html?ref=" + user.id;
-            document.getElementById('ref-link').value = myRefLink;
+            const { data: ralliements } = await _supabase.from('ralliements').select('mission_id, missions (*)').eq('user_id', user.id);
+            const { data: parrainages } = await _supabase.from('parrainages').select('*').eq('parrain_id', user.id);
 
-            const { data: ralliements } = await _supabase
-                .from('ralliements')
-                .select('mission_id, missions (*)')
-                .eq('user_id', user.id);
-
-            const { data: parrainages } = await _supabase
-                .from('parrainages')
-                .select('*')
-                .eq('parrain_id', user.id);
-
-            const container = document.getElementById('my-missions-container');
-            
             const mCount = ralliements ? ralliements.length : 0;
             const pCount = parrainages ? parrainages.length : 0;
             const totalPoints = (mCount * 150) + (pCount * 50);
@@ -220,28 +204,29 @@
             else if (totalPoints > 300) rank = "ÉCLAIREUR";
             document.getElementById('display-rank').innerText = "RANG : " + rank;
 
+            const container = document.getElementById('my-missions-container');
             if (!ralliements || ralliements.length === 0) {
-                container.innerHTML = "<p style='color:var(--text-gray); font-family:Orbitron; font-size:0.8rem;'>// AUCUNE MISSION REJOINTE. L'ARÈNE VOUS ATTEND.</p>";
+                container.innerHTML = "<p style='color:var(--text-gray); font-family:Orbitron; font-size:0.8rem;'>// AUCUNE MISSION REJOINTE.</p>";
                 return;
             }
 
             container.innerHTML = ralliements.map(item => {
                 const m = item.missions;
                 if (!m) return ""; 
+                const isFull = m.statut === 'termine';
                 const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
-                const isFull = progress >= 100;
                 
                 return `
-                    <div class="active-mission">
+                    <div class="active-mission" style="${isFull ? 'border-color:var(--neon-blue)' : ''}">
                         <div class="mission-icon">
                             <img src="${m.image_url || 'https://via.placeholder.com/60'}" alt="">
                         </div>
                         <div class="mission-name">
                             <h4 style="${isFull ? 'color:var(--neon-blue)' : ''}">${m.titre}</h4>
-                            <p>Cible : ${m.prix_cible}€ // Status : ${isFull ? 'Mission Accomplie' : 'En cours de ralliement'}</p>
+                            <p>${isFull ? '🏆 VICTOIRE : ' + (m.code_victoire || 'Vérification...') : 'Cible : ' + m.prix_cible + '€'}</p>
                         </div>
                         <div class="mission-progress">
-                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: ${isFull ? 'var(--neon-blue)' : 'inherit'}">${progress}% ATTEINT</span>
+                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: ${isFull ? 'var(--neon-blue)' : 'inherit'}">${isFull ? 'SUCCÈS' : progress + '%'}</span>
                             <div class="mini-gauge">
                                 <div class="mini-fill ${isFull ? 'full' : ''}" style="width: ${progress}%;"></div>
                             </div>
