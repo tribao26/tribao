@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TRIBAO | L'Arène</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-black: #0a0a0a;
@@ -20,158 +20,74 @@
         }
 
         * { box-sizing: border-box; }
-        body, html {
-            margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-black);
-            color: var(--text-main);
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-black); color: var(--text-main); }
 
         .main-layout { display: flex; height: 100vh; width: 100vw; }
 
         /* --- SIDEBAR --- */
-        aside {
-            width: 260px;
-            background-color: var(--bg-sidebar);
-            border-right: var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-
+        aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron'; letter-spacing: 2px; }
-
-        .nav-item {
-            padding: 15px 25px;
-            color: var(--text-gray);
-            text-decoration: none;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            transition: 0.3s;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            color: var(--neon-green);
-            background: rgba(57, 255, 20, 0.05);
-            border-left: 3px solid var(--neon-green);
-        }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
 
         /* --- CONTENT --- */
         .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
-
-        header {
-            height: 70px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            background: rgba(10, 10, 10, 0.9);
-            border-bottom: var(--border);
-            flex-shrink: 0;
-        }
-
-        .logo-header {
-            font-family: 'Orbitron';
-            color: var(--neon-green);
-            font-weight: 700;
-            font-size: 1.3rem;
-            letter-spacing: 3px;
-            text-decoration: none;
-        }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron'; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; text-decoration: none; }
 
         .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
         .arena-grid { max-width: 1100px; margin: 0 auto; }
 
-        /* --- JOURNAL DE GUERRE (ALERTES) --- */
-        #alerte-victoire-container {
-            margin-bottom: 40px;
-            animation: pulse-blue 2s infinite ease-in-out;
+        /* --- JOURNAL DE GUERRE (ALERTE VICTOIRE) --- */
+        .war-journal {
+            background: rgba(0, 212, 255, 0.03);
+            border: 1px double var(--neon-blue);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: none; /* Caché par défaut, activé par JS */
+            position: relative;
+            overflow: hidden;
         }
-        @keyframes pulse-blue {
-            0% { box-shadow: 0 0 5px rgba(0, 212, 255, 0.2); }
-            50% { box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
-            100% { box-shadow: 0 0 5px rgba(0, 212, 255, 0.2); }
+        .war-journal::before {
+            content: "SIGNAL ENTRANT...";
+            position: absolute; top: 5px; right: 10px;
+            font-family: 'JetBrains Mono'; font-size: 0.5rem; color: var(--neon-blue); opacity: 0.5;
         }
+        .journal-title { font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .journal-body { font-size: 0.9rem; line-height: 1.4; color: #fff; }
+        .journal-body span { color: var(--neon-blue); font-weight: bold; }
 
         /* --- HERO --- */
         .hero-callout {
             background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent);
             border-left: 4px solid var(--neon-green);
-            padding: 40px;
-            margin-bottom: 50px;
-            border-radius: 0 12px 12px 0;
+            padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0;
         }
         .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
-        .hero-callout p { font-size: 1rem; color: var(--text-gray); margin-bottom: 25px; line-height: 1.5; }
-        .hero-callout p span { color: var(--neon-green); font-weight: 700; }
-
-        .auth-actions { display: flex; gap: 15px; margin-top: 20px; }
-        .btn-hero {
-            padding: 12px 25px;
-            font-family: 'Orbitron';
-            font-weight: 700;
-            font-size: 0.75rem;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: 0.3s;
-            text-align: center;
-        }
-        .btn-hero-solid { background: var(--neon-green); color: #000; }
-        .btn-hero-outline { border: 1px solid var(--neon-green); color: var(--neon-green); }
+        .hero-callout p { font-size: 1rem; color: var(--text-gray); }
 
         /* --- CARDS --- */
-        .mission-card {
-            background: var(--card-gray);
-            border: var(--border);
-            border-radius: 12px;
-            display: flex;
-            padding: 25px;
-            margin-bottom: 25px;
-            gap: 30px;
-            transition: 0.3s;
-        }
+        .mission-card { background: var(--card-gray); border: var(--border); border-radius: 12px; display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; transition: 0.3s; }
         .mission-card:hover { border-color: var(--neon-green); }
         .mission-card.completed { border-color: var(--neon-blue); }
-
         .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
-
         .mission-info { flex: 1; display: flex; flex-direction: column; }
         .mission-info h3 { margin: 0 0 10px; font-family: 'Orbitron'; color: #fff; }
         .price-tag { color: var(--neon-green); font-weight: 700; margin-bottom: 20px; }
         .price-tag.win { color: var(--neon-blue); }
-
-        .gauge-wrapper { margin-top: auto; }
         .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s; }
         .bar-fill.complete { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
-        
-        .gauge-data { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-gray); }
-
-        .btn-join {
-            margin-top: 15px;
-            background: var(--neon-gradient);
-            color: #000;
-            padding: 12px 25px;
-            border-radius: 4px;
-            font-family: 'Orbitron';
-            font-weight: 700;
-            text-decoration: none;
-            font-size: 0.75rem;
-            text-align: center;
-            transition: 0.3s;
-        }
+        .btn-join { margin-top: 15px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; }
         .btn-join.success { background: var(--blue-gradient); color: #fff; }
 
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
             aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
             .nav-label { display: none; }
-            .nav-item { padding: 15px 20px; border-left: none; white-space: nowrap; }
+            .nav-item { padding: 15px 20px; border-left: none; }
         }
     </style>
 </head>
@@ -197,18 +113,14 @@
 
             <div class="scroll-area">
                 <div class="arena-grid">
-                    
-                    <div id="alerte-victoire-container" style="display:none;">
-                        <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid var(--neon-blue); padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 20px;">
-                            <div style="font-size: 2rem;">📡</div>
-                            <div style="flex:1">
-                                <h4 style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.8rem; margin: 0; letter-spacing: 1px;">// DERNIÈRE VICTOIRE DE LA TRIBU</h4>
-                                <p id="victoire-texte" style="font-size: 0.85rem; margin: 8px 0 0; color: #fff; line-height: 1.4;"></p>
-                            </div>
-                            <div style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon-blue); border: 1px solid var(--neon-blue); padding: 5px 10px; border-radius: 4px; white-space: nowrap;">SIGNAL ÉTABLI</div>
+
+                    <div id="war-journal" class="war-journal">
+                        <div class="journal-title">📡 JOURNAL DE GUERRE : VICTOIRE CONFIRMÉE</div>
+                        <div id="journal-content" class="journal-body">
+                            Analyse des transmissions...
                         </div>
                     </div>
-
+                    
                     <section class="hero-callout">
                         <h2 id="hero-title">TRIBAO — Reprenez le pouvoir.</h2>
                         <p id="hero-desc">REJOIGNEZ LA TRIBU <span>TRIBAO</span>. Rassemblez-vous pour casser les prix.</p>
@@ -241,18 +153,12 @@
                 document.getElementById('logout-link').style.display = 'flex';
                 document.getElementById('qg-link').style.display = 'flex'; 
                 document.getElementById('hero-auth-btns').style.display = 'none';
-                document.getElementById('hero-title').innerText = "Ravi de vous revoir.";
             }
         }
 
-        async function handleLogout(e) {
-            e.preventDefault();
-            await _supabase.auth.signOut();
-            window.location.reload();
-        }
-
-        async function loadAlertesVictoire() {
-            const { data: missionTerminee } = await _supabase
+        async function loadWarJournal() {
+            // On récupère la dernière mission terminée
+            const { data: v } = await _supabase
                 .from('missions')
                 .select('titre, membres_actuels')
                 .eq('statut', 'termine')
@@ -260,10 +166,10 @@
                 .limit(1)
                 .maybeSingle();
 
-            if (missionTerminee) {
-                document.getElementById('alerte-victoire-container').style.display = 'block';
-                document.getElementById('victoire-texte').innerText = 
-                    `L'unité Tribao a triomphé ! La mission "${missionTerminee.titre}" est un succès total avec ${missionTerminee.membres_actuels} guerriers engagés. Le butin est en cours de distribution.`;
+            if (v) {
+                document.getElementById('war-journal').style.display = 'block';
+                document.getElementById('journal-content').innerHTML = 
+                    `L'unité TRIBAO a triomphé ! La mission <span>"${v.titre}"</span> est un succès total avec <span>${v.membres_actuels}</span> guerriers mobilisés. Le butin est actuellement distribué aux membres engagés.`;
             }
         }
 
@@ -272,36 +178,36 @@
             const listContainer = document.getElementById('missions-list');
             
             if (error || !data || data.length === 0) {
-                listContainer.innerHTML = "<p>// AUCUNE MISSION DÉPECTÉE</p>";
+                listContainer.innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
                 return;
             }
 
             listContainer.innerHTML = data.map(m => {
                 const obj = m.objectif_membres || 1;
                 const act = m.membres_actuels || 0;
-                const isTerminee = m.statut === 'termine';
+                const isWin = m.statut === 'termine';
                 const isFull = act >= obj;
                 const progress = Math.min(100, Math.round((act / obj) * 100));
                 
                 return `
-                    <div class="mission-card ${isTerminee ? 'completed' : ''}">
+                    <div class="mission-card ${isWin ? 'completed' : ''}">
                         <div class="mission-img-box">
                             <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="Produit">
                         </div>
                         <div class="mission-info">
-                            <h3 style="${isTerminee ? 'color:var(--neon-blue)' : ''}">${m.titre}</h3>
-                            <div class="price-tag ${isTerminee ? 'win' : ''}">
-                                ${isTerminee ? 'MISSION RÉUSSIE' : (isFull ? 'OBJECTIF ATTEINT' : 'CIBLE : ' + m.prix_cible + '€')}
+                            <h3 style="${isWin ? 'color:var(--neon-blue)' : ''}">${m.titre}</h3>
+                            <div class="price-tag ${isWin ? 'win' : ''}">
+                                ${isWin ? 'MISSION RÉUSSIE' : (isFull ? 'OBJECTIF ATTEINT' : 'CIBLE : ' + m.prix_cible + '€')}
                             </div>
                             <div class="gauge-wrapper">
-                                <div class="bar-bg"><div class="bar-fill ${isTerminee ? 'complete' : ''}" style="width: ${progress}%;"></div></div>
+                                <div class="bar-bg"><div class="bar-fill ${isWin ? 'complete' : ''}" style="width: ${progress}%;"></div></div>
                                 <div class="gauge-data">
                                     <span>${act} / ${obj} Guerriers</span>
-                                    <span style="${isTerminee ? 'color:var(--neon-blue)' : ''}">${isTerminee ? 'VICTOIRE' : progress + '%'}</span>
+                                    <span style="${isWin ? 'color:var(--neon-blue)' : ''}">${isWin ? 'VICTOIRE' : progress + '%'}</span>
                                 </div>
                             </div>
-                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isTerminee ? 'success' : ''}">
-                                ${isTerminee ? 'VOIR LE BUTIN' : 'DÉTAILS MISSION'}
+                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isWin ? 'success' : ''}">
+                                ${isWin ? 'RÉCUPÉRER BUTIN' : 'DÉTAILS MISSION'}
                             </a>
                         </div>
                     </div>
@@ -309,8 +215,14 @@
             }).join('');
         }
 
+        async function handleLogout(e) {
+            e.preventDefault();
+            await _supabase.auth.signOut();
+            window.location.reload();
+        }
+
         checkSession();
-        loadAlertesVictoire();
+        loadWarJournal();
         loadMissions();
     </script>
 </body>
