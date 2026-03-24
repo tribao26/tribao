@@ -264,11 +264,15 @@
             `).join('');
         }
 
-        function refreshCoreData() {
-            loadPendingRequests();
-            loadValidatedRequests();
-            updateDashboardStats();
-        }
+        // --- FONCTION DE MISE À JOUR GLOBALE ---
+function refreshCoreData() {
+    console.log("Système : Rafraîchissement des données en cours...");
+    
+    // On relance les 3 piliers du dashboard
+    loadPendingRequests();   // Recharger le tableau "En attente"
+    loadValidatedRequests(); // Recharger le tableau "Missions dans l'Arène"
+    updateDashboardStats();  // Recalculer les chiffres en haut
+}
 
         function openLaunchModal(req) {
             selectedRequest = req;
