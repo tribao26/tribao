@@ -11,6 +11,7 @@
             --bg-sidebar: #121212;
             --card-gray: #1a1a1a;
             --neon-green: #39FF14;
+            --neon-blue: #00d4ff;
             --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
             --text-main: #f0f0f0;
             --text-gray: #888;
@@ -45,9 +46,10 @@
         .tactic-box { margin-top: 50px; padding: 30px; background: var(--card-gray); border-radius: 12px; border: var(--border); }
         .gauge-bar-lg { width: 100%; height: 12px; background: #000; border-radius: 20px; margin-bottom: 20px; overflow: hidden; border: 1px solid #222; }
         .gauge-fill-lg { height: 100%; width: 0%; background: var(--neon-gradient); box-shadow: 0 0 20px var(--neon-green); transition: width 1s ease-in-out; }
+        .gauge-fill-lg.full { background: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
 
         .btn-enlist { width: 100%; padding: 20px; background: var(--neon-gradient); color: #000; font-family: 'Orbitron'; font-weight: 700; border: none; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 1rem; }
-        .btn-enlist:disabled { opacity: 0.7; cursor: not-allowed; filter: grayscale(1); }
+        .btn-enlist:disabled { background: #222 !important; color: #666 !important; cursor: not-allowed; box-shadow: none !important; }
 
         @media (max-width: 1000px) {
             aside { display: none; }
@@ -61,8 +63,8 @@
         <aside>
             <div style="padding: 30px 25px;"><span style="font-family:'Orbitron'; color:var(--neon-green); font-weight:700;">TRIBAO</span></div>
             <a href="arene.html" class="nav-item">L'ARÈNE</a>
-            <a href="dashboard-guerrier.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
-            <a href="contact.html" class="nav-item">SUPPORT</a>
+            <a href="dashboard.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
+            <a href="#" class="nav-item">SUPPORT</a>
         </aside>
 
         <div class="content-wrapper">
@@ -71,7 +73,7 @@
             <div class="mission-grid" id="mission-content" style="display: none;">
                 <div class="product-visual"><img id="mission-img" src="" alt="Produit"></div>
                 <div class="product-data">
-                    <div class="badge-status">MISSION ACTIVÉE</div>
+                    <div id="status-badge" class="badge-status">MISSION ACTIVÉE</div>
                     <h1 id="mission-title">Chargement...</h1>
                     <div class="price-info">
                         <span class="target-price" id="mission-price-target">-- €</span>
@@ -84,7 +86,7 @@
                             <span id="gauge-text">0 / 0</span>
                         </div>
                         <div class="gauge-bar-lg"><div id="gauge-fill" class="gauge-fill-lg"></div></div>
-                        <button class="btn-enlist" onclick="enlistInMission()">REJOINDRE LA MISSION</button>
+                        <button id="main-action-btn" class="btn-enlist" onclick="enlistInMission()">REJOINDRE LA MISSION</button>
                     </div>
                 </div>
             </div>
@@ -101,17 +103,27 @@
         const urlParams = new URLSearchParams(window.location.search);
         const missionId = urlParams.get('id');
 
+        async function init() {
+            await checkSession();
+            await loadMission();
+        }
+
         async function checkSession() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 document.getElementById('qg-link').style.display = 'flex';
+                return session.user;
             }
+            return null;
         }
 
         async function loadMission() {
             const { data: m } = await _supabase.from('missions').select('*').eq('id', missionId).single();
             if (!m) return;
 
+            const user = await checkSession();
+            const btn = document.getElementById('main-action-btn');
+            
             document.getElementById('mission-title').innerText = m.titre;
             document.getElementById('mission-img').src = m.image_url;
             document.getElementById('mission-price-target').innerText = m.prix_cible + " €";
@@ -119,7 +131,36 @@
 
             const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
             document.getElementById('gauge-text').innerText = `${m.membres_actuels} / ${m.objectif_membres}`;
-            document.getElementById('gauge-fill').style.width = progress + "%";
+            const fill = document.getElementById('gauge-fill');
+            fill.style.width = progress + "%";
+
+            // Vérification si déjà rejoint
+            let alreadyJoined = false;
+            if (user) {
+                const { data: ralliement } = await _supabase
+                    .from('ralliements')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .eq('mission_id', missionId)
+                    .maybeSingle();
+                if (ralliement) alreadyJoined = true;
+            }
+
+            // --- LOGIQUE DE VERROUILLAGE DU BOUTON ---
+            if (m.membres_actuels >= m.objectif_membres) {
+                btn.innerText = "MISSION COMPLÈTE";
+                btn.disabled = true;
+                fill.classList.add('full');
+                document.getElementById('status-badge').innerText = "OBJECTIF ATTEINT";
+                document.getElementById('status-badge').style.borderColor = "var(--neon-blue)";
+                document.getElementById('status-badge').style.color = "var(--neon-blue)";
+            } else if (alreadyJoined) {
+                btn.innerText = "MISSION REJOINTE";
+                btn.disabled = true;
+                btn.style.border = "1px solid var(--neon-green)";
+                btn.style.background = "rgba(57, 255, 20, 0.05)";
+                btn.style.color = "var(--neon-green)";
+            }
 
             document.getElementById('loading-state').style.display = 'none';
             document.getElementById('mission-content').style.display = 'grid';
@@ -134,45 +175,45 @@
                 return; 
             }
 
-            const userRole = session.user.user_metadata.role;
-            if (userRole === 'pro') {
-                alert("ACCÈS REFUSÉ : Les Fournisseurs ne peuvent pas rallier de missions.");
-                return; 
-            }
-
-            const btn = document.querySelector('.btn-enlist');
-            btn.innerText = "// TRANSMISSION...";
+            const btn = document.getElementById('main-action-btn');
+            btn.innerText = "// VÉRIFICATION...";
             btn.disabled = true;
 
-            // 1. On crée le lien dans la table 'ralliements'
+            // 1. SÉCURITÉ : Re-vérifier le compteur en direct avant d'agir
+            const { data: mCheck } = await _supabase.from('missions').select('*').eq('id', missionId).single();
+            if (mCheck.membres_actuels >= mCheck.objectif_membres) {
+                alert("MISSION TERMINÉE : Désolé, la dernière place vient d'être prise !");
+                window.location.reload();
+                return;
+            }
+
+            // 2. Insérer le ralliement
             const { error: linkError } = await _supabase
                 .from('ralliements')
                 .insert([{ user_id: session.user.id, mission_id: missionId }]);
 
             if (linkError) {
-                alert("Erreur technique ou mission déjà ralliée.");
-                btn.disabled = false;
-                btn.innerText = "REJOINDRE LA MISSION";
+                alert("Vous faites déjà partie de cette mission !");
+                loadMission();
                 return;
             }
 
-            // 2. On met à jour le compteur dans 'missions'
-            const { data: m } = await _supabase.from('missions').select('membres_actuels').eq('id', missionId).single();
-            const { error } = await _supabase.from('missions').update({ membres_actuels: m.membres_actuels + 1 }).eq('id', missionId);
+            // 3. Incrémenter proprement
+            const { error: updateError } = await _supabase
+                .from('missions')
+                .update({ membres_actuels: mCheck.membres_actuels + 1 })
+                .eq('id', missionId);
 
-            if (!error) {
-                alert("ENGAGEMENT VALIDÉ ! Retrouvez cette mission dans votre QG.");
-                loadMission();
-                btn.innerText = "MISSION REJOINTE";
+            if (!updateError) {
+                alert("RALLIEMENT CONFIRMÉ ! Bienvenue dans la tribu.");
+                window.location.reload();
             } else {
-                alert("Erreur lors de la mise à jour du compteur.");
+                alert("Erreur de synchronisation. Contactez le support.");
                 btn.disabled = false;
-                btn.innerText = "REJOINDRE LA MISSION";
             }
         }
 
-        checkSession();
-        loadMission();
+        init();
     </script>
 </body>
 </html>
