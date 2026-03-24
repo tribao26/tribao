@@ -11,7 +11,7 @@
             --bg-sidebar: #121212;
             --card-gray: #1a1a1a;
             --neon-green: #39FF14;
-            --neon-blue: #00d4ff; /* Couleur de succès */
+            --neon-blue: #00d4ff;
             --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
             --blue-gradient: linear-gradient(135deg, #00d4ff 0%, #0072ff 100%);
             --text-main: #f0f0f0;
@@ -84,8 +84,18 @@
         }
 
         .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
-
         .arena-grid { max-width: 1100px; margin: 0 auto; }
+
+        /* --- JOURNAL DE GUERRE (ALERTES) --- */
+        #alerte-victoire-container {
+            margin-bottom: 40px;
+            animation: pulse-blue 2s infinite ease-in-out;
+        }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 5px rgba(0, 212, 255, 0.2); }
+            50% { box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
+            100% { box-shadow: 0 0 5px rgba(0, 212, 255, 0.2); }
+        }
 
         /* --- HERO --- */
         .hero-callout {
@@ -175,10 +185,7 @@
                 <div id="user-email" style="font-size: 0.7rem; color: #fff; margin-top: 5px; opacity: 0.8; overflow: hidden; text-overflow: ellipsis;">---</div>
             </div>
             <a href="arene.html" class="nav-item active">L'ARÈNE</a>
-            <a href="dashboard-guerrier.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
-            <a href="fournisseurs.html" class="nav-item">FOURNISSEURS</a>
-            <a href="comment-ca-marche.html" class="nav-item">COMMENT CA MARCHE</a>
-            <a href="contact.html" class="nav-item">CONTACT</a>
+            <a href="dashboard.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
             <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
         </aside>
 
@@ -190,6 +197,18 @@
 
             <div class="scroll-area">
                 <div class="arena-grid">
+                    
+                    <div id="alerte-victoire-container" style="display:none;">
+                        <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid var(--neon-blue); padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 20px;">
+                            <div style="font-size: 2rem;">📡</div>
+                            <div style="flex:1">
+                                <h4 style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.8rem; margin: 0; letter-spacing: 1px;">// DERNIÈRE VICTOIRE DE LA TRIBU</h4>
+                                <p id="victoire-texte" style="font-size: 0.85rem; margin: 8px 0 0; color: #fff; line-height: 1.4;"></p>
+                            </div>
+                            <div style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon-blue); border: 1px solid var(--neon-blue); padding: 5px 10px; border-radius: 4px; white-space: nowrap;">SIGNAL ÉTABLI</div>
+                        </div>
+                    </div>
+
                     <section class="hero-callout">
                         <h2 id="hero-title">TRIBAO — Reprenez le pouvoir.</h2>
                         <p id="hero-desc">REJOIGNEZ LA TRIBU <span>TRIBAO</span>. Rassemblez-vous pour casser les prix.</p>
@@ -199,7 +218,7 @@
                         </div>
                     </section>
 
-                    <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS EN COURS</h2>
+                    <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS ACTIVES</h2>
                     <div id="missions-list">
                          <p style="color: var(--neon-green); font-family: 'Orbitron'; font-size: 0.8rem;">// DÉCRYPTAGE DU FLUX...</p>
                     </div>
@@ -232,40 +251,57 @@
             window.location.reload();
         }
 
+        async function loadAlertesVictoire() {
+            const { data: missionTerminee } = await _supabase
+                .from('missions')
+                .select('titre, membres_actuels')
+                .eq('statut', 'termine')
+                .order('id', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (missionTerminee) {
+                document.getElementById('alerte-victoire-container').style.display = 'block';
+                document.getElementById('victoire-texte').innerText = 
+                    `L'unité Tribao a triomphé ! La mission "${missionTerminee.titre}" est un succès total avec ${missionTerminee.membres_actuels} guerriers engagés. Le butin est en cours de distribution.`;
+            }
+        }
+
         async function loadMissions() {
             const { data, error } = await _supabase.from('missions').select('*').order('created_at', { ascending: false });
             const listContainer = document.getElementById('missions-list');
             
             if (error || !data || data.length === 0) {
-                listContainer.innerHTML = "<p>// AUCUNE MISSION DÉPECTÉE DANS L'ARÈNE</p>";
+                listContainer.innerHTML = "<p>// AUCUNE MISSION DÉPECTÉE</p>";
                 return;
             }
 
             listContainer.innerHTML = data.map(m => {
                 const obj = m.objectif_membres || 1;
                 const act = m.membres_actuels || 0;
+                const isTerminee = m.statut === 'termine';
                 const isFull = act >= obj;
                 const progress = Math.min(100, Math.round((act / obj) * 100));
                 
                 return `
-                    <div class="mission-card ${isFull ? 'completed' : ''}">
+                    <div class="mission-card ${isTerminee ? 'completed' : ''}">
                         <div class="mission-img-box">
                             <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="Produit">
                         </div>
                         <div class="mission-info">
-                            <h3 style="${isFull ? 'color:var(--neon-blue)' : ''}">${m.titre}</h3>
-                            <div class="price-tag ${isFull ? 'win' : ''}">
-                                ${isFull ? 'OBJECTIF ATTEINT' : 'CIBLE : ' + m.prix_cible + '€'}
+                            <h3 style="${isTerminee ? 'color:var(--neon-blue)' : ''}">${m.titre}</h3>
+                            <div class="price-tag ${isTerminee ? 'win' : ''}">
+                                ${isTerminee ? 'MISSION RÉUSSIE' : (isFull ? 'OBJECTIF ATTEINT' : 'CIBLE : ' + m.prix_cible + '€')}
                             </div>
                             <div class="gauge-wrapper">
-                                <div class="bar-bg"><div class="bar-fill ${isFull ? 'complete' : ''}" style="width: ${progress}%;"></div></div>
+                                <div class="bar-bg"><div class="bar-fill ${isTerminee ? 'complete' : ''}" style="width: ${progress}%;"></div></div>
                                 <div class="gauge-data">
                                     <span>${act} / ${obj} Guerriers</span>
-                                    <span style="${isFull ? 'color:var(--neon-blue)' : ''}">${isFull ? 'MISSION ACCOMPLIE' : progress + '%'}</span>
+                                    <span style="${isTerminee ? 'color:var(--neon-blue)' : ''}">${isTerminee ? 'VICTOIRE' : progress + '%'}</span>
                                 </div>
                             </div>
-                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isFull ? 'success' : ''}">
-                                ${isFull ? 'VOIR LE RÉSULTAT' : 'DÉTAILS MISSION'}
+                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isTerminee ? 'success' : ''}">
+                                ${isTerminee ? 'VOIR LE BUTIN' : 'DÉTAILS MISSION'}
                             </a>
                         </div>
                     </div>
@@ -274,6 +310,7 @@
         }
 
         checkSession();
+        loadAlertesVictoire();
         loadMissions();
     </script>
 </body>

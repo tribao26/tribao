@@ -47,7 +47,8 @@
         .recruit-box::after { display: none; }
         .recruit-group { display: flex; gap: 10px; margin-top: 15px; }
         .recruit-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: var(--neon-green); font-family: 'JetBrains Mono'; font-size: 0.75rem; border-radius: 4px; outline: none; }
-        .btn-copy { background: var(--neon-green); color: #000; border: none; padding: 0 20px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.7rem; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .btn-action { background: var(--neon-green); color: #000; border: none; padding: 0 20px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.7rem; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .btn-action:hover { filter: brightness(1.2); }
 
         .section-header { font-family: 'Orbitron'; font-size: 0.9rem; margin-bottom: 25px; letter-spacing: 2px; color: var(--text-gray); display: flex; align-items: center; gap: 15px; }
         .section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
@@ -56,7 +57,7 @@
             background: rgba(20, 20, 20, 0.5); border: var(--border); border-radius: 12px; padding: 25px;
             display: grid; grid-template-columns: 80px 1fr 200px; align-items: center; gap: 25px; margin-bottom: 15px;
         }
-        .mission-icon { width: 60px; height: 60px; background: #000; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; overflow: hidden; }
+        .mission-icon { width: 60px; height: 60px; background: #000; border-radius: 8px; border: 1px solid #333; overflow: hidden; }
         .mission-icon img { width: 100%; height: 100%; object-fit: cover; }
         .mission-name h4 { margin: 0 0 5px; font-family: 'Orbitron'; font-size: 1rem; }
         .mission-name p { margin: 0; font-size: 0.8rem; color: var(--text-gray); }
@@ -115,7 +116,7 @@
                                 <span>LIEN DE PARRAINAGE</span>
                                 <div class="recruit-group">
                                     <input type="text" id="ref-link" class="recruit-input" readonly value="...">
-                                    <button onclick="copyLink()" class="btn-copy">COPIER</button>
+                                    <button onclick="copyLink()" class="btn-action">COPIER</button>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +129,7 @@
                             <div class="stat-card" style="border-color: var(--neon-blue);"><span>CASHBACK DISPONIBLE</span><h3 style="color: var(--neon-blue);">0.00 €</h3></div>
                             <div class="stat-card"><span>ÉCONOMIES RÉALISÉES</span><h3 id="stat-eco">0.00 €</h3></div>
                         </div>
-                        <h2 class="section-header">MES BONS DE VICTOIRE (CODES UNIQUES)</h2>
+                        <h2 class="section-header">MES BONS DE VICTOIRE (ARSENAL)</h2>
                         <div id="coupons-container"></div>
                     </div>
                 </div>
@@ -150,17 +151,31 @@
         }
 
         async function getOrAssignCoupon(missionId, userId) {
-            // 1. Vérifier si déjà attribué
             const { data: existing } = await _supabase.from('coupons_uniques').select('code').eq('mission_id', missionId).eq('attribue_a', userId).maybeSingle();
             if (existing) return existing.code;
 
-            // 2. Sinon, prendre un code libre
             const { data: freeCode } = await _supabase.from('coupons_uniques').select('*').eq('mission_id', missionId).is('attribue_a', null).limit(1).maybeSingle();
             if (freeCode) {
                 await _supabase.from('coupons_uniques').update({ attribue_a: userId }).eq('id', freeCode.id);
                 return freeCode.code;
             }
-            return "EN ATTENTE DE CODES...";
+            return "CODE EN ATTENTE...";
+        }
+
+        // --- AUTOMATISATION ET TRACKING COMMISION ---
+        async function utiliserButin(code, url, missionId) {
+            await navigator.clipboard.writeText(code);
+            alert("UNITÉ TRIBAO : Code copié avec succès !\nVous allez être redirigé vers le fournisseur pour finaliser l'achat au tarif négocié.");
+            
+            const { data: { session } } = await _supabase.auth.getSession();
+            // On enregistre l'intention d'achat pour prouver la commission plus tard
+            await _supabase.from('intentions_achat').insert([{
+                user_id: session.user.id,
+                mission_id: missionId,
+                code_genere: code
+            }]);
+
+            window.open(url, '_blank');
         }
 
         async function initDashboard() {
@@ -176,22 +191,14 @@
 
             const mCount = ralliements ? ralliements.length : 0;
             const pCount = parrainages ? parrainages.length : 0;
-            const totalPoints = (mCount * 150) + (pCount * 50);
-
             document.getElementById('stat-count').innerText = mCount.toString().padStart(2, '0');
             document.getElementById('stat-recrues').innerText = pCount.toString().padStart(2, '0');
-            document.getElementById('stat-pts').innerText = totalPoints;
-
-            let rank = "SOLDAT";
-            if (totalPoints > 1500) rank = "LÉGENDE"; else if (totalPoints > 800) rank = "CENTURION"; else if (totalPoints > 300) rank = "ÉCLAIREUR";
-            document.getElementById('display-rank').innerText = "RANG : " + rank;
+            document.getElementById('stat-pts').innerText = (mCount * 150) + (pCount * 50);
 
             const container = document.getElementById('my-missions-container');
             const arsenal = document.getElementById('coupons-container');
-            
             if (!ralliements || ralliements.length === 0) {
-                container.innerHTML = "<p>// AUCUNE MISSION.</p>";
-                arsenal.innerHTML = "<p>// AUCUN BON DÉBLOQUÉ.</p>";
+                container.innerHTML = "<p>// AUCUNE MISSION ACTIVE.</p>";
                 return;
             }
 
@@ -203,14 +210,18 @@
                 if (!m) continue;
                 const isFull = m.statut === 'termine';
                 const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
+                const targetUrl = m.url_produit || "#"; // Lien vers le fournisseur
                 
                 let myCode = "";
                 if (isFull) {
                     myCode = await getOrAssignCoupon(m.id, user.id);
                     arsenalHTML += `
-                        <div class="stat-card" style="margin-bottom:10px; border-color:var(--neon-blue)">
-                            <span>${m.titre}</span>
-                            <div class="coupon-box">${myCode}</div>
+                        <div class="stat-card" style="margin-bottom:15px; border-color:var(--neon-blue); background: rgba(0, 212, 255, 0.05);">
+                            <span style="color: var(--neon-blue);">🏆 VICTOIRE : ${m.titre}</span>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <div class="coupon-box" style="flex:1; text-align:center;">${myCode}</div>
+                                <button onclick="utiliserButin('${myCode}', '${targetUrl}', '${m.id}')" class="btn-action" style="background: var(--neon-blue);">DÉPLOYER LE CODE</button>
+                            </div>
                         </div>`;
                 }
 
@@ -219,23 +230,23 @@
                         <div class="mission-icon"><img src="${m.image_url || 'https://via.placeholder.com/60'}"></div>
                         <div class="mission-name">
                             <h4 style="${isFull ? 'color:var(--neon-blue)' : ''}">${m.titre}</h4>
-                            <p>${isFull ? '🏆 CODE DÉBLOQUÉ' : 'Cible : ' + m.prix_cible + '€'}</p>
-                            ${isFull ? `<div class="coupon-box">${myCode}</div>` : ''}
+                            <p>${isFull ? '🏆 MISSION ACCOMPLIE' : 'Cible : ' + m.prix_cible + '€'}</p>
+                            ${isFull ? `<button onclick="utiliserButin('${myCode}', '${targetUrl}', '${m.id}')" class="btn-action" style="background:var(--neon-blue); margin-top:10px; font-size:0.6rem;">ALLER CHEZ LE FOURNISSEUR</button>` : ''}
                         </div>
                         <div class="mission-progress">
-                            <span style="font-size: 0.8rem; color: ${isFull ? 'var(--neon-blue)' : 'inherit'}">${isFull ? 'VICTOIRE' : progress + '%'}</span>
+                            <span style="font-size:0.8rem; color:${isFull ? 'var(--neon-blue)' : 'inherit'}">${isFull ? 'SUCCÈS' : progress + '%'}</span>
                             <div class="mini-gauge"><div class="mini-fill ${isFull ? 'full' : ''}" style="width: ${progress}%;"></div></div>
                         </div>
                     </div>`;
             }
 
             container.innerHTML = missionHTML;
-            arsenal.innerHTML = arsenalHTML || "<p>// LES BONS S'AFFICHERONT ICI APRÈS LA VICTOIRE.</p>";
+            arsenal.innerHTML = arsenalHTML || "<p>// L'ARSENAL EST VIDE. GAGNEZ DES MISSIONS POUR DÉBLOQUER DES CODES.</p>";
         }
 
         function copyLink() {
             const el = document.getElementById("ref-link"); el.select();
-            navigator.clipboard.writeText(el.value); alert("Lien copié !");
+            navigator.clipboard.writeText(el.value); alert("Lien de parrainage copié !");
         }
 
         async function handleLogout(e) {
