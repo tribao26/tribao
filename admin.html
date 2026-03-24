@@ -136,16 +136,16 @@
 
         <div class="dashboard-view">
             <div class="stats-grid">
-                <div class="stat-box"><small>Conversion</small><div class="stat-val">18.4%</div></div>
-                <div class="stat-box"><small>Guerriers/H</small><div class="stat-val">12</div></div>
-                <div class="stat-box"><small>Engagement</small><div class="stat-val" style="color: var(--neon-blue);">24%</div></div>
-                <div class="stat-box"><small>C.A. PRÉVU</small><div class="stat-val" style="color: var(--neon-green);">14 250 €</div></div>
+                <div class="stat-box"><small>Conversion</small><div class="stat-val" id="stat-conversion">--%</div></div>
+                <div class="stat-box"><small>Requêtes</small><div class="stat-val" id="stat-requests">--</div></div>
+                <div class="stat-box"><small>Engagement</small><div class="stat-val" id="stat-engagement" style="color: var(--neon-blue);">--</div></div>
+                <div class="stat-box"><small>C.A. PRÉVU</small><div class="stat-val" id="stat-ca" style="color: var(--neon-green);">0 €</div></div>
             </div>
 
             <div class="control-panel">
                 <div class="panel-head">
                     <h2>// REQUÊTES EN ATTENTE DE VALIDATION</h2>
-                    <button class="btn btn-add" onclick="loadPendingRequests()">RAFRAÎCHIR</button>
+                    <button class="btn btn-add" onclick="refreshCoreData()">RAFRAÎCHIR</button>
                 </div>
                 <table>
                     <thead>
@@ -180,7 +180,7 @@
             if (input.value === ADMIN_CODE) {
                 document.getElementById('lock-screen').style.display = 'none';
                 sessionStorage.setItem('admin_auth', 'granted');
-                loadPendingRequests();
+                refreshCoreData();
             } else {
                 alert("ACCÈS REFUSÉ");
                 input.value = "";
@@ -189,8 +189,39 @@
 
         function logoutAdmin(e) {
             e.preventDefault();
-            sessionStorage.removeItem('admin_auth'); // On détruit le badge
-            window.location.href = "index.html";     // On redirige
+            sessionStorage.removeItem('admin_auth');
+            window.location.href = "index.html";
+        }
+
+        // --- 📊 CALCUL DES STATISTIQUES ---
+        async function updateDashboardStats() {
+            // 1. Fetch Requêtes pour Conversion
+            const { data: reqs } = await _supabase.from('requetes').select('statut');
+            if(reqs) {
+                const total = reqs.length;
+                const validee = reqs.filter(r => r.statut === 'validee').length;
+                const conv = total > 0 ? ((validee / total) * 100).toFixed(1) : 0;
+                document.getElementById('stat-conversion').innerText = conv + "%";
+                document.getElementById('stat-requests').innerText = total;
+            }
+
+            // 2. Fetch Missions pour CA et Engagement
+            const { data: missions } = await _supabase.from('missions').select('prix_cible, objectif_membres, membres_actuels');
+            if(missions) {
+                let caTotal = 0;
+                let engagement = 0;
+                missions.forEach(m => {
+                    caTotal += (m.prix_cible * m.objectif_membres);
+                    engagement += m.membres_actuels;
+                });
+                document.getElementById('stat-ca').innerText = caTotal.toLocaleString() + " €";
+                document.getElementById('stat-engagement').innerText = engagement;
+            }
+        }
+
+        function refreshCoreData() {
+            loadPendingRequests();
+            updateDashboardStats();
         }
 
         // --- 🛰️ SUPABASE OPERATIONS ---
@@ -240,15 +271,14 @@
                 prix_cible: parseFloat(price),
                 objectif_membres: selectedRequest.objectif_membres,
                 membres_actuels: 1,
-                image_url: image,
-                
+                image_url: image
             }]);
 
             if(!err1) {
                 await _supabase.from('requetes').update({ statut: 'validee' }).eq('id', selectedRequest.id);
                 alert("SYSTÈME : MISSION DÉPLOYÉE DANS L'ARÈNE");
                 closeModal();
-                loadPendingRequests();
+                refreshCoreData();
             } else {
                 alert("ERREUR : " + err1.message);
             }
@@ -258,7 +288,7 @@
         window.onload = function() {
             if (sessionStorage.getItem('admin_auth') === 'granted') {
                 document.getElementById('lock-screen').style.display = 'none';
-                loadPendingRequests();
+                refreshCoreData();
             }
         };
 
