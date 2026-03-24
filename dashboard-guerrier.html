@@ -26,7 +26,7 @@
         /* --- SIDEBAR GUERRIER --- */
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
-        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; cursor: pointer; }
         .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
         .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
 
@@ -91,9 +91,9 @@
         <aside>
             <div class="nav-label" id="unit-id">UNITÉ : CHARGEMENT...</div>
             <a href="arene.html" class="nav-item">L'ARÈNE</a>
-            <a href="#" class="nav-item active">MON QG</a>
+            <a href="#" id="menu-home" class="nav-item active" onclick="switchView('home')">MON QG</a>
+            <a href="#" id="menu-arsenal" class="nav-item" onclick="switchView('arsenal')">PORTEFEUILLE</a>
             <a href="#" class="nav-item">MES COMMANDES</a>
-            <a href="#" class="nav-item">PORTEFEUILLE</a>
             
             <div class="nav-footer">
                 <a href="#" onclick="handleLogout(event)" class="nav-item" style="color:#ff4444;">DÉCONNEXION</a>
@@ -109,33 +109,52 @@
             <div class="scroll-area">
                 <div class="dashboard-grid">
                     
-                    <div class="stats-row">
-                        <div class="stat-card">
-                            <span>RECRUES DIRECTES</span>
-                            <h3 id="stat-recrues">00</h3>
-                        </div>
-                        <div class="stat-card">
-                            <span>MISSIONS REJOINTES</span>
-                            <h3 id="stat-count">00</h3>
-                        </div>
-                        <div class="stat-card">
-                            <span>POINTS D'INFLUENCE</span>
-                            <h3 id="stat-pts">0</h3>
+                    <div id="view-home">
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <span>RECRUES DIRECTES</span>
+                                <h3 id="stat-recrues">00</h3>
+                            </div>
+                            <div class="stat-card">
+                                <span>MISSIONS REJOINTES</span>
+                                <h3 id="stat-count">00</h3>
+                            </div>
+                            <div class="stat-card">
+                                <span>POINTS D'INFLUENCE</span>
+                                <h3 id="stat-pts">0</h3>
+                            </div>
+
+                            <div class="stat-card recruit-box">
+                                <span>LIEN DE PARRAINAGE</span>
+                                <div class="recruit-group">
+                                    <input type="text" id="ref-link" class="recruit-input" readonly value="GÉNÉRATION DU LIEN...">
+                                    <button onclick="copyLink()" class="btn-copy">COPIER LE LIEN</button>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="stat-card recruit-box">
-                            <span>LIEN DE PARRAINAGE</span>
-                            <div class="recruit-group">
-                                <input type="text" id="ref-link" class="recruit-input" readonly value="GÉNÉRATION DU LIEN...">
-                                <button onclick="copyLink()" class="btn-copy">COPIER LE LIEN</button>
-                            </div>
+                        <h2 class="section-header">MES ENGAGEMENTS ACTIFS</h2>
+                        <div id="my-missions-container">
+                            <p style="color:var(--neon-green); font-family:'JetBrains Mono'; font-size:0.8rem;">// RÉCUPÉRATION DES DONNÉES TACTIQUES...</p>
                         </div>
                     </div>
 
-                    <h2 class="section-header">MES ENGAGEMENTS ACTIFS</h2>
+                    <div id="view-arsenal" style="display: none;">
+                        <div class="stats-row">
+                            <div class="stat-card" style="border-color: var(--neon-blue);">
+                                <span>BUTIN DISPONIBLE (CASHBACK)</span>
+                                <h3 style="color: var(--neon-blue);">0.00 €</h3>
+                            </div>
+                            <div class="stat-card">
+                                <span>RÉDUCTION TOTALE OBTENUE</span>
+                                <h3 id="stat-total-promo">0.00 €</h3>
+                            </div>
+                        </div>
 
-                    <div id="my-missions-container">
-                        <p style="color:var(--neon-green); font-family:'JetBrains Mono'; font-size:0.8rem;">// RÉCUPÉRATION DES DONNÉES TACTIQUES...</p>
+                        <h2 class="section-header">MES BONS DE VICTOIRE (COUPONS)</h2>
+                        <div id="coupons-container">
+                            <p style="color:var(--text-gray); font-family:'JetBrains Mono'; font-size:0.8rem;">// AUCUN COUPON DÉPLOYÉ POUR LE MOMENT.</p>
+                        </div>
                     </div>
 
                 </div>
@@ -153,6 +172,15 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        // --- NAVIGATION ENTRE VUES ---
+        function switchView(view) {
+            document.getElementById('view-home').style.display = (view === 'home') ? 'block' : 'none';
+            document.getElementById('view-arsenal').style.display = (view === 'arsenal') ? 'block' : 'none';
+
+            document.getElementById('menu-home').classList.toggle('active', view === 'home');
+            document.getElementById('menu-arsenal').classList.toggle('active', view === 'arsenal');
+        }
+
         async function initDashboard() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (!session) {
@@ -163,7 +191,7 @@
             const user = session.user;
             document.getElementById('unit-id').innerText = `UNITÉ : ${(user.user_metadata.full_name || user.email.split('@')[0]).toUpperCase()}`;
 
-            // --- 🤝 GÉNÉRATION DU LIEN DE PARRAINAGE ---
+            // --- 🤝 LIEN DE PARRAINAGE ---
             const myRefLink = window.location.origin + "/auth.html?ref=" + user.id;
             document.getElementById('ref-link').value = myRefLink;
 
@@ -180,7 +208,7 @@
 
             const container = document.getElementById('my-missions-container');
             
-            // Calcul des points : 150 par mission + 50 par recrue
+            // Points : 150 par mission + 50 par recrue
             const mCount = ralliements ? ralliements.length : 0;
             const pCount = parrainages ? parrainages.length : 0;
             const totalPoints = (mCount * 150) + (pCount * 50);
@@ -189,7 +217,7 @@
             document.getElementById('stat-recrues').innerText = pCount.toString().padStart(2, '0');
             document.getElementById('stat-pts').innerText = totalPoints;
 
-            // --- 🎖️ LOGIQUE DE RANG ---
+            // --- 🎖️ RANG ---
             let rank = "SOLDAT";
             if (totalPoints > 1500) rank = "LÉGENDE";
             else if (totalPoints > 800) rank = "CENTURION";
@@ -204,7 +232,7 @@
             // Affichage des missions
             container.innerHTML = ralliements.map(item => {
                 const m = item.missions;
-                if (!m) return ""; // Sécurité si mission supprimée
+                if (!m) return ""; 
                 const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
                 const isFull = progress >= 100;
                 
