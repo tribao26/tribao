@@ -11,6 +11,7 @@
             --bg-sidebar: #121212;
             --card-gray: #1a1a1a;
             --neon-green: #39FF14;
+            --neon-blue: #00d4ff;
             --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
             --text-main: #f0f0f0;
             --text-gray: #888;
@@ -33,7 +34,7 @@
         .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
         .logo-header { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; }
-        .user-rank { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 5px 10px; border-radius: 4px; }
+        .user-rank { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 5px 10px; border-radius: 4px; transition: 0.5s; }
 
         /* --- SCROLL AREA --- */
         .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
@@ -70,6 +71,7 @@
         .mission-progress { text-align: right; }
         .mini-gauge { width: 100%; height: 6px; background: #000; border-radius: 10px; margin-top: 10px; overflow: hidden; }
         .mini-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 1s; }
+        .mini-fill.full { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
 
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
@@ -101,7 +103,7 @@
         <div class="content-wrapper">
             <header>
                 <div class="logo-header">TRIBAO</div>
-                <div class="user-rank" id="display-rank">RANG : ÉCLAIREUR</div>
+                <div class="user-rank" id="display-rank">CHARGEMENT GRADE...</div>
             </header>
 
             <div class="scroll-area">
@@ -109,8 +111,8 @@
                     
                     <div class="stats-row">
                         <div class="stat-card">
-                            <span>ÉCONOMIE ESTIMÉE</span>
-                            <h3 id="stat-eco">0.00 €</h3>
+                            <span>RECRUES DIRECTES</span>
+                            <h3 id="stat-recrues">00</h3>
                         </div>
                         <div class="stat-card">
                             <span>MISSIONS REJOINTES</span>
@@ -165,7 +167,7 @@
             const myRefLink = window.location.origin + "/auth.html?ref=" + user.id;
             document.getElementById('ref-link').value = myRefLink;
 
-            // --- 📊 RÉCUPÉRATION DONNÉES (MISSIONS + PARRAINAGES) ---
+            // --- 📊 RÉCUPÉRATION DONNÉES ---
             const { data: ralliements } = await _supabase
                 .from('ralliements')
                 .select('mission_id, missions (*)')
@@ -184,7 +186,15 @@
             const totalPoints = (mCount * 150) + (pCount * 50);
 
             document.getElementById('stat-count').innerText = mCount.toString().padStart(2, '0');
+            document.getElementById('stat-recrues').innerText = pCount.toString().padStart(2, '0');
             document.getElementById('stat-pts').innerText = totalPoints;
+
+            // --- 🎖️ LOGIQUE DE RANG ---
+            let rank = "SOLDAT";
+            if (totalPoints > 1500) rank = "LÉGENDE";
+            else if (totalPoints > 800) rank = "CENTURION";
+            else if (totalPoints > 300) rank = "ÉCLAIREUR";
+            document.getElementById('display-rank').innerText = "RANG : " + rank;
 
             if (!ralliements || ralliements.length === 0) {
                 container.innerHTML = "<p style='color:var(--text-gray); font-family:Orbitron; font-size:0.8rem;'>// AUCUNE MISSION REJOINTE. L'ARÈNE VOUS ATTEND.</p>";
@@ -194,7 +204,9 @@
             // Affichage des missions
             container.innerHTML = ralliements.map(item => {
                 const m = item.missions;
+                if (!m) return ""; // Sécurité si mission supprimée
                 const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
+                const isFull = progress >= 100;
                 
                 return `
                     <div class="active-mission">
@@ -202,12 +214,14 @@
                             <img src="${m.image_url || 'https://via.placeholder.com/60'}" alt="">
                         </div>
                         <div class="mission-name">
-                            <h4>${m.titre}</h4>
-                            <p>Cible : ${m.prix_cible}€ // Status : En cours de ralliement</p>
+                            <h4 style="${isFull ? 'color:var(--neon-blue)' : ''}">${m.titre}</h4>
+                            <p>Cible : ${m.prix_cible}€ // Status : ${isFull ? 'Mission Accomplie' : 'En cours de ralliement'}</p>
                         </div>
                         <div class="mission-progress">
-                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem;">${progress}% ATTEINT</span>
-                            <div class="mini-gauge"><div class="mini-fill" style="width: ${progress}%;"></div></div>
+                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: ${isFull ? 'var(--neon-blue)' : 'inherit'}">${progress}% ATTEINT</span>
+                            <div class="mini-gauge">
+                                <div class="mini-fill ${isFull ? 'full' : ''}" style="width: ${progress}%;"></div>
+                            </div>
                         </div>
                     </div>
                 `;
