@@ -46,7 +46,7 @@
         /* --- SIDEBAR --- */
         aside { width: 280px; background: var(--panel-bg); border-right: var(--border); display: flex; flex-direction: column; }
         .cmd-label { padding: 30px 20px 10px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--accent-orange); letter-spacing: 2px; }
-        .nav-item { padding: 15px 20px; color: var(--text-dim); text-decoration: none; font-size: 0.8rem; transition: 0.2s; border-left: 3px solid transparent; }
+        .nav-item { padding: 15px 20px; color: var(--text-dim); text-decoration: none; font-size: 0.8rem; transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; }
         .nav-item:hover, .nav-item.active { color: #fff; background: rgba(255, 62, 0, 0.05); border-left-color: var(--accent-orange); }
 
         /* --- MAIN AREA --- */
@@ -71,6 +71,20 @@
 
         .btn { padding: 6px 12px; border: none; border-radius: 3px; font-family: 'JetBrains Mono'; font-size: 0.7rem; cursor: pointer; }
         .btn-add { background: var(--neon-green); color: #000; font-weight: 700; }
+        
+        /* OPTION C : STYLE BOUTON ANNULER */
+        .btn-cancel { 
+            background: rgba(255, 62, 0, 0.1); 
+            color: var(--accent-orange); 
+            border: 1px solid var(--accent-orange); 
+            font-size: 0.65rem;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-family: 'Orbitron';
+            transition: 0.3s;
+        }
+        .btn-cancel:hover { background: var(--accent-orange); color: #fff; }
 
         #launch-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -118,11 +132,10 @@
 
     <aside>
         <div class="cmd-label">TRIBAO CORE ADMIN</div>
-        <a href="#" class="nav-item active">TABLEAU DE BORD</a>
-        <a href="#" class="nav-item">GÉRER LES MISSIONS</a>
-        <a href="#" class="nav-item">BASE GUERRIERS</a>
+        <div onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active">TABLEAU DE BORD</div>
+        <div onclick="switchTab('guerriers')" id="nav-guerriers" class="nav-item">BASE GUERRIERS</div>
         <div style="margin-top: auto; border-top: var(--border);">
-            <a href="index.html" onclick="logoutAdmin(event)" class="nav-item" style="color: var(--accent-orange);">QUITTER LE SYSTÈME</a>
+            <a href="index.html" onclick="logoutAdmin(event)" class="nav-item" style="color: var(--accent-orange); display: block; text-decoration: none;">QUITTER LE SYSTÈME</a>
         </div>
     </aside>
 
@@ -132,7 +145,7 @@
             <div class="sys-status" id="sys-status">● LIAISON ÉTABLIE // MARS 2026</div>
         </header>
 
-        <div class="dashboard-view">
+        <div class="dashboard-view" id="view-dashboard">
             <div class="stats-grid">
                 <div class="stat-box"><small>Conversion</small><div class="stat-val" id="stat-conversion">--%</div></div>
                 <div class="stat-box"><small>Requêtes</small><div class="stat-val" id="stat-requests">--</div></div>
@@ -143,7 +156,7 @@
             <div class="control-panel">
                 <div class="panel-head">
                     <h2>// REQUÊTES EN ATTENTE DE VALIDATION</h2>
-                    <button class="btn btn-add" id="refresh-btn" onclick="refreshCoreData()">RAFRAÎCHIR</button>
+                    <button class="btn btn-add" onclick="refreshCoreData()">RAFRAÎCHIR</button>
                 </div>
                 <table>
                     <thead>
@@ -156,7 +169,7 @@
                         </tr>
                     </thead>
                     <tbody id="requetes-table-body">
-                        <tr><td colspan="5" style="text-align:center; color:var(--text-dim)">// CHARGEMENT DU FLUX...</td></tr>
+                        <tr><td colspan="5" style="text-align:center; color:var(--text-dim)">// CHARGEMENT...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -172,10 +185,37 @@
                             <th>PRODUIT</th>
                             <th>MARQUE</th>
                             <th>STATUT</th>
+                            <th>ACTION</th>
                         </tr>
                     </thead>
                     <tbody id="validees-table-body">
-                        <tr><td colspan="4" style="text-align:center; color:var(--text-dim)">// AUCUNE MISSION VALIDÉE</td></tr>
+                        <tr><td colspan="5" style="text-align:center; color:var(--text-dim)">// AUCUNE MISSION VALIDÉE</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dashboard-view" id="view-guerriers" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-box"><small>Total Guerriers</small><div class="stat-val" id="stat-total-guerriers">--</div></div>
+                <div class="stat-box"><small>Engagement Moyen</small><div class="stat-val" style="color:var(--neon-blue)">100%</div></div>
+            </div>
+            <div class="control-panel">
+                <div class="panel-head">
+                    <h2>// REGISTRE DES UNITÉS IDENTIFIÉES</h2>
+                    <button class="btn btn-add" onclick="loadGuerriers()">RECHARGER BASE</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>IDENTIFIANT UNIQUE</th>
+                            <th>PREMIÈRE ACTIVITÉ</th>
+                            <th>MISSIONS REJOINTES</th>
+                            <th>RANK</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guerriers-table-body">
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-dim)">// SCANNING DES DONNÉES...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -191,18 +231,23 @@
 
         let selectedRequest = null;
 
-        // --- 📊 FONCTION DE MISE À JOUR GLOBALE ---
-        async function refreshCoreData() {
-            console.log("Système : Rafraîchissement des données...");
+        function switchTab(target) {
+            document.getElementById('view-dashboard').style.display = target === 'dashboard' ? 'block' : 'none';
+            document.getElementById('view-guerriers').style.display = target === 'guerriers' ? 'block' : 'none';
             
-            // On lance les 3 piliers en parallèle
+            document.getElementById('nav-dashboard').classList.toggle('active', target === 'dashboard');
+            document.getElementById('nav-guerriers').classList.toggle('active', target === 'guerriers');
+            
+            if(target === 'guerriers') loadGuerriers();
+            else refreshCoreData();
+        }
+
+        async function refreshCoreData() {
             await Promise.all([
                 loadPendingRequests(),
                 loadValidatedRequests(),
                 updateDashboardStats()
             ]);
-            
-            console.log("Système : Dashboard à jour.");
         }
 
         async function updateDashboardStats() {
@@ -215,7 +260,7 @@
                 document.getElementById('stat-requests').innerText = total;
             }
 
-            const { data: missions } = await _supabase.from('missions').select('prix_cible, objectif_membres, membres_actuels');
+            const { data: missions } = await _supabase.from('missions').select('*');
             if(missions) {
                 let caTotal = 0;
                 let engagement = 0;
@@ -231,12 +276,10 @@
         async function loadPendingRequests() {
             const { data } = await _supabase.from('requetes').select('*').eq('statut', 'en_attente');
             const tbody = document.getElementById('requetes-table-body');
-            
             if (!data || data.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--text-dim)'>// AUCUNE REQUÊTE EN ATTENTE</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--text-dim)'>// AUCUNE REQUÊTE</td></tr>";
                 return;
             }
-            
             tbody.innerHTML = data.map(req => `
                 <tr>
                     <td>#${req.user_id.substring(0,8)}</td>
@@ -253,56 +296,76 @@
             const tbody = document.getElementById('validees-table-body');
             
             if (!data || data.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; color:var(--text-dim)'>// AUCUNE MISSION VALIDÉE</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--text-dim)'>// AUCUNE MISSION VALIDÉE</td></tr>";
                 return;
             }
-            
+
             tbody.innerHTML = data.map(req => `
                 <tr>
                     <td>#${req.user_id.substring(0,8)}</td>
-                    <td>${req.type_produit || 'N/A'}</td>
-                    <td>${req.marque || 'N/A'}</td>
+                    <td>${req.type_produit}</td>
+                    <td>${req.marque}</td>
                     <td><span style="color:var(--neon-green); font-size:0.6rem;">● DÉPLOYÉE</span></td>
+                    <td><button class="btn-cancel" onclick="cancelMission('${req.id}', '${req.type_produit}')">ANNULER</button></td>
                 </tr>
             `).join('');
         }
 
-        // --- 🔐 LOGIQUE DE SÉCURITÉ ---
+        async function loadGuerriers() {
+            const { data } = await _supabase.from('requetes').select('user_id, created_at');
+            const tbody = document.getElementById('guerriers-table-body');
+            const uniqueIDs = [...new Set(data.map(item => item.user_id))];
+            document.getElementById('stat-total-guerriers').innerText = uniqueIDs.length;
+
+            tbody.innerHTML = uniqueIDs.map(id => {
+                const firstContact = data.find(d => d.user_id === id).created_at;
+                return `
+                    <tr>
+                        <td style="color:var(--neon-blue)">#${id}</td>
+                        <td>${new Date(firstContact).toLocaleDateString()}</td>
+                        <td>1</td>
+                        <td>SOLDAT</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function cancelMission(requestId, titre) {
+            if(confirm(`Voulez-vous supprimer la mission "${titre}" de l'Arène et la remettre en attente ?`)) {
+                const { error: err1 } = await _supabase.from('missions').delete().eq('titre', titre);
+                const { error: err2 } = await _supabase.from('requetes').update({ statut: 'en_attente' }).eq('id', requestId);
+                
+                if(!err1 && !err2) {
+                    alert("SYSTÈME : MISSION ANNULÉE ET REQUÊTE RÉACTIVÉE");
+                    refreshCoreData();
+                } else {
+                    alert("ERREUR LORS DE L'ANNULATION");
+                }
+            }
+        }
+
         function unlockSystem() {
             const input = document.getElementById('admin-pass');
             if (input.value === ADMIN_CODE) {
                 document.getElementById('lock-screen').style.display = 'none';
                 sessionStorage.setItem('admin_auth', 'granted');
                 refreshCoreData();
-            } else {
-                alert("ACCÈS REFUSÉ");
-                input.value = "";
-            }
+            } else { alert("ACCÈS REFUSÉ"); input.value = ""; }
         }
 
-        function logoutAdmin(e) {
-            e.preventDefault();
-            sessionStorage.removeItem('admin_auth');
-            window.location.href = "index.html";
-        }
-
-        // --- 🚀 MODAL & VALIDATION ---
         function openLaunchModal(req) {
             selectedRequest = req;
-            document.getElementById('modal-product-name').innerText = (req.type_produit || "Produit") + " (" + (req.marque || "Marque") + ")";
+            document.getElementById('modal-product-name').innerText = `${req.type_produit} (${req.marque})`;
             document.getElementById('launch-modal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('launch-modal').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('launch-modal').style.display = 'none'; }
 
         async function processValidation() {
             const price = document.getElementById('final-price').value;
             const image = document.getElementById('final-image').value;
-            if(!price || !image) { alert("DONNÉES MANQUANTES"); return; }
+            if(!price || !image) return alert("DONNÉES MANQUANTES");
 
-            // 1. Insertion dans Missions
             const { error: err1 } = await _supabase.from('missions').insert([{
                 titre: selectedRequest.type_produit,
                 prix_cible: parseFloat(price),
@@ -312,18 +375,20 @@
             }]);
 
             if(!err1) {
-                // 2. Update du statut de la requête
                 await _supabase.from('requetes').update({ statut: 'validee' }).eq('id', selectedRequest.id);
-                alert("SYSTÈME : MISSION DÉPLOYÉE DANS L'ARÈNE");
                 closeModal();
-                // 3. Force le rafraîchissement
                 refreshCoreData();
             } else {
                 alert("ERREUR : " + err1.message);
             }
         }
 
-        // --- DÉMARRAGE ---
+        function logoutAdmin(e) {
+            e.preventDefault();
+            sessionStorage.removeItem('admin_auth');
+            window.location.href = "index.html";
+        }
+
         window.onload = function() {
             if (sessionStorage.getItem('admin_auth') === 'granted') {
                 document.getElementById('lock-screen').style.display = 'none';
