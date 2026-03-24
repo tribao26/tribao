@@ -23,39 +23,32 @@
 
         .main-layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- SIDEBAR GUERRIER --- */
         aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
         .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
         .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron', sans-serif; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; cursor: pointer; }
         .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
         .nav-footer { margin-top: auto; border-top: var(--border); padding: 10px 0; }
 
-        /* --- CONTENT --- */
         .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
         .logo-header { font-family: 'Orbitron', sans-serif; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; }
         .user-rank { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 5px 10px; border-radius: 4px; transition: 0.5s; }
 
-        /* --- SCROLL AREA --- */
         .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
         .dashboard-grid { max-width: 1100px; margin: 0 auto; }
 
-        /* --- STATS CARDS --- */
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .stat-card { background: var(--card-gray); border: var(--border); padding: 25px; border-radius: 12px; position: relative; overflow: hidden; }
         .stat-card::after { content: ""; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--neon-green); }
         .stat-card span { display: block; font-family: 'Orbitron'; font-size: 0.65rem; color: var(--text-gray); margin-bottom: 10px; }
         .stat-card h3 { margin: 0; font-family: 'JetBrains Mono'; font-size: 1.8rem; color: #fff; }
 
-        /* --- RECRUITMENT BOX --- */
         .recruit-box { grid-column: 1 / -1; border: 1px dashed var(--neon-green); background: rgba(57, 255, 20, 0.02); }
         .recruit-box::after { display: none; }
         .recruit-group { display: flex; gap: 10px; margin-top: 15px; }
         .recruit-input { flex: 1; background: #000; border: 1px solid #333; padding: 12px; color: var(--neon-green); font-family: 'JetBrains Mono'; font-size: 0.75rem; border-radius: 4px; outline: none; }
         .btn-copy { background: var(--neon-green); color: #000; border: none; padding: 0 20px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.7rem; border-radius: 4px; cursor: pointer; transition: 0.3s; }
-        .btn-copy:hover { filter: brightness(1.2); }
 
-        /* --- MISSIONS REJOINTES --- */
         .section-header { font-family: 'Orbitron'; font-size: 0.9rem; margin-bottom: 25px; letter-spacing: 2px; color: var(--text-gray); display: flex; align-items: center; gap: 15px; }
         .section-header::after { content: ""; flex: 1; height: 1px; background: #222; }
 
@@ -72,6 +65,11 @@
         .mini-gauge { width: 100%; height: 6px; background: #000; border-radius: 10px; margin-top: 10px; overflow: hidden; }
         .mini-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 1s; }
         .mini-fill.full { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+
+        .coupon-box { 
+            background: #000; border: 1px solid var(--neon-blue); color: var(--neon-blue); 
+            padding: 8px 12px; border-radius: 4px; font-family: 'JetBrains Mono'; font-size: 0.8rem; margin-top: 5px; display: inline-block;
+        }
 
         @media (max-width: 850px) {
             .main-layout { flex-direction: column; }
@@ -103,66 +101,38 @@
         <div class="content-wrapper">
             <header>
                 <div class="logo-header">TRIBAO</div>
-                <div class="user-rank" id="display-rank">CHARGEMENT GRADE...</div>
+                <div class="user-rank" id="display-rank">CHARGEMENT...</div>
             </header>
 
             <div class="scroll-area">
                 <div class="dashboard-grid">
-                    
                     <div id="view-home">
                         <div class="stats-row">
-                            <div class="stat-card">
-                                <span>RECRUES DIRECTES</span>
-                                <h3 id="stat-recrues">00</h3>
-                            </div>
-                            <div class="stat-card">
-                                <span>MISSIONS REJOINTES</span>
-                                <h3 id="stat-count">00</h3>
-                            </div>
-                            <div class="stat-card">
-                                <span>POINTS D'INFLUENCE</span>
-                                <h3 id="stat-pts">0</h3>
-                            </div>
-
+                            <div class="stat-card"><span>RECRUES DIRECTES</span><h3 id="stat-recrues">00</h3></div>
+                            <div class="stat-card"><span>MISSIONS REJOINTES</span><h3 id="stat-count">00</h3></div>
+                            <div class="stat-card"><span>POINTS D'INFLUENCE</span><h3 id="stat-pts">0</h3></div>
                             <div class="stat-card recruit-box">
                                 <span>LIEN DE PARRAINAGE</span>
                                 <div class="recruit-group">
-                                    <input type="text" id="ref-link" class="recruit-input" readonly value="GÉNÉRATION DU LIEN...">
-                                    <button onclick="copyLink()" class="btn-copy">COPIER LE LIEN</button>
+                                    <input type="text" id="ref-link" class="recruit-input" readonly value="...">
+                                    <button onclick="copyLink()" class="btn-copy">COPIER</button>
                                 </div>
                             </div>
                         </div>
-
                         <h2 class="section-header">MES ENGAGEMENTS ACTIFS</h2>
-                        <div id="my-missions-container">
-                            <p style="color:var(--neon-green); font-family:'JetBrains Mono'; font-size:0.8rem;">// RÉCUPÉRATION DES DONNÉES TACTIQUES...</p>
-                        </div>
+                        <div id="my-missions-container"></div>
                     </div>
 
                     <div id="view-arsenal" style="display: none;">
                         <div class="stats-row">
-                            <div class="stat-card" style="border-color: var(--neon-blue);">
-                                <span>BUTIN DISPONIBLE (CASHBACK)</span>
-                                <h3 style="color: var(--neon-blue);">0.00 €</h3>
-                            </div>
-                            <div class="stat-card">
-                                <span>RÉDUCTION TOTALE OBTENUE</span>
-                                <h3 id="stat-total-promo">0.00 €</h3>
-                            </div>
+                            <div class="stat-card" style="border-color: var(--neon-blue);"><span>CASHBACK DISPONIBLE</span><h3 style="color: var(--neon-blue);">0.00 €</h3></div>
+                            <div class="stat-card"><span>ÉCONOMIES RÉALISÉES</span><h3 id="stat-eco">0.00 €</h3></div>
                         </div>
-
-                        <h2 class="section-header">MES BONS DE VICTOIRE (COUPONS)</h2>
-                        <div id="coupons-container">
-                            <p style="color:var(--text-gray); font-family:'JetBrains Mono'; font-size:0.8rem;">// AUCUN COUPON DÉPLOYÉ POUR LE MOMENT.</p>
-                        </div>
+                        <h2 class="section-header">MES BONS DE VICTOIRE (CODES UNIQUES)</h2>
+                        <div id="coupons-container"></div>
                     </div>
-
                 </div>
             </div>
-
-            <footer style="padding: 20px 40px; border-top: var(--border); font-size: 0.7rem; color: #444;">
-                © 2026 TRIBAO - SYSTÈME DE GESTION TACTIQUE
-            </footer>
         </div>
     </div>
 
@@ -179,11 +149,25 @@
             document.getElementById('menu-arsenal').classList.toggle('active', view === 'arsenal');
         }
 
+        async function getOrAssignCoupon(missionId, userId) {
+            // 1. Vérifier si déjà attribué
+            const { data: existing } = await _supabase.from('coupons_uniques').select('code').eq('mission_id', missionId).eq('attribue_a', userId).maybeSingle();
+            if (existing) return existing.code;
+
+            // 2. Sinon, prendre un code libre
+            const { data: freeCode } = await _supabase.from('coupons_uniques').select('*').eq('mission_id', missionId).is('attribue_a', null).limit(1).maybeSingle();
+            if (freeCode) {
+                await _supabase.from('coupons_uniques').update({ attribue_a: userId }).eq('id', freeCode.id);
+                return freeCode.code;
+            }
+            return "EN ATTENTE DE CODES...";
+        }
+
         async function initDashboard() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (!session) { window.location.href = 'auth.html'; return; }
-
             const user = session.user;
+            
             document.getElementById('unit-id').innerText = `UNITÉ : ${(user.user_metadata.full_name || user.email.split('@')[0]).toUpperCase()}`;
             document.getElementById('ref-link').value = window.location.origin + "/auth.html?ref=" + user.id;
 
@@ -199,54 +183,63 @@
             document.getElementById('stat-pts').innerText = totalPoints;
 
             let rank = "SOLDAT";
-            if (totalPoints > 1500) rank = "LÉGENDE";
-            else if (totalPoints > 800) rank = "CENTURION";
-            else if (totalPoints > 300) rank = "ÉCLAIREUR";
+            if (totalPoints > 1500) rank = "LÉGENDE"; else if (totalPoints > 800) rank = "CENTURION"; else if (totalPoints > 300) rank = "ÉCLAIREUR";
             document.getElementById('display-rank').innerText = "RANG : " + rank;
 
             const container = document.getElementById('my-missions-container');
+            const arsenal = document.getElementById('coupons-container');
+            
             if (!ralliements || ralliements.length === 0) {
-                container.innerHTML = "<p style='color:var(--text-gray); font-family:Orbitron; font-size:0.8rem;'>// AUCUNE MISSION REJOINTE.</p>";
+                container.innerHTML = "<p>// AUCUNE MISSION.</p>";
+                arsenal.innerHTML = "<p>// AUCUN BON DÉBLOQUÉ.</p>";
                 return;
             }
 
-            container.innerHTML = ralliements.map(item => {
+            let missionHTML = "";
+            let arsenalHTML = "";
+
+            for (const item of ralliements) {
                 const m = item.missions;
-                if (!m) return ""; 
+                if (!m) continue;
                 const isFull = m.statut === 'termine';
                 const progress = Math.min(100, Math.round((m.membres_actuels / m.objectif_membres) * 100));
                 
-                return `
+                let myCode = "";
+                if (isFull) {
+                    myCode = await getOrAssignCoupon(m.id, user.id);
+                    arsenalHTML += `
+                        <div class="stat-card" style="margin-bottom:10px; border-color:var(--neon-blue)">
+                            <span>${m.titre}</span>
+                            <div class="coupon-box">${myCode}</div>
+                        </div>`;
+                }
+
+                missionHTML += `
                     <div class="active-mission" style="${isFull ? 'border-color:var(--neon-blue)' : ''}">
-                        <div class="mission-icon">
-                            <img src="${m.image_url || 'https://via.placeholder.com/60'}" alt="">
-                        </div>
+                        <div class="mission-icon"><img src="${m.image_url || 'https://via.placeholder.com/60'}"></div>
                         <div class="mission-name">
                             <h4 style="${isFull ? 'color:var(--neon-blue)' : ''}">${m.titre}</h4>
-                            <p>${isFull ? '🏆 VICTOIRE : ' + (m.code_victoire || 'Vérification...') : 'Cible : ' + m.prix_cible + '€'}</p>
+                            <p>${isFull ? '🏆 CODE DÉBLOQUÉ' : 'Cible : ' + m.prix_cible + '€'}</p>
+                            ${isFull ? `<div class="coupon-box">${myCode}</div>` : ''}
                         </div>
                         <div class="mission-progress">
-                            <span style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: ${isFull ? 'var(--neon-blue)' : 'inherit'}">${isFull ? 'SUCCÈS' : progress + '%'}</span>
-                            <div class="mini-gauge">
-                                <div class="mini-fill ${isFull ? 'full' : ''}" style="width: ${progress}%;"></div>
-                            </div>
+                            <span style="font-size: 0.8rem; color: ${isFull ? 'var(--neon-blue)' : 'inherit'}">${isFull ? 'VICTOIRE' : progress + '%'}</span>
+                            <div class="mini-gauge"><div class="mini-fill ${isFull ? 'full' : ''}" style="width: ${progress}%;"></div></div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    </div>`;
+            }
+
+            container.innerHTML = missionHTML;
+            arsenal.innerHTML = arsenalHTML || "<p>// LES BONS S'AFFICHERONT ICI APRÈS LA VICTOIRE.</p>";
         }
 
         function copyLink() {
-            const copyText = document.getElementById("ref-link");
-            copyText.select();
-            navigator.clipboard.writeText(copyText.value);
-            alert("UNITÉ DE RECRUTEMENT : Lien de parrainage copié !");
+            const el = document.getElementById("ref-link"); el.select();
+            navigator.clipboard.writeText(el.value); alert("Lien copié !");
         }
 
         async function handleLogout(e) {
-            e.preventDefault();
-            await _supabase.auth.signOut();
-            window.location.href = 'index.html';
+            e.preventDefault(); await _supabase.auth.signOut(); window.location.href = 'index.html';
         }
 
         initDashboard();

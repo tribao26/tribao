@@ -43,13 +43,11 @@
         }
         .lock-box button:hover { background: #fff; color: #000; }
 
-        /* --- SIDEBAR --- */
         aside { width: 280px; background: var(--panel-bg); border-right: var(--border); display: flex; flex-direction: column; }
         .cmd-label { padding: 30px 20px 10px; font-family: 'Orbitron'; font-size: 0.7rem; color: var(--accent-orange); letter-spacing: 2px; }
-        .nav-item { padding: 15px 20px; color: var(--text-dim); text-decoration: none; font-size: 0.8rem; transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; }
+        .nav-item { padding: 15px 25px; color: var(--text-dim); text-decoration: none; font-size: 0.8rem; transition: 0.2s; border-left: 3px solid transparent; cursor: pointer; }
         .nav-item:hover, .nav-item.active { color: #fff; background: rgba(255, 62, 0, 0.05); border-left-color: var(--accent-orange); }
 
-        /* --- MAIN AREA --- */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
         header { padding: 20px 40px; border-bottom: var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(5,5,5,0.9); position: sticky; top: 0; z-index: 10; }
         .sys-status { font-size: 0.7rem; color: var(--neon-green); }
@@ -71,6 +69,7 @@
 
         .btn { padding: 6px 12px; border: none; border-radius: 3px; font-family: 'JetBrains Mono'; font-size: 0.7rem; cursor: pointer; }
         .btn-add { background: var(--neon-green); color: #000; font-weight: 700; }
+        .btn-win { background: var(--neon-blue); color: #000; font-weight: 700; }
         
         .btn-cancel { 
             background: rgba(255, 62, 0, 0.1); 
@@ -164,9 +163,9 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>GUERRIER ID</th>
+                            <th>MISSION ID</th>
                             <th>PRODUIT</th>
-                            <th>MARQUE</th>
+                            <th>ENGAGEMENT</th>
                             <th>STATUT</th>
                             <th>ACTION</th>
                         </tr>
@@ -197,7 +196,7 @@
                         </tr>
                     </thead>
                     <tbody id="guerriers-table-body">
-                        <tr><td colspan="3" style="text-align:center;">// SCANNING...</td></tr>
+                        <tr><td colspan="3" style="text-align:center;">// SCANNING DES DONNÉES...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -274,31 +273,91 @@
         }
 
         async function loadValidatedRequests() {
-            const { data } = await _supabase.from('requetes').select('*').eq('statut', 'validee');
+            const { data } = await _supabase.from('missions').select('*');
             const tbody = document.getElementById('validees-table-body');
-            tbody.innerHTML = (data && data.length > 0) ? data.map(req => `
-                <tr>
-                    <td>#${req.user_id.substring(0,8)}</td>
-                    <td>${req.type_produit}</td>
-                    <td>${req.marque}</td>
-                    <td><span style="color:var(--neon-green); font-size:0.6rem;">● DÉPLOYÉE</span></td>
-                    <td><button class="btn-cancel" onclick="cancelMission('${req.id}', '${req.type_produit}')">ANNULER</button></td>
-                </tr>
-            `).join('') : "<tr><td colspan='5' style='text-align:center;'>// AUCUNE MISSION VALIDÉE</td></tr>";
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>// AUCUNE MISSION VALIDÉE</td></tr>";
+                return;
+            }
+
+            tbody.innerHTML = data.map(m => {
+                const isFull = m.membres_actuels >= m.objectif_membres;
+                const isTerminee = m.statut === 'termine';
+                
+                let actionBtn = `<button class="btn-cancel" onclick="cancelMission('${m.id}', '${m.titre}')">ANNULER</button>`;
+                
+                if (isFull && !isTerminee) {
+                    actionBtn = `<button class="btn btn-win" onclick="finalizeVictory('${m.id}', '${m.titre}')">DISTRIBUER CODES</button>`;
+                } else if (isTerminee) {
+                    actionBtn = `<span style="color:var(--neon-blue); font-size:0.6rem;">CODES DÉPLOYÉS</span>`;
+                }
+
+                return `
+                    <tr>
+                        <td>#${m.id}</td>
+                        <td>${m.titre}</td>
+                        <td style="color:var(--neon-blue)">${m.membres_actuels}/${m.objectif_membres} G</td>
+                        <td>
+                            <span style="color:${isTerminee ? 'var(--neon-blue)' : (isFull ? 'var(--neon-blue)' : 'var(--neon-green)')}">
+                                ● ${isTerminee ? 'TERMINÉ' : (isFull ? 'PLEIN' : 'EN COURS')}
+                            </span>
+                        </td>
+                        <td>${actionBtn}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        async function cancelMission(requestId, titre) {
-            if(confirm(`Voulez-vous supprimer la mission "${titre}" et TOUS ses ralliements ?`)) {
-                // Nettoyage radical : ilike ignore la casse, trim ignore les espaces
-                const { error: err1 } = await _supabase.from('missions').delete().ilike('titre', titre.trim());
+        // --- FONCTION DE DISTRIBUTION DES CODES UNIQUES ---
+        async function finalizeVictory(missionId, titre) {
+            const codesRaw = prompt(`MISSION ACCOMPLIE (${titre}) : Collez ici la liste des codes uniques (séparés par une virgule) :`);
+            
+            if (codesRaw) {
+                const codesArray = codesRaw.split(',').map(c => c.trim()).filter(c => c !== "");
+                
+                if (codesArray.length === 0) return alert("ERREUR : Aucun code détecté.");
+
+                // 1. On insère la réserve de codes dans la nouvelle table
+                const couponsToInsert = codesArray.map(code => ({
+                    mission_id: missionId,
+                    code: code
+                }));
+
+                const { error: err1 } = await _supabase.from('coupons_uniques').insert(couponsToInsert);
+
+                if (err1) {
+                    console.error(err1);
+                    return alert("ERREUR : Impossible d'injecter les codes. Vérifiez la table coupons_uniques.");
+                }
+
+                // 2. On clôture la mission
+                const { error: err2 } = await _supabase.from('missions')
+                    .update({ statut: 'termine' })
+                    .eq('id', missionId);
+                
+                if(!err2) {
+                    alert(`${codesArray.length} CODES UNIQUES DÉPLOYÉS AVEC SUCCÈS !`);
+                    refreshCoreData();
+                }
+            }
+        }
+
+        async function cancelMission(missionId, titre) {
+            if(confirm(`Supprimer "${titre}" et TOUS ses ralliements ?`)) {
+                // On récupère d'abord l'ID de la requête liée via le titre pour la remettre en attente
+                const { data: missionData } = await _supabase.from('missions').select('*').eq('id', missionId).single();
+                
+                const { error: err1 } = await _supabase.from('missions').delete().eq('id', missionId);
                 
                 if (err1) {
-                    console.error("Erreur 409 probable :", err1);
-                    alert("ERREUR : Impossible de supprimer. Videz d'abord la table 'ralliements' manuellement sur Supabase.");
+                    alert("ERREUR : Suppression bloquée par des ralliements actifs.");
                     return;
                 }
 
-                await _supabase.from('requetes').update({ statut: 'en_attente' }).eq('id', requestId);
+                // On cherche la requête correspondante pour la réactiver
+                await _supabase.from('requetes').update({ statut: 'en_attente' }).ilike('type_produit', titre);
+                
                 await refreshCoreData();
                 alert("SYSTÈME : MISSION NETTOYÉE");
             }
@@ -310,7 +369,7 @@
             document.getElementById('stat-total-guerriers').innerText = uniqueIDs.length;
             document.getElementById('guerriers-table-body').innerHTML = uniqueIDs.map(id => {
                 const firstContact = data.find(d => d.user_id === id).created_at;
-                return `<tr><td style="color:var(--neon-blue)">#${id}</td><td>${new Date(firstContact).toLocaleDateString()}</td><td>SOLDAT</td></tr>`;
+                return `<tr><td style="color:var(--neon-blue)">#${id.substring(0,8)}...</td><td>${new Date(firstContact).toLocaleDateString()}</td><td>SOLDAT</td></tr>`;
             }).join('');
         }
 
@@ -334,13 +393,16 @@
             const price = document.getElementById('final-price').value;
             const image = document.getElementById('final-image').value;
             if(!price || !image) return alert("DONNÉES MANQUANTES");
+            
             const { error } = await _supabase.from('missions').insert([{
                 titre: selectedRequest.type_produit,
                 prix_cible: parseFloat(price),
                 objectif_membres: selectedRequest.objectif_membres,
                 membres_actuels: 1,
-                image_url: image
+                image_url: image,
+                statut: 'active'
             }]);
+            
             if(!error) {
                 await _supabase.from('requetes').update({ statut: 'validee' }).eq('id', selectedRequest.id);
                 closeModal();
