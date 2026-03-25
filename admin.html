@@ -278,7 +278,94 @@
             closeModal(); refreshCoreData();
         }
 
-        function logoutAdmin(e) { e.preventDefault(); sessionStorage.removeItem('admin_auth'); window.location.href = "index.html"; }
+        function logoutAdmin(e<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>TRIBAO | Terminal Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: #0a0a0a; color: #fff; font-family: 'JetBrains Mono', monospace; padding: 40px; }
+        h1 { font-family: 'Orbitron'; color: #39FF14; letter-spacing: 2px; }
+        .admin-panel { max-width: 800px; margin: 0 auto; border: 1px solid #222; padding: 30px; border-radius: 8px; background: #111; }
+        .mission-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #222; }
+        .btn-export { background: #39FF14; color: #000; border: none; padding: 10px 20px; font-family: 'Orbitron'; font-weight: 700; cursor: pointer; border-radius: 4px; font-size: 0.7rem; }
+        .btn-export:hover { filter: brightness(1.2); }
+        .status-win { color: #00d4ff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-panel">
+        <h1>TERMINAL LOGISTIQUE</h1>
+        <p>// EXTRACTION DES DONNÉES DE MOBILISATION</p>
+        <div id="admin-missions-list">Chargement des missions...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function exportMissionData(missionId, missionTitle, pPublic, pCible) {
+            // Récupération des membres ralliés via une jointure
+            const { data, error } = await _supabase
+                .from('ralliements')
+                .select(`
+                    user_id,
+                    profiles (full_name)
+                `)
+                .eq('mission_id', missionId);
+
+            if (error || !data) {
+                alert("Erreur d'extraction.");
+                return;
+            }
+
+            // Construction du CSV
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Mission;Prix Public;Prix Cible;Nom du Guerrier;ID Guerrier\n";
+
+            data.forEach(row => {
+                const nom = row.profiles?.full_name || "Anonyme";
+                csvContent += `${missionTitle};${pPublic}€;${pCible}€;${nom};${row.user_id}\n`;
+            });
+
+            // Téléchargement du fichier
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `TRIBAO_Mobilisation_${missionTitle.replace(/ /g,"_")}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function loadAdminMissions() {
+            const { data } = await _supabase.from('missions').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('admin-missions-list');
+            
+            if (!data) return;
+
+            container.innerHTML = data.map(m => `
+                <div class="mission-row">
+                    <div>
+                        <div style="font-weight:bold">${m.titre}</div>
+                        <div style="font-size:0.7rem; color:#888">${m.membres_actuels}/${m.objectif_membres} membres</div>
+                    </div>
+                    <div>
+                        ${m.statut === 'termine' ? '<span class="status-win">VICTOIRE</span>' : 'EN COURS'}
+                        <button class="btn-export" onclick="exportMissionData('${m.id}', '${m.titre}', '${m.prix_public}', '${m.prix_cible}')">CSV</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        loadAdminMissions();
+    </script>
+</body>
+</html>) { e.preventDefault(); sessionStorage.removeItem('admin_auth'); window.location.href = "index.html"; }
 
         window.onload = () => { if (sessionStorage.getItem('admin_auth') === 'granted') { document.getElementById('lock-screen').style.display = 'none'; refreshCoreData(); } };
     </script>
