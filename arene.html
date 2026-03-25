@@ -38,7 +38,7 @@
         .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
         .arena-grid { max-width: 1100px; margin: 0 auto; }
 
-        /* --- NOUVEAU : BANDEAU STATS --- */
+        /* --- BANDEAU STATS --- */
         .tribe-counters {
             display: flex; justify-content: center; gap: 40px; padding: 15px;
             background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
@@ -112,11 +112,11 @@
         .mission-info { flex: 1; display: flex; flex-direction: column; }
         .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
         
-        /* NOUVEAU : STYLE COMPARAISON PRIX */
+        /* AMÉLIORATION PRIX */
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .price-public { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-gray); }
-        .price-public span { text-decoration: line-through; }
-        .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1rem; }
+        .price-public { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #555; }
+        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; } /* Barre rouge pour l'impact */
+        .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; text-shadow: 0 0 8px rgba(57, 255, 20, 0.2); }
         .price-target.win { color: var(--neon-blue); }
 
         .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
@@ -125,8 +125,10 @@
         
         .gauge-data { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-gray); }
 
-        .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; }
+        /* BOUTON INTELLIGENT */
+        .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; }
         .btn-join.success { background: var(--blue-gradient); color: #fff; }
+        .btn-join.already-in { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); cursor: default; }
 
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
@@ -154,7 +156,7 @@
         <div class="content-wrapper">
             <header>
                 <a href="index.html" class="logo-header">TRIBAO</a>
-                <a href="soumission-mission.html" style="font-size: 0.6rem; padding: 8px 12px;" class="btn-join">+ LANCER UNE MISSION</a>
+                <a href="soumission-mission.html" style="font-size: 0.6rem; padding: 8px 12px;" class="btn-join">+ PROPOSER UNE CIBLE</a>
             </header>
 
             <div class="tribe-counters">
@@ -196,12 +198,11 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        let userRalliements = [];
+
         async function updateTribeCounters() {
-            // Compte les guerriers
             const { count: gCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'guerrier');
-            // Compte les vendeurs
             const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'vendeur');
-            
             if (gCount !== null) document.getElementById('count-guerriers').innerText = gCount;
             if (vCount !== null) document.getElementById('count-vendeurs').innerText = vCount;
         }
@@ -213,24 +214,19 @@
                 document.getElementById('user-email').innerText = session.user.email;
                 document.getElementById('logout-link').style.display = 'flex';
                 document.getElementById('qg-link').style.display = 'flex'; 
-                document.getElementById('qg-link').href = 'dashboard-guerrier.html';
                 document.getElementById('hero-auth-btns').style.display = 'none';
+
+                // On récupère les ralliements du guerrier pour l'UI intelligente
+                const { data: ralls } = await _supabase.from('ralliements').select('mission_id').eq('user_id', session.user.id);
+                if(ralls) userRalliements = ralls.map(r => r.mission_id);
             }
         }
 
         async function loadWarJournal() {
-            const { data: v } = await _supabase
-                .from('missions')
-                .select('titre, membres_actuels')
-                .eq('statut', 'termine')
-                .order('id', { ascending: false })
-                .limit(1)
-                .maybeSingle();
-
+            const { data: v } = await _supabase.from('missions').select('titre, membres_actuels').eq('statut', 'termine').order('id', { ascending: false }).limit(1).maybeSingle();
             if (v) {
                 document.getElementById('war-journal').style.display = 'block';
-                document.getElementById('journal-content').innerHTML = 
-                    `L'unité TRIBAO a triomphé ! La mission <span>"${v.titre}"</span> est un succès total avec <span>${v.membres_actuels}</span> guerriers mobilisés. Le butin est actuellement distribué aux membres engagés.`;
+                document.getElementById('journal-content').innerHTML = `L'unité TRIBAO a triomphé ! La mission <span>"${v.titre}"</span> est un succès total avec <span>${v.membres_actuels}</span> guerriers mobilisés.`;
             }
         }
 
@@ -247,8 +243,10 @@
                 const obj = m.objectif_membres || 1;
                 const act = m.membres_actuels || 0;
                 const isWin = m.statut === 'termine';
-                const isFull = act >= obj;
                 const progress = Math.min(100, Math.round((act / obj) * 100));
+                
+                // Détection si déjà engagé
+                const isEngaged = userRalliements.includes(m.id);
                 
                 return `
                     <div class="mission-card ${isWin ? 'completed' : ''}">
@@ -270,8 +268,9 @@
                                     <span style="${isWin ? 'color:var(--neon-blue)' : ''}">${isWin ? 'VICTOIRE' : progress + '%'}</span>
                                 </div>
                             </div>
-                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isWin ? 'success' : ''}">
-                                ${isWin ? 'RÉCUPÉRER BUTIN' : 'DÉTAILS MISSION'}
+
+                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isWin ? 'success' : (isEngaged ? 'already-in' : '')}">
+                                ${isWin ? 'RÉCUPÉRER BUTIN' : (isEngaged ? 'ENGAGÉ ⚔️' : 'DÉTAILS MISSION')}
                             </a>
                         </div>
                     </div>
@@ -285,10 +284,13 @@
             window.location.reload();
         }
 
-        checkSession();
-        loadWarJournal();
-        loadMissions();
-        updateTribeCounters();
+        // Exécution synchronisée
+        (async () => {
+            await checkSession();
+            await updateTribeCounters();
+            await loadWarJournal();
+            await loadMissions();
+        })();
     </script>
 </body>
 </html>

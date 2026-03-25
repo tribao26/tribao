@@ -178,7 +178,6 @@
             status.style.color = "var(--text-gray)";
             status.innerText = "// TRANSMISSION EN COURS...";
 
-            // Traduction des rôles pour la base de données
             const dbRole = (currentRole === 'tribu') ? 'guerrier' : 'vendeur';
 
             if (currentMode === 'signup') {
@@ -192,17 +191,19 @@
                     status.style.color = "#ff4444";
                     status.innerText = "ERREUR : " + error.message;
                 } else if (data.user) {
-                    // --- NOUVEAU : CRÉATION DU PROFIL EN TABLE ---
-                    await _supabase.from('profiles').insert([
+                    // FORCE L'INSERTION IMMÉDIATE POUR LE COMPTEUR
+                    const { error: profileError } = await _supabase.from('profiles').insert([
                         { id: data.user.id, full_name: name, role: dbRole }
                     ]);
 
+                    if(profileError) console.error("Sync Profile Error:", profileError);
+
                     status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
-                    status.innerText = "DÉVERROUILLAGE RÉUSSI...";
+                    status.innerText = "UNITÉ ENREGISTRÉE DANS LA TRIBU...";
                     
                     setTimeout(() => {
                         window.location.href = (dbRole === 'vendeur') ? 'dashboard-fournisseur.html' : 'arene.html';
-                    }, 1000);
+                    }, 1200);
                 }
             } else {
                 const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
