@@ -130,12 +130,10 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // --- 🤝 CAPTURE DU PARRAIN ---
         const urlParams = new URLSearchParams(window.location.search);
         const refId = urlParams.get('ref');
         if (refId) {
             localStorage.setItem('referrer_id', refId);
-            console.log("Cible de parrainage verrouillée : " + refId);
         }
 
         let currentRole = 'tribu';
@@ -180,25 +178,31 @@
             status.style.color = "var(--text-gray)";
             status.innerText = "// TRANSMISSION EN COURS...";
 
+            // Traduction des rôles pour la base de données
+            const dbRole = (currentRole === 'tribu') ? 'guerrier' : 'vendeur';
+
             if (currentMode === 'signup') {
                 const { data, error } = await _supabase.auth.signUp({
                     email,
                     password,
-                    options: { data: { full_name: name, role: currentRole } }
+                    options: { data: { full_name: name, role: dbRole } }
                 });
 
                 if (error) {
                     status.style.color = "#ff4444";
                     status.innerText = "ERREUR : " + error.message;
-                } else if (data.session) {
+                } else if (data.user) {
+                    // --- NOUVEAU : CRÉATION DU PROFIL EN TABLE ---
+                    await _supabase.from('profiles').insert([
+                        { id: data.user.id, full_name: name, role: dbRole }
+                    ]);
+
                     status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
                     status.innerText = "DÉVERROUILLAGE RÉUSSI...";
+                    
                     setTimeout(() => {
-                        window.location.href = (currentRole === 'pro') ? 'dashboard-fournisseur.html' : 'arene.html';
+                        window.location.href = (dbRole === 'vendeur') ? 'dashboard-fournisseur.html' : 'arene.html';
                     }, 1000);
-                } else {
-                    status.style.color = (currentRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
-                    status.innerText = "INSCRIPTION OK. Vérifiez vos emails.";
                 }
             } else {
                 const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
@@ -207,12 +211,12 @@
                     status.style.color = "#ff4444";
                     status.innerText = "IDENTIFIANTS INVALIDES";
                 } else {
-                    const userRole = data.user.user_metadata.role || 'tribu';
-                    status.style.color = (userRole === 'tribu') ? "var(--neon-green)" : "var(--neon-blue)";
+                    const userRole = data.user.user_metadata.role || 'guerrier';
+                    status.style.color = (userRole === 'guerrier') ? "var(--neon-green)" : "var(--neon-blue)";
                     status.innerText = "DÉVERROUILLAGE RÉUSSI...";
                     
                     setTimeout(() => {
-                        window.location.href = (userRole === 'pro') ? 'dashboard-fournisseur.html' : 'arene.html';
+                        window.location.href = (userRole === 'vendeur') ? 'dashboard-fournisseur.html' : 'arene.html';
                     }, 1000);
                 }
             }
