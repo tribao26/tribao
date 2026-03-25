@@ -38,6 +38,14 @@
         .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
         .arena-grid { max-width: 1100px; margin: 0 auto; }
 
+        /* --- NOUVEAU : BANDEAU STATS --- */
+        .tribe-counters {
+            display: flex; justify-content: center; gap: 40px; padding: 15px;
+            background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
+            font-family: 'Orbitron'; font-size: 0.65rem; letter-spacing: 1px; flex-shrink: 0;
+        }
+        .counter-item span { color: var(--neon-green); font-weight: 700; margin-right: 5px; }
+
         /* --- JOURNAL DE GUERRE --- */
         .war-journal {
             background: rgba(0, 212, 255, 0.03);
@@ -65,7 +73,7 @@
             padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0;
         }
         .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
-        .hero-callout p { font-size: 1rem; color: var(--text-gray); margin-bottom: 30px; } /* Ajusté pour l'espace boutons */
+        .hero-callout p { font-size: 1rem; color: var(--text-gray); margin-bottom: 30px; }
 
         .auth-actions { display: flex; gap: 15px; margin-top: 25px; }
         
@@ -102,13 +110,22 @@
         .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
         .mission-info { flex: 1; display: flex; flex-direction: column; }
-        .mission-info h3 { margin: 0 0 10px; font-family: 'Orbitron'; color: #fff; }
-        .price-tag { color: var(--neon-green); font-weight: 700; margin-bottom: 20px; }
-        .price-tag.win { color: var(--neon-blue); }
+        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
+        
+        /* NOUVEAU : STYLE COMPARAISON PRIX */
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .price-public { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--text-gray); }
+        .price-public span { text-decoration: line-through; }
+        .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1rem; }
+        .price-target.win { color: var(--neon-blue); }
+
         .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s; }
         .bar-fill.complete { background: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
-        .btn-join { margin-top: 15px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; }
+        
+        .gauge-data { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-gray); }
+
+        .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; }
         .btn-join.success { background: var(--blue-gradient); color: #fff; }
 
         @media (max-width: 900px) {
@@ -116,6 +133,7 @@
             aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
             .nav-label { display: none; }
             .nav-item { padding: 15px 20px; border-left: none; }
+            .mission-card { flex-direction: column; align-items: center; text-align: center; }
         }
     </style>
 </head>
@@ -138,6 +156,11 @@
                 <a href="index.html" class="logo-header">TRIBAO</a>
                 <a href="soumission-mission.html" style="font-size: 0.6rem; padding: 8px 12px;" class="btn-join">+ LANCER UNE MISSION</a>
             </header>
+
+            <div class="tribe-counters">
+                <div class="counter-item"><span id="count-guerriers">--</span> GUERRIERS MOBILISÉS</div>
+                <div class="counter-item"><span id="count-vendeurs" style="color:var(--neon-blue)">--</span> PARTENAIRES LOGISTIQUES</div>
+            </div>
 
             <div class="scroll-area">
                 <div class="arena-grid">
@@ -173,13 +196,22 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        async function updateTribeCounters() {
+            // Compte les guerriers
+            const { count: gCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'guerrier');
+            // Compte les vendeurs
+            const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'vendeur');
+            
+            if (gCount !== null) document.getElementById('count-guerriers').innerText = gCount;
+            if (vCount !== null) document.getElementById('count-vendeurs').innerText = vCount;
+        }
+
         async function checkSession() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
                 document.getElementById('user-identity').style.display = 'block';
                 document.getElementById('user-email').innerText = session.user.email;
                 document.getElementById('logout-link').style.display = 'flex';
-                // Correction du lien vers ton fichier QG
                 document.getElementById('qg-link').style.display = 'flex'; 
                 document.getElementById('qg-link').href = 'dashboard-guerrier.html';
                 document.getElementById('hero-auth-btns').style.display = 'none';
@@ -225,9 +257,12 @@
                         </div>
                         <div class="mission-info">
                             <h3 style="${isWin ? 'color:var(--neon-blue)' : ''}">${m.titre}</h3>
-                            <div class="price-tag ${isWin ? 'win' : ''}">
-                                ${isWin ? 'MISSION RÉUSSIE' : (isFull ? 'OBJECTIF ATTEINT' : 'CIBLE : ' + m.prix_cible + '€')}
+                            
+                            <div class="price-row">
+                                <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
+                                <div class="price-target ${isWin ? 'win' : ''}">TRIBAO: ${m.prix_cible}€</div>
                             </div>
+
                             <div class="gauge-wrapper">
                                 <div class="bar-bg"><div class="bar-fill ${isWin ? 'complete' : ''}" style="width: ${progress}%;"></div></div>
                                 <div class="gauge-data">
@@ -253,6 +288,7 @@
         checkSession();
         loadWarJournal();
         loadMissions();
+        updateTribeCounters();
     </script>
 </body>
 </html>
