@@ -34,7 +34,7 @@
         .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
         header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; z-index: 100; }
         
-        /* --- OPTIMISATION LOGO 95PX --- */
+        /* --- OPTIMISATION LOGO XXL SANS CONFLIT --- */
         .logo-header { 
             display: flex; 
             align-items: center; 
@@ -42,27 +42,33 @@
             height: 100%;
             position: relative;
             z-index: 110;
+            min-width: 120px; /* Espace de sécurité */
         }
         .logo-svg { 
-            height: 95px; /* Taille demandée */
+            height: 95px; 
             width: auto; 
-            margin-top: 15px; /* Centre visuellement malgré le débordement */
+            margin-top: 25px; /* Décalage pour le débordement stylisé */
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             filter: drop-shadow(0 0 5px rgba(57, 255, 20, 0.2));
         }
         .logo-header:hover .logo-svg { 
             filter: drop-shadow(0 0 20px var(--neon-green));
-            transform: scale(1.08) rotate(-2deg);
+            transform: scale(1.05);
         }
 
         .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
         .arena-grid { max-width: 1100px; margin: 0 auto; }
 
-        /* --- BANDEAU STATS BOOSTÉ --- */
+        /* --- BANDEAU STATS RÉALIGNÉ --- */
         .tribe-counters {
-            display: flex; justify-content: center; gap: 60px; padding: 25px 15px;
-            background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
-            font-family: 'Orbitron'; flex-shrink: 0;
+            display: flex; 
+            justify-content: center; 
+            gap: 60px; 
+            padding: 25px 15px 25px 120px; /* Ajout de padding-left pour éviter le logo */
+            background: rgba(57, 255, 20, 0.03); 
+            border-bottom: 1px solid #1a1a1a;
+            font-family: 'Orbitron'; 
+            flex-shrink: 0;
         }
         .counter-item {
             display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -142,7 +148,6 @@
         .mission-info { flex: 1; display: flex; flex-direction: column; }
         .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
         
-        /* AMÉLIORATION PRIX */
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .price-public { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #555; }
         .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; } 
@@ -155,7 +160,6 @@
         
         .gauge-data { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-gray); }
 
-        /* BOUTON INTELLIGENT */
         .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; }
         .btn-join.success { background: var(--blue-gradient); color: #fff; }
         .btn-join.already-in { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); cursor: default; }
@@ -166,7 +170,7 @@
             .nav-label { display: none; }
             .nav-item { padding: 15px 20px; border-left: none; }
             .mission-card { flex-direction: column; align-items: center; text-align: center; }
-            .tribe-counters { gap: 30px; }
+            .tribe-counters { gap: 30px; padding-left: 15px; justify-content: space-around; }
             .counter-item span { font-size: 1.5rem; }
             .logo-svg { height: 60px; margin-top: 0; }
         }
@@ -201,7 +205,6 @@
 
             <div class="scroll-area">
                 <div class="arena-grid">
-
                     <div id="war-journal" class="war-journal">
                         <div class="journal-title">📡 JOURNAL DE GUERRE : VICTOIRE CONFIRMÉE</div>
                         <div id="journal-content" class="journal-body">
@@ -286,12 +289,10 @@
                         </div>
                         <div class="mission-info">
                             <h3 style="${isWin ? 'color:var(--neon-blue)' : ''}">${m.titre}</h3>
-                            
                             <div class="price-row">
                                 <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
                                 <div class="price-target ${isWin ? 'win' : ''}">TRIBAO: ${m.prix_cible}€</div>
                             </div>
-
                             <div class="gauge-wrapper">
                                 <div class="bar-bg"><div class="bar-fill ${isWin ? 'complete' : ''}" style="width: ${progress}%;"></div></div>
                                 <div class="gauge-data">
@@ -299,7 +300,6 @@
                                     <span style="${isWin ? 'color:var(--neon-blue)' : ''}">${isWin ? 'VICTOIRE' : progress + '%'}</span>
                                 </div>
                             </div>
-
                             <a href="mission-detail.html?id=${m.id}" class="btn-join ${isWin ? 'success' : (isEngaged ? 'already-in' : '')}">
                                 ${isWin ? 'RÉCUPÉRER BUTIN' : (isEngaged ? 'ENGAGÉ ⚔️' : 'DÉTAILS MISSION')}
                             </a>
