@@ -30,19 +30,9 @@
         .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
         .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
 
-        /* --- LOGO SPARTAN SIDEBAR --- */
-        .sidebar-footer-logo {
-            padding: 20px;
-            text-align: center;
-            margin-top: 20px; /* Espace après MON QG */
-        }
-        .sidebar-logo-img {
-            width: 100%;
-            height: auto;
-            max-width: 210px; /* Prend l'espace de la sidebar */
-            filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.1));
-            transition: 0.3s;
-        }
+        /* --- LOGO SPARTAN SIDEBAR (SOUS MON QG) --- */
+        .sidebar-logo-box { padding: 20px; text-align: center; margin-top: 20px; }
+        .sidebar-logo-svg { width: 100%; height: auto; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.1)); transition: 0.3s; }
 
         /* --- CONTENT --- */
         .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
@@ -54,44 +44,39 @@
 
         /* --- BANDEAU STATS --- */
         .tribe-counters {
-            display: flex; justify-content: center; gap: 40px; padding: 15px;
+            display: flex; justify-content: center; gap: 60px; padding: 25px 15px;
             background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
-            font-family: 'Orbitron'; font-size: 0.65rem; letter-spacing: 1px; flex-shrink: 0;
+            font-family: 'Orbitron'; flex-shrink: 0;
         }
-        .counter-item span { color: var(--neon-green); font-weight: 700; margin-right: 5px; }
-        
-        .counter-item span#count-vendeurs { color: var(--neon-blue); }
+        .counter-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-gray); letter-spacing: 1px; }
+        .counter-item span { font-size: 2rem; font-weight: 800; color: var(--neon-green); line-height: 1; text-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+
+        /* --- HERO & BOUTONS AUTH --- */
+        .hero-callout { background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent); border-left: 4px solid var(--neon-green); padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0; }
+        .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
+        .auth-actions { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-hero { padding: 12px 25px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.75rem; text-decoration: none; border-radius: 4px; transition: 0.3s; text-align: center; letter-spacing: 1px; }
+        .btn-hero-solid { background: var(--neon-green); color: #000; border: 1px solid var(--neon-green); }
+        .btn-hero-outline { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; }
 
         /* --- MISSIONS CARDS --- */
         .mission-card { background: var(--card-gray); border: var(--border); border-radius: 12px; display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; transition: 0.3s; }
         .mission-card:hover { border-color: var(--neon-green); }
         .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .mission-info { flex: 1; display: flex; flex-direction: column; }
-        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
-        
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .price-public { font-family: 'JetBrains Mono'; font-size: 0.75rem; color: #555; }
-        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; } 
+        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; }
         .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; }
-
         .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s; }
         .gauge-data { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-gray); }
-
-        .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; }
+        .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; display: block; }
         .btn-join.already-in { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); cursor: default; }
-
-        /* --- JOURNAL & HERO --- */
-        .war-journal { background: rgba(0, 212, 255, 0.03); border: 1px double var(--neon-blue); border-radius: 8px; padding: 20px; margin-bottom: 30px; display: none; position: relative; }
-        .journal-title { font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 8px; }
-        .hero-callout { background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent); border-left: 4px solid var(--neon-green); padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0; }
-        .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
 
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
             aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
-            .nav-label, .sidebar-footer-logo { display: none; }
+            .sidebar-logo-box, .nav-label { display: none; }
             .nav-item { padding: 15px 20px; border-left: none; }
             .mission-card { flex-direction: column; align-items: center; text-align: center; }
         }
@@ -109,8 +94,8 @@
             <a href="arene.html" class="nav-item active">L'ARÈNE</a>
             <a href="dashboard-guerrier.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
             
-            <div class="sidebar-footer-logo">
-                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO Emblem" class="sidebar-logo-img">
+            <div class="sidebar-logo-box">
+                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO" class="sidebar-logo-svg">
             </div>
 
             <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
@@ -119,25 +104,24 @@
         <div class="content-wrapper">
             <header>
                 <a href="index.html" class="logo-header">TRIBAO</a>
-                <a href="soumission-mission.html" style="font-size: 0.6rem; padding: 8px 12px;" class="btn-join">+ LANCER UNE MISSION</a>
+                <a href="soumission-mission.html" class="btn-join" style="margin-top:0; font-size: 0.6rem; padding: 8px 12px;">+ LANCER UNE MISSION</a>
             </header>
 
             <div class="tribe-counters">
                 <div class="counter-item"><span id="count-guerriers">--</span> GUERRIERS MOBILISÉS</div>
-                <div class="counter-item"><span id="count-vendeurs">--</span> PARTENAIRES LOGISTIQUES</div>
+                <div class="counter-item"><span id="count-vendeurs" style="color:var(--neon-blue)">--</span> PARTENAIRES LOGISTIQUES</div>
             </div>
 
             <div class="scroll-area">
                 <div class="arena-grid">
-
-                    <div id="war-journal" class="war-journal">
-                        <div class="journal-title">📡 JOURNAL DE GUERRE : VICTOIRE CONFIRMÉE</div>
-                        <div id="journal-content" class="journal-body">Analyse des transmissions...</div>
+                    <div id="war-journal" style="display:none; margin-bottom: 30px; padding: 20px; border: 1px double var(--neon-blue); border-radius: 8px; background: rgba(0, 212, 255, 0.03);">
+                        <div style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.7rem; letter-spacing: 2px;">📡 JOURNAL DE GUERRE</div>
+                        <div id="journal-content" style="font-size: 0.9rem; color: #fff; margin-top: 10px;"></div>
                     </div>
-                    
+
                     <section class="hero-callout">
                         <h2 id="hero-title">TRIBAO — Reprenez le pouvoir.</h2>
-                        <p id="hero-desc">REJOIGNEZ LA TRIBU <span>TRIBAO</span>. Rassemblez-vous pour casser les prix.</p>
+                        <p>REJOIGNEZ LA TRIBU <span>TRIBAO</span>. Rassemblez-vous pour casser les prix.</p>
                         <div class="auth-actions" id="hero-auth-btns">
                             <a href="auth.html" class="btn-hero btn-hero-solid">S'INSCRIRE</a>
                             <a href="auth.html" class="btn-hero btn-hero-outline">SE CONNECTER</a>
@@ -176,7 +160,6 @@
                 document.getElementById('logout-link').style.display = 'flex';
                 document.getElementById('qg-link').style.display = 'flex'; 
                 document.getElementById('hero-auth-btns').style.display = 'none';
-
                 const { data: ralls } = await _supabase.from('ralliements').select('mission_id').eq('user_id', session.user.id);
                 if(ralls) userRalliements = ralls.map(r => r.mission_id);
             }
@@ -186,7 +169,7 @@
             const { data: v } = await _supabase.from('missions').select('titre, membres_actuels').eq('statut', 'termine').order('id', { ascending: false }).limit(1).maybeSingle();
             if (v) {
                 document.getElementById('war-journal').style.display = 'block';
-                document.getElementById('journal-content').innerHTML = `L'unité TRIBAO a triomphé ! La mission <span>"${v.titre}"</span> est un succès total avec <span>${v.membres_actuels}</span> guerriers mobilisés.`;
+                document.getElementById('journal-content').innerHTML = `L'unité TRIBAO a triomphé ! La mission "${v.titre}" est un succès total avec ${v.membres_actuels} guerriers mobilisés.`;
             }
         }
 
@@ -200,7 +183,6 @@
             listContainer.innerHTML = data.map(m => {
                 const obj = m.objectif_membres || 1;
                 const act = m.membres_actuels || 0;
-                const isWin = m.statut === 'termine';
                 const progress = Math.min(100, Math.round((act / obj) * 100));
                 const isEngaged = userRalliements.includes(m.id);
                 return `
