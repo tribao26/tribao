@@ -219,7 +219,7 @@
             document.getElementById('stat-missions').innerText = missions.length;
 
             tbody.innerHTML = missions.map(m => {
-                const isReady = m.membres_actuels >= (m.objectif_membres / 2); // Eligible si au moins 50%
+                const isReady = m.membres_actuels >= (m.objectif_membres / 2);
                 return `
                     <tr>
                         <td>${m.titre}</td>
@@ -227,7 +227,7 @@
                         <td>${m.prix_cible} €</td>
                         <td><span class="status-badge">${isReady ? 'OUVERT' : 'EN RALLIEMENT'}</span></td>
                         <td>
-                            <button onclick="submitBid(${m.id}, '${m.titre.replace(/'/g, "\\'")}')" class="btn-bid">SOUMETTRE PRIX</button>
+                            <button onclick="submitBid('${m.id}', '${m.titre.replace(/'/g, "\\'")}')" class="btn-bid">SOUMETTRE PRIX</button>
                         </td>
                     </tr>
                 `;
@@ -245,17 +245,16 @@
 
         async function submitBid(missionId, title) {
             const { data: { session } } = await _supabase.auth.getSession();
+            if (!session) return;
             
             const prix = prompt(`Votre meilleure offre pour : ${title} (€)`);
             if (!prix || isNaN(prix)) return;
 
-            const message = prompt(`Un message pour la tribu ? (Garanties, délais...)`);
-
+            // ON SUPPRIME LA LIGNE 'MESSAGE' QUI N'EXISTE PAS DANS TA TABLE
             const { error } = await _supabase.from('offres').insert([{
                 mission_id: missionId,
                 fournisseur_id: session.user.id,
                 prix_propose: parseFloat(prix),
-                message: message || "Offre partenaire TRIBAO PRO",
                 statut: 'en_attente'
             }]);
 
@@ -264,6 +263,7 @@
                 location.reload();
             } else {
                 alert("ERREUR LORS DE LA TRANSMISSION : " + error.message);
+                console.error(error);
             }
         }
 
