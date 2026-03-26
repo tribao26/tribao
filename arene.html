@@ -13,7 +13,7 @@
             --neon-green: #39FF14;
             --neon-blue: #00d4ff;
             --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
-            --blue-gradient: linear-gradient(135deg, #00d4ff 0%, #0072ff 100%);
+            --blue-gradient: linear-gradient(135deg, #00d4ff 0%, #0055ff 100%);
             --text-main: #f0f0f0;
             --text-gray: #888;
             --border: 1px solid #222;
@@ -43,12 +43,20 @@
 
         /* --- BANDEAU STATS --- */
         .tribe-counters {
-            display: flex; justify-content: center; gap: 40px; padding: 15px;
+            display: flex; justify-content: center; gap: 60px; padding: 25px 15px;
             background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
-            font-family: 'Orbitron'; font-size: 0.65rem; letter-spacing: 1px; flex-shrink: 0;
+            font-family: 'Orbitron'; flex-shrink: 0;
         }
-        .counter-item span { color: var(--neon-green); font-weight: 700; margin-right: 5px; }
-        .counter-item span#count-vendeurs { color: var(--neon-blue); }
+        .counter-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-gray); letter-spacing: 1px; }
+        .counter-item span { font-size: 2rem; font-weight: 800; color: var(--neon-green); line-height: 1; text-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+
+        /* --- HERO & BOUTONS AUTH --- */
+        .hero-callout { background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent); border-left: 4px solid var(--neon-green); padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0; }
+        .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
+        .auth-actions { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-hero { padding: 12px 25px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.75rem; text-decoration: none; border-radius: 4px; transition: 0.3s; text-align: center; letter-spacing: 1px; }
+        .btn-hero-solid { background: var(--neon-green); color: #000; border: 1px solid var(--neon-green); }
+        .btn-hero-outline { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; }
 
         /* --- MISSIONS CARDS --- */
         .mission-card { background: var(--card-gray); border: var(--border); border-radius: 12px; display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; transition: 0.3s; }
@@ -56,10 +64,10 @@
         .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
         .mission-info { flex: 1; display: flex; flex-direction: column; }
-        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; text-transform: uppercase; }
+        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
         
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; } 
+        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; }
         .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; text-align: right; }
         .price-label { font-size: 0.55rem; color: var(--text-gray); display: block; margin-bottom: 2px; letter-spacing: 1px; }
 
@@ -92,7 +100,7 @@
             <a href="dashboard-guerrier.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
             
             <div class="sidebar-footer-logo">
-                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO Emblem" class="sidebar-logo-img">
+                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO" class="sidebar-logo-img">
             </div>
 
             <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
@@ -106,11 +114,25 @@
 
             <div class="tribe-counters">
                 <div class="counter-item"><span id="count-guerriers">--</span> GUERRIERS MOBILISÉS</div>
-                <div class="counter-item"><span id="count-vendeurs">--</span> PARTENAIRES LOGISTIQUES</div>
+                <div class="counter-item"><span id="count-vendeurs" style="color:var(--neon-blue)">--</span> PARTENAIRES LOGISTIQUES</div>
             </div>
 
             <div class="scroll-area">
                 <div class="arena-grid">
+                    <div id="war-journal" style="display:none; margin-bottom: 30px; padding: 20px; border: 1px double var(--neon-blue); border-radius: 8px; background: rgba(0, 212, 255, 0.03);">
+                        <div style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.7rem; letter-spacing: 2px;">📡 JOURNAL DE GUERRE</div>
+                        <div id="journal-content" style="font-size: 0.9rem; color: #fff; margin-top: 10px;"></div>
+                    </div>
+
+                    <section id="hero-section" class="hero-callout">
+                        <h2 id="hero-title">TRIBAO — Reprenez le pouvoir.</h2>
+                        <p>REJOIGNEZ LA TRIBU <span>TRIBAO</span>. Rassemblez-vous pour casser les prix.</p>
+                        <div class="auth-actions" id="hero-auth-btns">
+                            <a href="auth.html" class="btn-hero btn-hero-solid">S'INSCRIRE</a>
+                            <a href="auth.html" class="btn-hero btn-hero-outline">SE CONNECTER</a>
+                        </div>
+                    </section>
+
                     <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS ACTIVES</h2>
                     <div id="missions-list">
                          <p style="color: var(--neon-green); font-family: 'Orbitron'; font-size: 0.8rem;">// DÉCRYPTAGE DU FLUX...</p>
@@ -142,8 +164,24 @@
                 document.getElementById('user-email').innerText = session.user.email;
                 document.getElementById('logout-link').style.display = 'flex';
                 document.getElementById('qg-link').style.display = 'flex'; 
+                // Cache le bloc HERO si l'utilisateur est connecté
+                document.getElementById('hero-section').style.display = 'none';
+                
                 const { data: ralls } = await _supabase.from('ralliements').select('mission_id').eq('user_id', session.user.id);
                 if(ralls) userRalliements = ralls.map(r => r.mission_id);
+            }
+            
+            // CAPTURE DU PARRAINAGE DANS L'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const refId = urlParams.get('ref');
+            if (refId) localStorage.setItem('tribao_referrer_id', refId);
+        }
+
+        async function loadWarJournal() {
+            const { data: v } = await _supabase.from('missions').select('titre, membres_actuels').eq('statut', 'termine').order('id', { ascending: false }).limit(1).maybeSingle();
+            if (v) {
+                document.getElementById('war-journal').style.display = 'block';
+                document.getElementById('journal-content').innerHTML = `L'unité TRIBAO a triomphé ! La mission "${v.titre}" est un succès total avec ${v.membres_actuels} guerriers mobilisés.`;
             }
         }
 
@@ -213,6 +251,7 @@
         (async () => {
             await checkSession();
             await updateTribeCounters();
+            await loadWarJournal();
             await loadMissions();
         })();
     </script>
