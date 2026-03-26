@@ -245,24 +245,27 @@
 
         async function submitBid(missionId, title) {
             const { data: { session } } = await _supabase.auth.getSession();
-            if (!session) return;
+            if (!session) return alert("Session expirée.");
             
             const prix = prompt(`Votre meilleure offre pour : ${title} (€)`);
             if (!prix || isNaN(prix)) return;
 
-            // ON SUPPRIME LA LIGNE 'MESSAGE' QUI N'EXISTE PAS DANS TA TABLE
+            const message = prompt(`Message pour la tribu (facultatif) :`);
+
+            // --- TRIPLE VÉRIFICATION DES COLONNES SUPABASE ---
             const { error } = await _supabase.from('offres').insert([{
-                mission_id: missionId,
-                fournisseur_id: session.user.id,
-                prix_propose: parseFloat(prix),
+                mission_id: parseInt(missionId), // Force int8
+                fournisseur_id: session.user.id, // UUID
+                prix_propose: parseFloat(prix),  // numeric
+                message: message || "Offre partenaire TRIBAO PRO",
                 statut: 'en_attente'
             }]);
 
             if (!error) {
-                alert("COTATION TRANSMISE AVEC SUCCÈS.");
+                alert("MISSION ACCOMPLIE : Offre de " + prix + "€ enregistrée !");
                 location.reload();
             } else {
-                alert("ERREUR LORS DE LA TRANSMISSION : " + error.message);
+                alert("ERREUR SUPABASE : " + error.message);
                 console.error(error);
             }
         }
