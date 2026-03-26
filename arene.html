@@ -13,7 +13,7 @@
             --neon-green: #39FF14;
             --neon-blue: #00d4ff;
             --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
-            --blue-gradient: linear-gradient(135deg, #00d4ff 0%, #0072ff 100%);
+            --blue-gradient: linear-gradient(135deg, #00d4ff 0%, #0055ff 100%);
             --text-main: #f0f0f0;
             --text-gray: #888;
             --border: 1px solid #222;
@@ -30,9 +30,8 @@
         .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
         .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
 
-        /* --- LOGO SPARTAN SIDEBAR (SOUS MON QG) --- */
-        .sidebar-logo-box { padding: 20px; text-align: center; margin-top: 20px; }
-        .sidebar-logo-svg { width: 100%; height: auto; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.1)); transition: 0.3s; }
+        .sidebar-footer-logo { padding: 20px; text-align: center; margin-top: 20px; }
+        .sidebar-logo-img { width: 100%; height: auto; max-width: 210px; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.1)); }
 
         /* --- CONTENT --- */
         .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
@@ -44,39 +43,37 @@
 
         /* --- BANDEAU STATS --- */
         .tribe-counters {
-            display: flex; justify-content: center; gap: 60px; padding: 25px 15px;
+            display: flex; justify-content: center; gap: 40px; padding: 15px;
             background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
-            font-family: 'Orbitron'; flex-shrink: 0;
+            font-family: 'Orbitron'; font-size: 0.65rem; letter-spacing: 1px; flex-shrink: 0;
         }
-        .counter-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-gray); letter-spacing: 1px; }
-        .counter-item span { font-size: 2rem; font-weight: 800; color: var(--neon-green); line-height: 1; text-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
-
-        /* --- HERO & BOUTONS AUTH --- */
-        .hero-callout { background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent); border-left: 4px solid var(--neon-green); padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0; }
-        .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
-        .auth-actions { display: flex; gap: 15px; margin-top: 25px; }
-        .btn-hero { padding: 12px 25px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.75rem; text-decoration: none; border-radius: 4px; transition: 0.3s; text-align: center; letter-spacing: 1px; }
-        .btn-hero-solid { background: var(--neon-green); color: #000; border: 1px solid var(--neon-green); }
-        .btn-hero-outline { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; }
+        .counter-item span { color: var(--neon-green); font-weight: 700; margin-right: 5px; }
+        .counter-item span#count-vendeurs { color: var(--neon-blue); }
 
         /* --- MISSIONS CARDS --- */
         .mission-card { background: var(--card-gray); border: var(--border); border-radius: 12px; display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; transition: 0.3s; }
         .mission-card:hover { border-color: var(--neon-green); }
         .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .mission-info { flex: 1; display: flex; flex-direction: column; }
+        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
+        
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; }
+        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; } 
         .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; }
+        .price-label { font-size: 0.6rem; color: var(--text-gray); display: block; margin-bottom: 2px; }
+
         .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s; }
         .gauge-data { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-gray); }
+
         .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; display: block; }
         .btn-join.already-in { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); cursor: default; }
 
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
             aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
-            .sidebar-logo-box, .nav-label { display: none; }
+            .nav-label, .sidebar-footer-logo { display: none; }
             .nav-item { padding: 15px 20px; border-left: none; }
             .mission-card { flex-direction: column; align-items: center; text-align: center; }
         }
@@ -94,8 +91,8 @@
             <a href="arene.html" class="nav-item active">L'ARÈNE</a>
             <a href="dashboard-guerrier.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
             
-            <div class="sidebar-logo-box">
-                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO" class="sidebar-logo-svg">
+            <div class="sidebar-footer-logo">
+                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO Emblem" class="sidebar-logo-img">
             </div>
 
             <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
@@ -109,7 +106,7 @@
 
             <div class="tribe-counters">
                 <div class="counter-item"><span id="count-guerriers">--</span> GUERRIERS MOBILISÉS</div>
-                <div class="counter-item"><span id="count-vendeurs" style="color:var(--neon-blue)">--</span> PARTENAIRES LOGISTIQUES</div>
+                <div class="counter-item"><span id="count-vendeurs">--</span> PARTENAIRES LOGISTIQUES</div>
             </div>
 
             <div class="scroll-area">
@@ -118,15 +115,6 @@
                         <div style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.7rem; letter-spacing: 2px;">📡 JOURNAL DE GUERRE</div>
                         <div id="journal-content" style="font-size: 0.9rem; color: #fff; margin-top: 10px;"></div>
                     </div>
-
-                    <section class="hero-callout">
-                        <h2 id="hero-title">TRIBAO — Reprenez le pouvoir.</h2>
-                        <p>REJOIGNEZ LA TRIBU <span>TRIBAO</span>. Rassemblez-vous pour casser les prix.</p>
-                        <div class="auth-actions" id="hero-auth-btns">
-                            <a href="auth.html" class="btn-hero btn-hero-solid">S'INSCRIRE</a>
-                            <a href="auth.html" class="btn-hero btn-hero-outline">SE CONNECTER</a>
-                        </div>
-                    </section>
 
                     <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS ACTIVES</h2>
                     <div id="missions-list">
@@ -159,32 +147,41 @@
                 document.getElementById('user-email').innerText = session.user.email;
                 document.getElementById('logout-link').style.display = 'flex';
                 document.getElementById('qg-link').style.display = 'flex'; 
-                document.getElementById('hero-auth-btns').style.display = 'none';
                 const { data: ralls } = await _supabase.from('ralliements').select('mission_id').eq('user_id', session.user.id);
                 if(ralls) userRalliements = ralls.map(r => r.mission_id);
             }
         }
 
-        async function loadWarJournal() {
-            const { data: v } = await _supabase.from('missions').select('titre, membres_actuels').eq('statut', 'termine').order('id', { ascending: false }).limit(1).maybeSingle();
-            if (v) {
-                document.getElementById('war-journal').style.display = 'block';
-                document.getElementById('journal-content').innerHTML = `L'unité TRIBAO a triomphé ! La mission "${v.titre}" est un succès total avec ${v.membres_actuels} guerriers mobilisés.`;
-            }
-        }
-
         async function loadMissions() {
-            const { data, error } = await _supabase.from('missions').select('*').order('created_at', { ascending: false });
-            const listContainer = document.getElementById('missions-list');
-            if (error || !data || data.length === 0) {
-                listContainer.innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
+            // ON RÉCUPÈRE LES MISSIONS ET LES OFFRES ASSOCIÉES
+            const { data: missions, error } = await _supabase
+                .from('missions')
+                .select('*, offres(prix_propose)')
+                .order('created_at', { ascending: false });
+
+            if (error || !missions || missions.length === 0) {
+                document.getElementById('missions-list').innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
                 return;
             }
-            listContainer.innerHTML = data.map(m => {
+
+            document.getElementById('missions-list').innerHTML = missions.map(m => {
                 const obj = m.objectif_membres || 1;
                 const act = m.membres_actuels || 0;
                 const progress = Math.min(100, Math.round((act / obj) * 100));
                 const isEngaged = userRalliements.includes(m.id);
+
+                // LOGIQUE DU MEILLEUR PRIX
+                let displayPrice = m.prix_cible;
+                let isPartnerOffer = false;
+
+                if (m.offres && m.offres.length > 0) {
+                    const lowestOffer = Math.min(...m.offres.map(o => o.prix_propose));
+                    if (lowestOffer < displayPrice) {
+                        displayPrice = lowestOffer;
+                        isPartnerOffer = true;
+                    }
+                }
+
                 return `
                     <div class="mission-card">
                         <div class="mission-img-box">
@@ -194,7 +191,10 @@
                             <h3>${m.titre}</h3>
                             <div class="price-row">
                                 <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
-                                <div class="price-target">TRIBAO: ${m.prix_cible}€</div>
+                                <div class="price-target">
+                                    <span class="price-label">${isPartnerOffer ? 'MEILLEURE OFFRE' : 'PRIX CIBLE'}</span>
+                                    ${displayPrice}€
+                                </div>
                             </div>
                             <div class="gauge-wrapper">
                                 <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
@@ -220,7 +220,458 @@
         (async () => {
             await checkSession();
             await updateTribeCounters();
-            await loadWarJournal();
+            await loadMissions();
+        })();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | L'Arène</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14;
+            --neon-blue: #00d4ff;
+            --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
+            --blue-gradient: linear-gradient(135deg, #00d4ff 0%, #0055ff 100%);
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --border: 1px solid #222;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-black); color: var(--text-main); }
+
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR --- */
+        aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron'; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
+
+        .sidebar-footer-logo { padding: 20px; text-align: center; margin-top: 20px; }
+        .sidebar-logo-img { width: 100%; height: auto; max-width: 210px; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.1)); }
+
+        /* --- CONTENT --- */
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron'; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; text-decoration: none; }
+
+        .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
+        .arena-grid { max-width: 1100px; margin: 0 auto; }
+
+        /* --- BANDEAU STATS --- */
+        .tribe-counters {
+            display: flex; justify-content: center; gap: 40px; padding: 15px;
+            background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
+            font-family: 'Orbitron'; font-size: 0.65rem; letter-spacing: 1px; flex-shrink: 0;
+        }
+        .counter-item span { color: var(--neon-green); font-weight: 700; margin-right: 5px; }
+        .counter-item span#count-vendeurs { color: var(--neon-blue); }
+
+        /* --- MISSIONS CARDS --- */
+        .mission-card { background: var(--card-gray); border: var(--border); border-radius: 12px; display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; transition: 0.3s; }
+        .mission-card:hover { border-color: var(--neon-green); }
+        .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .mission-info { flex: 1; display: flex; flex-direction: column; }
+        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
+        
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; } 
+        .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; }
+        .price-label { font-size: 0.6rem; color: var(--text-gray); display: block; margin-bottom: 2px; }
+
+        .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s; }
+        .gauge-data { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-gray); }
+
+        .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; display: block; }
+        .btn-join.already-in { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); cursor: default; }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label, .sidebar-footer-logo { display: none; }
+            .nav-item { padding: 15px 20px; border-left: none; }
+            .mission-card { flex-direction: column; align-items: center; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">PORTAIL TRIBU</div>
+            <div id="user-identity" style="padding: 10px 25px; margin-bottom: 10px; display: none;">
+                <div style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon-green); letter-spacing: 1px;">GUERRIER CONNECTÉ</div>
+                <div id="user-email" style="font-size: 0.7rem; color: #fff; margin-top: 5px; opacity: 0.8; overflow: hidden; text-overflow: ellipsis;">---</div>
+            </div>
+            <a href="arene.html" class="nav-item active">L'ARÈNE</a>
+            <a href="dashboard-guerrier.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
+            
+            <div class="sidebar-footer-logo">
+                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO Emblem" class="sidebar-logo-img">
+            </div>
+
+            <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
+        </aside>
+
+        <div class="content-wrapper">
+            <header>
+                <a href="index.html" class="logo-header">TRIBAO</a>
+                <a href="soumission-mission.html" class="btn-join" style="margin-top:0; font-size: 0.6rem; padding: 8px 12px;">+ LANCER UNE MISSION</a>
+            </header>
+
+            <div class="tribe-counters">
+                <div class="counter-item"><span id="count-guerriers">--</span> GUERRIERS MOBILISÉS</div>
+                <div class="counter-item"><span id="count-vendeurs">--</span> PARTENAIRES LOGISTIQUES</div>
+            </div>
+
+            <div class="scroll-area">
+                <div class="arena-grid">
+                    <div id="war-journal" style="display:none; margin-bottom: 30px; padding: 20px; border: 1px double var(--neon-blue); border-radius: 8px; background: rgba(0, 212, 255, 0.03);">
+                        <div style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.7rem; letter-spacing: 2px;">📡 JOURNAL DE GUERRE</div>
+                        <div id="journal-content" style="font-size: 0.9rem; color: #fff; margin-top: 10px;"></div>
+                    </div>
+
+                    <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS ACTIVES</h2>
+                    <div id="missions-list">
+                         <p style="color: var(--neon-green); font-family: 'Orbitron'; font-size: 0.8rem;">// DÉCRYPTAGE DU FLUX...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let userRalliements = [];
+
+        async function updateTribeCounters() {
+            const { count: gCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'guerrier');
+            const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'vendeur');
+            if (gCount !== null) document.getElementById('count-guerriers').innerText = gCount;
+            if (vCount !== null) document.getElementById('count-vendeurs').innerText = vCount;
+        }
+
+        async function checkSession() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                document.getElementById('user-identity').style.display = 'block';
+                document.getElementById('user-email').innerText = session.user.email;
+                document.getElementById('logout-link').style.display = 'flex';
+                document.getElementById('qg-link').style.display = 'flex'; 
+                const { data: ralls } = await _supabase.from('ralliements').select('mission_id').eq('user_id', session.user.id);
+                if(ralls) userRalliements = ralls.map(r => r.mission_id);
+            }
+        }
+
+        async function loadMissions() {
+            // ON RÉCUPÈRE LES MISSIONS ET LES OFFRES ASSOCIÉES
+            const { data: missions, error } = await _supabase
+                .from('missions')
+                .select('*, offres(prix_propose)')
+                .order('created_at', { ascending: false });
+
+            if (error || !missions || missions.length === 0) {
+                document.getElementById('missions-list').innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
+                return;
+            }
+
+            document.getElementById('missions-list').innerHTML = missions.map(m => {
+                const obj = m.objectif_membres || 1;
+                const act = m.membres_actuels || 0;
+                const progress = Math.min(100, Math.round((act / obj) * 100));
+                const isEngaged = userRalliements.includes(m.id);
+
+                // LOGIQUE DU MEILLEUR PRIX
+                let displayPrice = m.prix_cible;
+                let isPartnerOffer = false;
+
+                if (m.offres && m.offres.length > 0) {
+                    const lowestOffer = Math.min(...m.offres.map(o => o.prix_propose));
+                    if (lowestOffer < displayPrice) {
+                        displayPrice = lowestOffer;
+                        isPartnerOffer = true;
+                    }
+                }
+
+                return `
+                    <div class="mission-card">
+                        <div class="mission-img-box">
+                            <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="Produit">
+                        </div>
+                        <div class="mission-info">
+                            <h3>${m.titre}</h3>
+                            <div class="price-row">
+                                <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
+                                <div class="price-target">
+                                    <span class="price-label">${isPartnerOffer ? 'MEILLEURE OFFRE' : 'PRIX CIBLE'}</span>
+                                    ${displayPrice}€
+                                </div>
+                            </div>
+                            <div class="gauge-wrapper">
+                                <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
+                                <div class="gauge-data">
+                                    <span>${act} / ${obj} Guerriers</span>
+                                    <span>${progress}%</span>
+                                </div>
+                            </div>
+                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isEngaged ? 'already-in' : ''}">
+                                ${isEngaged ? 'ENGAGÉ ⚔️' : 'DÉTAILS MISSION'}
+                            </a>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function handleLogout(e) {
+            e.preventDefault();
+            await _supabase.auth.signOut();
+            window.location.reload();
+        }
+
+        (async () => {
+            await checkSession();
+            await updateTribeCounters();
+            await loadMissions();
+        })();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TRIBAO | L'Arène</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --bg-sidebar: #121212;
+            --card-gray: #1a1a1a;
+            --neon-green: #39FF14;
+            --neon-blue: #00d4ff;
+            --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
+            --blue-gradient: linear-gradient(135deg, #00d4ff 0%, #0055ff 100%);
+            --text-main: #f0f0f0;
+            --text-gray: #888;
+            --border: 1px solid #222;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-black); color: var(--text-main); }
+
+        .main-layout { display: flex; height: 100vh; width: 100vw; }
+
+        /* --- SIDEBAR --- */
+        aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron'; letter-spacing: 2px; }
+        .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
+
+        .sidebar-footer-logo { padding: 20px; text-align: center; margin-top: 20px; }
+        .sidebar-logo-img { width: 100%; height: auto; max-width: 210px; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.1)); }
+
+        /* --- CONTENT --- */
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .logo-header { font-family: 'Orbitron'; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; text-decoration: none; }
+
+        .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
+        .arena-grid { max-width: 1100px; margin: 0 auto; }
+
+        /* --- BANDEAU STATS --- */
+        .tribe-counters {
+            display: flex; justify-content: center; gap: 40px; padding: 15px;
+            background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
+            font-family: 'Orbitron'; font-size: 0.65rem; letter-spacing: 1px; flex-shrink: 0;
+        }
+        .counter-item span { color: var(--neon-green); font-weight: 700; margin-right: 5px; }
+        .counter-item span#count-vendeurs { color: var(--neon-blue); }
+
+        /* --- MISSIONS CARDS --- */
+        .mission-card { background: var(--card-gray); border: var(--border); border-radius: 12px; display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; transition: 0.3s; }
+        .mission-card:hover { border-color: var(--neon-green); }
+        .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .mission-info { flex: 1; display: flex; flex-direction: column; }
+        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
+        
+        .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; } 
+        .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; }
+        .price-label { font-size: 0.6rem; color: var(--text-gray); display: block; margin-bottom: 2px; }
+
+        .bar-bg { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s; }
+        .gauge-data { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-gray); }
+
+        .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; display: block; }
+        .btn-join.already-in { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); cursor: default; }
+
+        @media (max-width: 900px) {
+            .main-layout { flex-direction: column; }
+            aside { width: 100%; height: auto; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: var(--border); }
+            .nav-label, .sidebar-footer-logo { display: none; }
+            .nav-item { padding: 15px 20px; border-left: none; }
+            .mission-card { flex-direction: column; align-items: center; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <aside>
+            <div class="nav-label">PORTAIL TRIBU</div>
+            <div id="user-identity" style="padding: 10px 25px; margin-bottom: 10px; display: none;">
+                <div style="font-family: 'Orbitron'; font-size: 0.6rem; color: var(--neon-green); letter-spacing: 1px;">GUERRIER CONNECTÉ</div>
+                <div id="user-email" style="font-size: 0.7rem; color: #fff; margin-top: 5px; opacity: 0.8; overflow: hidden; text-overflow: ellipsis;">---</div>
+            </div>
+            <a href="arene.html" class="nav-item active">L'ARÈNE</a>
+            <a href="dashboard-guerrier.html" id="qg-link" class="nav-item" style="display: none;">MON QG</a>
+            
+            <div class="sidebar-footer-logo">
+                <img src="https://xcubiufhiclvgnwzagnl.supabase.co/storage/v1/object/public/missions-images/logo.svg" alt="TRIBAO Emblem" class="sidebar-logo-img">
+            </div>
+
+            <a href="#" id="logout-link" onclick="handleLogout(event)" class="nav-item" style="display:none; color: #ff4444; margin-top: auto; border-top: 1px solid #222;">DÉCONNEXION</a>
+        </aside>
+
+        <div class="content-wrapper">
+            <header>
+                <a href="index.html" class="logo-header">TRIBAO</a>
+                <a href="soumission-mission.html" class="btn-join" style="margin-top:0; font-size: 0.6rem; padding: 8px 12px;">+ LANCER UNE MISSION</a>
+            </header>
+
+            <div class="tribe-counters">
+                <div class="counter-item"><span id="count-guerriers">--</span> GUERRIERS MOBILISÉS</div>
+                <div class="counter-item"><span id="count-vendeurs">--</span> PARTENAIRES LOGISTIQUES</div>
+            </div>
+
+            <div class="scroll-area">
+                <div class="arena-grid">
+                    <div id="war-journal" style="display:none; margin-bottom: 30px; padding: 20px; border: 1px double var(--neon-blue); border-radius: 8px; background: rgba(0, 212, 255, 0.03);">
+                        <div style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: 0.7rem; letter-spacing: 2px;">📡 JOURNAL DE GUERRE</div>
+                        <div id="journal-content" style="font-size: 0.9rem; color: #fff; margin-top: 10px;"></div>
+                    </div>
+
+                    <h2 style="font-size: 0.8rem; color: var(--text-gray); margin-bottom: 25px; font-family: 'Orbitron'; letter-spacing: 2px;">// MISSIONS ACTIVES</h2>
+                    <div id="missions-list">
+                         <p style="color: var(--neon-green); font-family: 'Orbitron'; font-size: 0.8rem;">// DÉCRYPTAGE DU FLUX...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://xcubiufhiclvgnwzagnl.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        let userRalliements = [];
+
+        async function updateTribeCounters() {
+            const { count: gCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'guerrier');
+            const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'vendeur');
+            if (gCount !== null) document.getElementById('count-guerriers').innerText = gCount;
+            if (vCount !== null) document.getElementById('count-vendeurs').innerText = vCount;
+        }
+
+        async function checkSession() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                document.getElementById('user-identity').style.display = 'block';
+                document.getElementById('user-email').innerText = session.user.email;
+                document.getElementById('logout-link').style.display = 'flex';
+                document.getElementById('qg-link').style.display = 'flex'; 
+                const { data: ralls } = await _supabase.from('ralliements').select('mission_id').eq('user_id', session.user.id);
+                if(ralls) userRalliements = ralls.map(r => r.mission_id);
+            }
+        }
+
+        async function loadMissions() {
+            // ON RÉCUPÈRE LES MISSIONS ET LES OFFRES ASSOCIÉES
+            const { data: missions, error } = await _supabase
+                .from('missions')
+                .select('*, offres(prix_propose)')
+                .order('created_at', { ascending: false });
+
+            if (error || !missions || missions.length === 0) {
+                document.getElementById('missions-list').innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
+                return;
+            }
+
+            document.getElementById('missions-list').innerHTML = missions.map(m => {
+                const obj = m.objectif_membres || 1;
+                const act = m.membres_actuels || 0;
+                const progress = Math.min(100, Math.round((act / obj) * 100));
+                const isEngaged = userRalliements.includes(m.id);
+
+                // LOGIQUE DU MEILLEUR PRIX
+                let displayPrice = m.prix_cible;
+                let isPartnerOffer = false;
+
+                if (m.offres && m.offres.length > 0) {
+                    const lowestOffer = Math.min(...m.offres.map(o => o.prix_propose));
+                    if (lowestOffer < displayPrice) {
+                        displayPrice = lowestOffer;
+                        isPartnerOffer = true;
+                    }
+                }
+
+                return `
+                    <div class="mission-card">
+                        <div class="mission-img-box">
+                            <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="Produit">
+                        </div>
+                        <div class="mission-info">
+                            <h3>${m.titre}</h3>
+                            <div class="price-row">
+                                <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
+                                <div class="price-target">
+                                    <span class="price-label">${isPartnerOffer ? 'MEILLEURE OFFRE' : 'PRIX CIBLE'}</span>
+                                    ${displayPrice}€
+                                </div>
+                            </div>
+                            <div class="gauge-wrapper">
+                                <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
+                                <div class="gauge-data">
+                                    <span>${act} / ${obj} Guerriers</span>
+                                    <span>${progress}%</span>
+                                </div>
+                            </div>
+                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isEngaged ? 'already-in' : ''}">
+                                ${isEngaged ? 'ENGAGÉ ⚔️' : 'DÉTAILS MISSION'}
+                            </a>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function handleLogout(e) {
+            e.preventDefault();
+            await _supabase.auth.signOut();
+            window.location.reload();
+        }
+
+        (async () => {
+            await checkSession();
+            await updateTribeCounters();
             await loadMissions();
         })();
     </script>
