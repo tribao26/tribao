@@ -197,16 +197,18 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        console.log("--- RADAR V2 ACTIVÉ : 17h38 ---");
+        let currentSession = null;
 
         async function initProDashboard() {
             const { data: { session } } = await _supabase.auth.getSession();
-            if (!session) {
+            currentSession = session;
+
+            if (!currentSession) {
                 window.location.href = 'auth.html';
                 return;
             }
 
-            const user = session.user;
+            const user = currentSession.user;
             document.getElementById('pro-name').innerText = `ID: ${user.id.substring(0,8)} // ${user.email}`;
 
             loadMissions();
@@ -217,8 +219,7 @@
             const { data: missions, error } = await _supabase.from('missions').select('*, offres(prix_propose, fournisseur_id)');
             if (error) return;
 
-            const { data: { session } } = await _supabase.auth.getSession();
-            const myId = session ? session.user.id : null;
+            const myId = currentSession ? currentSession.user.id : null;
             const tbody = document.getElementById('mission-body');
             document.getElementById('stat-missions').innerText = missions.length;
 
@@ -230,10 +231,11 @@
                 let maMeilleureOffre = null;
 
                 offres.forEach(o => {
-                    if (o.prix_propose < meilleurPrix) meilleurPrix = o.prix_propose;
+                    const prixOffre = Number(o.prix_propose);
+                    if (prixOffre < meilleurPrix) meilleurPrix = prixOffre;
                     if (myId && o.fournisseur_id === myId) {
-                        if (!maMeilleureOffre || o.prix_propose < maMeilleureOffre) {
-                            maMeilleureOffre = o.prix_propose;
+                        if (!maMeilleureOffre || prixOffre < maMeilleureOffre) {
+                            maMeilleureOffre = prixOffre;
                         }
                     }
                 });
@@ -259,8 +261,8 @@
                         </td>
                         <td>${m.membres_actuels} / ${m.objectif_membres}</td>
                         <td>
-                            <div style="font-size:0.6rem; color:var(--text-gray)">À BATTRE</div>
-                            <div style="font-family:'JetBrains Mono'; font-weight:700; color:var(--neon-blue)">${meilleurPrix} €</div>
+                             <div style="font-size:0.6rem; color:var(--text-gray)">À BATTRE</div>
+                             <div style="font-family:'JetBrains Mono'; font-weight:700; color:var(--neon-blue)">${meilleurPrix} €</div>
                         </td>
                         <td><span class="status-badge" style="border:1px solid ${statusColor}; color:${statusColor}; background:transparent">${statusText}</span></td>
                         <td>
@@ -283,28 +285,31 @@
         }
 
         async function submitBid(missionId, title) {
-            const { data: { session } } = await _supabase.auth.getSession();
-            if (!session) return alert("Session expirée.");
+            if (!currentSession) {
+                const { data: { session } } = await _supabase.auth.getSession();
+                currentSession = session;
+            }
+            
+            if (!currentSession) return alert("Session expirée. Reconnectez-vous.");
             
             const prix = prompt(`Votre meilleure offre pour : ${title} (€)`);
             if (!prix || isNaN(prix)) return;
 
             const message = prompt(`Message pour la tribu (facultatif) :`);
 
-            // --- TRIPLE VÉRIFICATION DES COLONNES SUPABASE ---
             const { error } = await _supabase.from('offres').insert([{
-                mission_id: parseInt(missionId), // Force int8
-                fournisseur_id: session.user.id, // UUID
-                prix_propose: parseFloat(prix),  // numeric
+                mission_id: parseInt(missionId),
+                fournisseur_id: currentSession.user.id,
+                prix_propose: parseFloat(prix),
                 message: message || "Offre partenaire TRIBAO PRO",
                 statut: 'en_attente'
             }]);
 
             if (!error) {
-                alert("MISSION ACCOMPLIE : Offre de " + prix + "€ enregistrée !");
+                alert("🎯 IMPACT CONFIRMÉ ! Prix à " + prix + "€ enregistré.");
                 location.reload();
             } else {
-                alert("ERREUR SUPABASE : " + error.message);
+                alert("ERREUR : " + error.message);
                 console.error(error);
             }
         }
