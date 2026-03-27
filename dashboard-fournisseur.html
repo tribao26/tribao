@@ -197,6 +197,8 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjdWJpdWZoaWNsdmdud3phZ25sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTgwNjgsImV4cCI6MjA4OTE5NDA2OH0.FfP2_9BbiK7uqtFw_3QcUdUQMUSAoYRfpE5l1K5IB1c';
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        console.log("--- RADAR V2 ACTIVÉ : 17h38 ---");
+
         async function initProDashboard() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (!session) {
@@ -212,22 +214,59 @@
         }
 
         async function loadMissions() {
-            const { data: missions, error } = await _supabase.from('missions').select('*');
+            const { data: missions, error } = await _supabase.from('missions').select('*, offres(prix_propose, fournisseur_id)');
             if (error) return;
 
+            const { data: { session } } = await _supabase.auth.getSession();
+            const myId = session ? session.user.id : null;
             const tbody = document.getElementById('mission-body');
             document.getElementById('stat-missions').innerText = missions.length;
 
             tbody.innerHTML = missions.map(m => {
-                const isReady = m.membres_actuels >= (m.objectif_membres / 2);
+                const offres = m.offres || [];
+                const nbVendeurs = new Set(offres.map(o => o.fournisseur_id)).size;
+                
+                let meilleurPrix = m.prix_cible;
+                let maMeilleureOffre = null;
+
+                offres.forEach(o => {
+                    if (o.prix_propose < meilleurPrix) meilleurPrix = o.prix_propose;
+                    if (myId && o.fournisseur_id === myId) {
+                        if (!maMeilleureOffre || o.prix_propose < maMeilleureOffre) {
+                            maMeilleureOffre = o.prix_propose;
+                        }
+                    }
+                });
+
+                let statusColor = "var(--neon-blue)";
+                let statusText = m.membres_actuels >= (m.objectif_membres / 2) ? "OUVERT" : "EN RALLIEMENT";
+                
+                if (maMeilleureOffre) {
+                    if (maMeilleureOffre <= meilleurPrix) {
+                        statusColor = "var(--neon-blue)";
+                        statusText = "EN TÊTE 🏆";
+                    } else {
+                        statusColor = "#ff4444";
+                        statusText = `BATTU (-${(maMeilleureOffre - meilleurPrix).toFixed(2)}€)`;
+                    }
+                }
+
                 return `
                     <tr>
-                        <td>${m.titre}</td>
-                        <td>${m.membres_actuels} / ${m.objectif_membres}</td>
-                        <td>${m.prix_cible} €</td>
-                        <td><span class="status-badge">${isReady ? 'OUVERT' : 'EN RALLIEMENT'}</span></td>
                         <td>
-                            <button onclick="submitBid('${m.id}', '${m.titre.replace(/'/g, "\\'")}')" class="btn-bid">SOUMETTRE PRIX</button>
+                            <div style="font-weight:700">${m.titre}</div>
+                            <div style="font-size:0.6rem; color:var(--text-gray); margin-top:4px">${nbVendeurs} partenaire(s) en lice</div>
+                        </td>
+                        <td>${m.membres_actuels} / ${m.objectif_membres}</td>
+                        <td>
+                            <div style="font-size:0.6rem; color:var(--text-gray)">À BATTRE</div>
+                            <div style="font-family:'JetBrains Mono'; font-weight:700; color:var(--neon-blue)">${meilleurPrix} €</div>
+                        </td>
+                        <td><span class="status-badge" style="border:1px solid ${statusColor}; color:${statusColor}; background:transparent">${statusText}</span></td>
+                        <td>
+                            <button onclick="submitBid('${m.id}', '${m.titre.replace(/'/g, "\\'")}')" class="btn-bid">
+                                ${maMeilleureOffre ? 'RÉCHÉRIR' : 'SOUMETTRE'}
+                            </button>
                         </td>
                     </tr>
                 `;
