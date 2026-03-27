@@ -67,6 +67,7 @@
         .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
         
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .price-public { font-size: 0.9rem; }
         .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; }
         .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; text-align: right; }
         .price-label { font-size: 0.55rem; color: var(--text-gray); display: block; margin-bottom: 2px; letter-spacing: 1px; }
@@ -151,8 +152,11 @@
         let userRalliements = [];
 
         async function updateTribeCounters() {
+            // Compte les Guerriers
             const { count: gCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'guerrier');
-            const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'vendeur');
+            // Compte les Fournisseurs (Correction role: fournisseur)
+            const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'fournisseur');
+            
             if (gCount !== null) document.getElementById('count-guerriers').innerText = gCount;
             if (vCount !== null) document.getElementById('count-vendeurs').innerText = vCount;
         }
@@ -164,14 +168,12 @@
                 document.getElementById('user-email').innerText = session.user.email;
                 document.getElementById('logout-link').style.display = 'flex';
                 document.getElementById('qg-link').style.display = 'flex'; 
-                // Cache le bloc HERO si l'utilisateur est connecté
                 document.getElementById('hero-section').style.display = 'none';
                 
                 const { data: ralls } = await _supabase.from('ralliements').select('mission_id').eq('user_id', session.user.id);
                 if(ralls) userRalliements = ralls.map(r => r.mission_id);
             }
             
-            // CAPTURE DU PARRAINAGE DANS L'URL
             const urlParams = new URLSearchParams(window.location.search);
             const refId = urlParams.get('ref');
             if (refId) localStorage.setItem('tribao_referrer_id', refId);
@@ -186,9 +188,10 @@
         }
 
         async function loadMissions() {
+            // Requête incluant les profils des fournisseurs pour le nom du leader
             const { data: missions, error } = await _supabase
                 .from('missions')
-                .select('*, offres(prix_propose)')
+                .select('*, offres(prix_propose, fournisseur_id, profiles(full_name))')
                 .order('created_at', { ascending: false });
 
             if (error || !missions) {
@@ -203,13 +206,15 @@
                 const isEngaged = userRalliements.includes(m.id);
 
                 let displayPrice = m.prix_cible;
-                let isPartnerOffer = false;
+                let leaderName = "";
 
                 if (m.offres && m.offres.length > 0) {
-                    const lowestOffer = Math.min(...m.offres.map(o => o.prix_propose));
-                    if (lowestOffer < displayPrice) {
-                        displayPrice = lowestOffer;
-                        isPartnerOffer = true;
+                    const sortedOffres = [...m.offres].sort((a, b) => a.prix_propose - b.prix_propose);
+                    const bestOffer = sortedOffres[0];
+
+                    if (bestOffer.prix_propose < displayPrice) {
+                        displayPrice = bestOffer.prix_propose;
+                        leaderName = bestOffer.profiles ? bestOffer.profiles.full_name : "PARTENAIRE PRO";
                     }
                 }
 
@@ -223,7 +228,9 @@
                             <div class="price-row">
                                 <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
                                 <div class="price-target">
-                                    <span class="price-label">${isPartnerOffer ? 'OFFRE PARTENAIRE' : 'PRIX CIBLE'}</span>
+                                    <span class="price-label">
+                                        ${leaderName ? `EN TÊTE PAR : ${leaderName.toUpperCase()}` : 'PRIX CIBLE'}
+                                    </span>
                                     ${displayPrice}€
                                 </div>
                             </div>

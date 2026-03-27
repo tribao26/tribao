@@ -94,7 +94,7 @@
             text-shadow: 0 0 10px rgba(57, 255, 20, 0.18);
         }
 
-        /* --- NOUVEAU : STYLE COMPTEURS VITRINE --- */
+        /* --- STYLE COMPTEURS VITRINE --- */
         .live-stats {
             display: flex;
             gap: 30px;
@@ -312,11 +312,14 @@
             try {
                 // Compte les guerriers
                 const { count: gCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'guerrier');
-                // Compte les vendeurs
-                const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'vendeur');
+                
+                // Compte les fournisseurs (Vérification Triple : role = fournisseur)
+                const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'fournisseur');
                 
                 if (gCount !== null) document.getElementById('count-guerriers').innerText = gCount;
                 if (vCount !== null) document.getElementById('count-vendeurs').innerText = vCount;
+                else document.getElementById('count-vendeurs').innerText = "0";
+                
             } catch (e) {
                 console.error("Erreur compteurs:", e);
             }
