@@ -152,11 +152,8 @@
         let userRalliements = [];
 
         async function updateTribeCounters() {
-            // Compte les Guerriers
             const { count: gCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'guerrier');
-            // Compte les Fournisseurs (Correction role: fournisseur)
             const { count: vCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'fournisseur');
-            
             if (gCount !== null) document.getElementById('count-guerriers').innerText = gCount;
             if (vCount !== null) document.getElementById('count-vendeurs').innerText = vCount;
         }
@@ -188,65 +185,81 @@
         }
 
         async function loadMissions() {
-            // Requête incluant les profils des fournisseurs pour le nom du leader
-            const { data: missions, error } = await _supabase
-                .from('missions')
-                .select('*, offres(prix_propose, fournisseur_id, profiles(full_name))')
-                .order('created_at', { ascending: false });
+            try {
+                // Version blindée de la requête avec jointure profiles
+                const { data: missions, error } = await _supabase
+                    .from('missions')
+                    .select(`
+                        *,
+                        offres (
+                            prix_propose,
+                            fournisseur_id,
+                            profiles ( full_name )
+                        )
+                    `)
+                    .order('created_at', { ascending: false });
 
-            if (error || !missions) {
-                document.getElementById('missions-list').innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
-                return;
-            }
+                if (error) throw error;
 
-            document.getElementById('missions-list').innerHTML = missions.map(m => {
-                const obj = m.objectif_membres || 1;
-                const act = m.membres_actuels || 0;
-                const progress = Math.min(100, Math.round((act / obj) * 100));
-                const isEngaged = userRalliements.includes(m.id);
-
-                let displayPrice = m.prix_cible;
-                let leaderName = "";
-
-                if (m.offres && m.offres.length > 0) {
-                    const sortedOffres = [...m.offres].sort((a, b) => a.prix_propose - b.prix_propose);
-                    const bestOffer = sortedOffres[0];
-
-                    if (bestOffer.prix_propose < displayPrice) {
-                        displayPrice = bestOffer.prix_propose;
-                        leaderName = bestOffer.profiles ? bestOffer.profiles.full_name : "PARTENAIRE PRO";
-                    }
+                if (!missions || missions.length === 0) {
+                    document.getElementById('missions-list').innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
+                    return;
                 }
 
-                return `
-                    <div class="mission-card">
-                        <div class="mission-img-box">
-                            <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="Produit">
-                        </div>
-                        <div class="mission-info">
-                            <h3>${m.titre}</h3>
-                            <div class="price-row">
-                                <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
-                                <div class="price-target">
-                                    <span class="price-label">
-                                        ${leaderName ? `EN TÊTE PAR : ${leaderName.toUpperCase()}` : 'PRIX CIBLE'}
-                                    </span>
-                                    ${displayPrice}€
-                                </div>
+                document.getElementById('missions-list').innerHTML = missions.map(m => {
+                    const obj = m.objectif_membres || 1;
+                    const act = m.membres_actuels || 0;
+                    const progress = Math.min(100, Math.round((act / obj) * 100));
+                    const isEngaged = userRalliements.includes(m.id);
+
+                    let displayPrice = m.prix_cible;
+                    let leaderName = "";
+
+                    if (m.offres && m.offres.length > 0) {
+                        const sortedOffres = [...m.offres].sort((a, b) => a.prix_propose - b.prix_propose);
+                        const bestOffer = sortedOffres[0];
+
+                        if (bestOffer.prix_propose < displayPrice) {
+                            displayPrice = bestOffer.prix_propose;
+                            leaderName = (bestOffer.profiles && bestOffer.profiles.full_name) 
+                                         ? bestOffer.profiles.full_name 
+                                         : "PARTENAIRE PRO";
+                        }
+                    }
+
+                    return `
+                        <div class="mission-card">
+                            <div class="mission-img-box">
+                                <img src="${m.image_url || 'https://via.placeholder.com/160/111/39FF14?text=TRIBAO'}" alt="Produit">
                             </div>
-                            <div class="gauge-wrapper">
-                                <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
-                                <div class="gauge-data">
-                                    <span>${act} / ${obj} Guerriers</span>
-                                    <span style="${progress >= 100 ? 'color:var(--neon-blue)' : ''}">${progress}%</span>
+                            <div class="mission-info">
+                                <h3>${m.titre}</h3>
+                                <div class="price-row">
+                                    <div class="price-public">Public: <span>${m.prix_public || '--'}€</span></div>
+                                    <div class="price-target">
+                                        <span class="price-label">
+                                            ${leaderName ? `EN TÊTE PAR : ${leaderName.toUpperCase()}` : 'PRIX CIBLE'}
+                                        </span>
+                                        ${displayPrice}€
+                                    </div>
                                 </div>
+                                <div class="gauge-wrapper">
+                                    <div class="bar-bg"><div class="bar-fill" style="width: ${progress}%;"></div></div>
+                                    <div class="gauge-data">
+                                        <span>${act} / ${obj} Guerriers</span>
+                                        <span style="${progress >= 100 ? 'color:var(--neon-blue)' : ''}">${progress}%</span>
+                                    </div>
+                                </div>
+                                <a href="mission-detail.html?id=${m.id}" class="btn-join ${isEngaged ? 'already-in' : ''}">
+                                    ${isEngaged ? 'ENGAGÉ ⚔️' : 'DÉTAILS MISSION'}
+                                </a>
                             </div>
-                            <a href="mission-detail.html?id=${m.id}" class="btn-join ${isEngaged ? 'already-in' : ''}">
-                                ${isEngaged ? 'ENGAGÉ ⚔️' : 'DÉTAILS MISSION'}
-                            </a>
-                        </div>
-                    </div>`;
-            }).join('');
+                        </div>`;
+                }).join('');
+            } catch (err) {
+                console.error("ERREUR CHARGEMENT MISSIONS:", err);
+                document.getElementById('missions-list').innerHTML = "<p style='color:#ff4444;'>// ERREUR DE SYNCHRONISATION DU FLUX</p>";
+            }
         }
 
         async function handleLogout(e) {
