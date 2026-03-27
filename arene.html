@@ -186,20 +186,24 @@
 
         async function loadMissions() {
             try {
-                // Version blindée de la requête avec jointure profiles
-                const { data: missions, error } = await _supabase
+                // 1. Récupération simple des missions et offres
+                const { data: missions, error: mError } = await _supabase
                     .from('missions')
-                    .select(`
-                        *,
-                        offres (
-                            prix_propose,
-                            fournisseur_id,
-                            profiles ( full_name )
-                        )
-                    `)
+                    .select('*, offres(prix_propose, fournisseur_id)')
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (mError) throw mError;
+
+                // 2. Récupération séparée des profils pour éviter l'erreur de jointure 400
+                const { data: profiles } = await _supabase
+                    .from('profiles')
+                    .select('id, full_name')
+                    .eq('role', 'fournisseur');
+
+                const profileMap = {};
+                if (profiles) {
+                    profiles.forEach(p => profileMap[p.id] = p.full_name);
+                }
 
                 if (!missions || missions.length === 0) {
                     document.getElementById('missions-list').innerHTML = "<p>// AUCUNE MISSION DÉTECTÉE</p>";
@@ -221,9 +225,7 @@
 
                         if (bestOffer.prix_propose < displayPrice) {
                             displayPrice = bestOffer.prix_propose;
-                            leaderName = (bestOffer.profiles && bestOffer.profiles.full_name) 
-                                         ? bestOffer.profiles.full_name 
-                                         : "PARTENAIRE PRO";
+                            leaderName = profileMap[bestOffer.fournisseur_id] || "PARTENAIRE PRO";
                         }
                     }
 
@@ -258,7 +260,7 @@
                 }).join('');
             } catch (err) {
                 console.error("ERREUR CHARGEMENT MISSIONS:", err);
-                document.getElementById('missions-list').innerHTML = "<p style='color:#ff4444;'>// ERREUR DE SYNCHRONISATION DU FLUX</p>";
+                document.getElementById('missions-list').innerHTML = "<p style='color:orange;'>// RECHERCHE DU FLUX EN COURS...</p>";
             }
         }
 
