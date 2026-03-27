@@ -292,21 +292,30 @@
             
             if (!currentSession) return alert("Session expirée. Reconnectez-vous.");
             
-            const prix = prompt(`Votre meilleure offre pour : ${title} (€)`);
-            if (!prix || isNaN(prix)) return;
+            let prixSaisi = prompt(`Votre meilleure offre pour : ${title} (€)`);
+            if (!prixSaisi) return;
+
+            // --- MANŒUVRE DE NETTOYAGE (ANTI-ERREUR) ---
+            // Supprime "€", remplace la virgule par un point, vire les espaces
+            let prixNettoye = prixSaisi.replace('€', '').replace(',', '.').trim();
+            let prixFinal = parseFloat(prixNettoye);
+
+            if (isNaN(prixFinal)) {
+                return alert("ERREUR : Veuillez entrer un prix valide (ex: 320 ou 310.50)");
+            }
 
             const message = prompt(`Message pour la tribu (facultatif) :`);
 
             const { error } = await _supabase.from('offres').insert([{
                 mission_id: parseInt(missionId),
                 fournisseur_id: currentSession.user.id,
-                prix_propose: parseFloat(prix),
+                prix_propose: prixFinal,
                 message: message || "Offre partenaire TRIBAO PRO",
                 statut: 'en_attente'
             }]);
 
             if (!error) {
-                alert("🎯 IMPACT CONFIRMÉ ! Prix à " + prix + "€ enregistré.");
+                alert("🎯 IMPACT CONFIRMÉ ! Prix à " + prixFinal + "€ enregistré.");
                 location.reload();
             } else {
                 alert("ERREUR : " + error.message);
