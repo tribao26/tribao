@@ -9,7 +9,7 @@
         :root {
             --bg-black: #0a0a0a;
             --bg-sidebar: #121212;
-            --card-gray: #1a1a1a;
+            --card-black: #000000; /* MODIFIÉ : Cartes noir pur */
             --neon-green: #39FF14;
             --neon-blue: #00d4ff;
             --neon-gradient: linear-gradient(135deg, #39FF14 0%, #2ecc71 100%);
@@ -20,12 +20,19 @@
         }
 
         * { box-sizing: border-box; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; background-color: var(--bg-black); color: var(--text-main); }
+        
+        /* MODIFIÉ : Fond global béton pour assurer la visibilité */
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            font-family: 'Inter', sans-serif; 
+            background: url('gris clair effet beton.webp') center center / cover no-repeat fixed;
+            color: var(--text-main); 
+        }
 
-        .main-layout { display: flex; height: 100vh; width: 100vw; }
+        .main-layout { display: flex; height: 100vh; width: 100vw; background: transparent; }
 
         /* --- SIDEBAR --- */
-        aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+        aside { width: 260px; background-color: var(--bg-sidebar); border-right: var(--border); display: flex; flex-direction: column; flex-shrink: 0; z-index: 10; }
         .nav-label { padding: 30px 25px 10px; font-size: 0.65rem; color: #444; font-family: 'Orbitron'; letter-spacing: 2px; }
         .nav-item { padding: 15px 25px; color: var(--text-gray); text-decoration: none; font-family: 'Orbitron'; font-size: 0.75rem; display: flex; align-items: center; transition: 0.3s; border-left: 3px solid transparent; }
         .nav-item:hover, .nav-item.active { color: var(--neon-green); background: rgba(57, 255, 20, 0.05); border-left: 3px solid var(--neon-green); }
@@ -34,24 +41,33 @@
         .sidebar-logo-img { width: 100%; height: auto; max-width: 210px; filter: drop-shadow(0 0 10px rgba(57, 255, 20, 0.1)); }
 
         /* --- CONTENT --- */
-        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
-        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; background: rgba(10, 10, 10, 0.9); border-bottom: var(--border); flex-shrink: 0; }
+        .content-wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: transparent; }
+        
+        header { 
+            height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; 
+            background: rgba(10, 10, 10, 0.95); border-bottom: var(--border); flex-shrink: 0; z-index: 10; 
+        }
         .logo-header { font-family: 'Orbitron'; color: var(--neon-green); font-weight: 700; font-size: 1.3rem; letter-spacing: 3px; text-decoration: none; }
 
-        .scroll-area { flex: 1; overflow-y: auto; padding: 40px; }
+        /* MODIFIÉ : Zone d'action transparente pour laisser voir le fond béton */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 40px; background: transparent; }
         .arena-grid { max-width: 1100px; margin: 0 auto; }
 
         /* --- BANDEAU STATS --- */
         .tribe-counters {
             display: flex; justify-content: center; gap: 60px; padding: 25px 15px;
-            background: rgba(57, 255, 20, 0.03); border-bottom: 1px solid #1a1a1a;
+            background: rgba(10, 10, 10, 0.9); border-bottom: 1px solid #1a1a1a;
             font-family: 'Orbitron'; flex-shrink: 0;
         }
         .counter-item { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-gray); letter-spacing: 1px; }
         .counter-item span { font-size: 2rem; font-weight: 800; color: var(--neon-green); line-height: 1; text-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
 
         /* --- HERO & BOUTONS AUTH --- */
-        .hero-callout { background: linear-gradient(to right, rgba(57, 255, 20, 0.05), transparent); border-left: 4px solid var(--neon-green); padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0; }
+        .hero-callout { 
+            background: rgba(0, 0, 0, 0.85); /* MODIFIÉ : Fond noir pour trancher sur le gris */
+            border-left: 4px solid var(--neon-green); padding: 40px; margin-bottom: 50px; border-radius: 0 12px 12px 0; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
         .hero-callout h2 { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; margin: 0 0 15px; letter-spacing: 2px; }
         .auth-actions { display: flex; gap: 15px; margin-top: 25px; }
         .btn-hero { padding: 12px 25px; font-family: 'Orbitron'; font-weight: 700; font-size: 0.75rem; text-decoration: none; border-radius: 4px; transition: 0.3s; text-align: center; letter-spacing: 1px; }
@@ -59,15 +75,23 @@
         .btn-hero-outline { border: 1px solid var(--neon-green); color: var(--neon-green); background: transparent; }
 
         /* --- MISSIONS CARDS --- */
-        .mission-card { background: var(--card-gray); border: var(--border); border-radius: 12px; display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; transition: 0.3s; }
-        .mission-card:hover { border-color: var(--neon-green); }
-        .mission-img-box { width: 160px; height: 160px; background: #000; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        /* MODIFIÉ : Cartes noir pur pour un contraste brutal sur le gris béton */
+        .mission-card { 
+            background: var(--card-black); 
+            border: 1px solid #333; 
+            border-radius: 12px; 
+            display: flex; padding: 25px; margin-bottom: 25px; gap: 30px; 
+            transition: 0.3s; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        .mission-card:hover { border-color: var(--neon-green); transform: translateY(-2px); }
+        .mission-img-box { width: 160px; height: 160px; background: #0a0a0a; border-radius: 8px; flex-shrink: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         .mission-img-box img { width: 100%; height: 100%; object-fit: cover; }
         .mission-info { flex: 1; display: flex; flex-direction: column; }
-        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; }
+        .mission-info h3 { margin: 0 0 15px; font-family: 'Orbitron'; color: #fff; letter-spacing: 1px; }
         
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .price-public { font-size: 0.9rem; }
+        .price-public { font-size: 0.9rem; color: var(--text-gray); }
         .price-public span { text-decoration: line-through; text-decoration-color: #ff4444; color: #555; }
         .price-target { font-family: 'Orbitron'; font-weight: 700; color: var(--neon-green); font-size: 1.1rem; text-align: right; }
         .price-label { font-size: 0.55rem; color: var(--text-gray); display: block; margin-bottom: 2px; letter-spacing: 1px; }
@@ -78,6 +102,15 @@
 
         .btn-join { margin-top: 20px; background: var(--neon-gradient); color: #000; padding: 12px 25px; border-radius: 4px; font-family: 'Orbitron'; font-weight: 700; text-decoration: none; font-size: 0.75rem; text-align: center; transition: 0.3s; border: 1px solid transparent; display: block; }
         .btn-join.already-in { background: transparent; border: 1px solid var(--neon-green); color: var(--neon-green); cursor: default; }
+
+        /* MODIFIÉ : Titre de section noir pour ressortir sur le béton */
+        h2[style*="letter-spacing: 2px;"] {
+            color: #000 !important;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            display: inline-block;
+            border-radius: 4px;
+        }
 
         @media (max-width: 900px) {
             .main-layout { flex-direction: column; }
@@ -186,7 +219,6 @@
 
         async function loadMissions() {
             try {
-                // 1. Récupération simple des missions et offres
                 const { data: missions, error: mError } = await _supabase
                     .from('missions')
                     .select('*, offres(prix_propose, fournisseur_id)')
@@ -194,7 +226,6 @@
 
                 if (mError) throw mError;
 
-                // 2. Récupération séparée des profils pour éviter l'erreur de jointure 400
                 const { data: profiles } = await _supabase
                     .from('profiles')
                     .select('id, full_name')
